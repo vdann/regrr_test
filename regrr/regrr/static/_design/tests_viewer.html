@@ -1,0 +1,315 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Test</title>
+	<meta charset="utf-8" />
+	<script src="extern/vue.js-v2.5.22/vue.js"></script>
+	<style>
+		.pad {
+			padding: 2px 30px 2px 30px;
+		}
+
+		.h {
+			text-align: center;
+			font-size: 1.2em;
+		}
+
+		.w_100 {
+			width: 100%;
+		}
+
+		.w_50 {
+			width: 50%;
+		}
+
+		.a_center {
+			text-align: center;
+		}
+
+		.a_right {
+			text-align: right;
+		}
+
+		.a_left {
+			text-align: left;
+		}
+
+		.va_top {
+			vertical-align: top;
+		}
+
+		.va_bottom {
+			vertical-align: bottom;
+		}
+
+		.va_middle {
+			vertical-align: middle;
+		}
+
+		.table_grid {
+			border-collapse: collapse;
+			border: 1px solid black;
+		}
+
+		.fw_normal {
+			font-weight: normal;
+		}
+
+		.fw_bold {
+			font-weight: bold;
+		}
+
+		.fs_italic {
+			font-style: italic
+		}
+
+		#table_tests > tbody > tr > td > div,
+		#table_tests > thead > tr > th > div {
+			height: 1.2em;
+			min-height: 1.2em;
+		}
+
+	</style>
+</head>
+<body>
+
+	<div id="app">
+
+		<button v-on:click="prev">&larr;</button>
+		<span>{{ cur+1 }} из {{ count }}</span>
+		<button v-on:click="next">&rarr;</button>
+
+		<hr>
+
+		<div class="h">Отделение лабораторной диагностики</div>
+	
+		<hr>
+
+		<table class="w_100">
+			<tr>
+				<td class="w_50 va_top">
+					Пациент: <b v-html="patient"></b> Пол:&nbsp;<b>{{ gender }}</b> <br />
+					Возраст: <b>{{ age }} л.</b> <br />
+					Дата поступления образца: <b>{{ date_receipt_example }}</b>
+				</td>
+
+				<td class="w_50 va_top">
+					№ заявки: <b> {{ number_request }} </b> <br />
+					Заказчик: <b> {{ customer }} </b> <br />
+					Отделение: <b> {{ department }} </b>
+				</td>
+			</tr>
+		</table>
+
+		<hr>
+
+		<div class="h"><b> {{ name_analysis }} </b></div>
+
+		<table id="table_tests" border="1" class="table_grid w_100">
+			<thead>
+				<tr>
+					<th class="fw_normal fs_italic" style="width: 48%"><div>Тест</div></th>
+					<th class="fw_normal fs_italic" style="width: 12%"><div>Результат</div></th>
+					<th class="fw_normal fs_italic" style="width: 20%"><div>Ед. изм.</div></th>
+					<th class="fw_normal fs_italic" style="width: 20%"><div>Референсные&nbsp;значения</div></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="test in tests">
+					<td v-html="test.name"><div></div></td>
+					<td class="pad a_center"><div v-html="test.result"></div></td>
+					<td class="pad a_center"><div v-html="test.unit"></div></td>
+					<td class="pad a_center"><div v-html="test.refs"></div></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="a_right">
+			<div>Исследованные биоматериалы: {{ biomaterials }} </div>
+			<div>Анализы выполнены на оборудовании: {{ equipment }} </div>
+		</div>
+
+		<div v-if="imprisonment_reference">
+		<hr>
+			<div><b>Заключение/Примечание:</b> <i>{{ imprisonment_reference }}</i></div>
+		</div>
+
+		<hr>
+
+		<table class="w_100">
+			<tr>
+				<td class="a_left va_bottom">
+					Исследование выполнил: <span v-html="research_performer"></span>
+				</td>
+
+				<td class="a_right va_bottom">
+					Дата доставки биоматериала: <b v-html="date_delivery_biomaterial"></b> <br />
+					Дата выполнения: <b v-html="date_completion"></b> <br />
+					Дата печати: <b v-html="date_print"></b> <br />
+				</td>
+			</tr>
+		</table>
+
+	</div>
+
+	<script>
+
+		function nbsp(s) {
+			return s.replace(/ /g, '&nbsp;');
+		}
+
+		function b(s) {
+			return '<b>' + s + '</b>';
+		}
+
+
+		function t(name, result, unit, refs) {
+			return {
+				name: name,
+				result: result,
+				unit: unit,
+				refs: nbsp(refs)
+			};
+		}
+
+		var analysis_reports = [
+		{
+			patient: nbsp("ТАРМАШЕВ А. Н."),
+			gender: 'М',
+			age: 58,
+			date_receipt_example: '12.11.2018',
+			number_request: '6810260156',
+			customer: 'НМИЦ онкологии',
+			department: '9. Отделение анестезиологии-реанимации',
+			name_analysis: 'Клинический анализ крови',
+			tests: [
+				t('Лейкоциты', '<b>27,60</b>', 'x10<sup>9</sup>/л', '4,00 - 9,00'),
+				t('Эритроциты', '<b>3,38</b>', 'x10<sup>12</sup>/л', '4,00 - 5,00'),
+				t('Гемоглобин', '<b>106</b>', 'г/л', '130 - 160'),
+				t('Гематокрит', '<b>30</b>', '%', '40 - 48'),
+				t('Средний объем эритроцита', '89,30', 'фл', '80,00 - 100,00'),
+				t('Среднее содержание гемоглобина в эритроците', '<b>31,40</b>', 'пг', '27,00 - 31,00'),
+				t('Средняя концентрация гемоглобина в эритроците', '351', 'г/л', '320 - 370'),
+				t('Коэффициент вариации относительной ширины распределения эритроцитов по объему', '13,30', '%', '10,00 - 20,00'),
+				t('Тромбоциты', '<b>505<b>', 'x10<sup>9</sup>/л', '180 - 320'),
+				t('Относительная ширина распределения тромбоцитов по объему', '17,80', '%', '10,00 - 20,00'),
+				t('Средний объем тромбоцитов', '<b>6,20<b>', 'фл', '7,40 - 10,40'),
+				t('Тромбокрит', '0,31', '%', '0,15 - 0,40'),
+			],
+			biomaterials: 'Кровь (ЭДТА)',
+			equipment: 'МЕК 8222',
+			imprisonment_reference: null,
+			research_performer: nbsp('Грачева С. В.'),
+			date_delivery_biomaterial: nbsp('12.11.2018 19:03'),
+			date_completion: nbsp('12.11.2018 19:17'),
+			date_print: nbsp('12.11.2018'),
+		}, 
+
+		{
+			patient: nbsp("ТАРМАШЕВ А. Н."),
+			gender: 'М',
+			age: 58,
+			date_receipt_example: '20.11.2018',
+			number_request: '6810271447',
+			customer: 'НМИЦ онкологии',
+			department: '4. Хирургическое отделение абдоминальной онкологии',
+			name_analysis: 'Биохимические исследования',
+			tests: [
+				t('АЛТ', b('24,00'), 'Ед/л', '0,00 - 55,00'),
+				t('АСТ', '19,00', 'Ед/л', '5,00 - 34,00'),
+				t('Белок общий', b('44,00'), 'г/л', '63,00 - 83,00'),
+				t('Билирубин общий', '6,00', 'мкмоль/л', '40 - 48'),
+				t('Глюкоза', b('6,19'), 'мкмоль/л', '3,89 - 5,83'),
+				t('Креатинин', b('52,20'), 'мкмоль/л', '63,60 - 110,50'),
+				t('Клубочковая фильтрация CKD-EPI Креатинин', '111,56', 'мл/мин.1.73м^2', '> 60,00'),
+				t('Мочевина', '3,30', 'мкмоль/л', '3,00 - 9,20'),
+				t('С-реактивный белок', b('61,90'), 'мг/л', '0,00 - 5,00'),
+			],
+			biomaterials: 'Кровь (активатор свёртывания и гель)',
+			equipment: 'Architect c4000',
+			imprisonment_reference: 'Измерение Креатинина стандартизовано по методу IDMS',
+			research_performer: nbsp('Дзембак Т. М.'),
+			date_delivery_biomaterial: nbsp('20.11.2018 09:16'),
+			date_completion: nbsp('20.11.2018 11:23'),
+			date_print: nbsp('20.11.2018'),
+		},
+
+		{
+			patient: nbsp("ИВАНОВ И. И."),
+			gender: 'М',
+			age: 48,
+			date_receipt_example: '22.11.2018',
+			number_request: '6810261111',
+			customer: 'НМИЦ онкологии',
+			department: '9. Отделение анестезиологии-реанимации',
+			name_analysis: 'Клинический анализ крови',
+			tests: [
+				t('Лейкоциты', '5,60', 'x10<sup>9</sup>/л', '4,00 - 9,00'),
+				t('Эритроциты', '4,38', 'x10<sup>12</sup>/л', '4,00 - 5,00'),
+				t('Гемоглобин', b('100'), 'г/л', '130 - 160'),
+				t('Гематокрит', b('44'), '%', '40 - 48'),
+				t('Средний объем эритроцита', '89,30', 'фл', '80,00 - 100,00'),
+				t('Среднее содержание гемоглобина в эритроците', '31,00', 'пг', '27,00 - 31,00'),
+				t('Средняя концентрация гемоглобина в эритроците', b('300'), 'г/л', '320 - 370'),
+				t('Коэффициент вариации относительной ширины распределения эритроцитов по объему', '13,30', '%', '10,00 - 20,00'),
+				t('Тромбоциты', '305', 'x10<sup>9</sup>/л', '180 - 320'),
+				t('Относительная ширина распределения тромбоцитов по объему', '17,80', '%', '10,00 - 20,00'),
+				t('Средний объем тромбоцитов', b('5,20'), 'фл', '7,40 - 10,40'),
+				t('Тромбокрит', '0,31', '%', '0,15 - 0,40'),
+			],
+			biomaterials: 'Кровь (ЭДТА)',
+			equipment: 'МЕК 8222',
+			imprisonment_reference: null,
+			research_performer: nbsp('Грачева С. В.'),
+			date_delivery_biomaterial: nbsp('22.11.2018 10:03'),
+			date_completion: nbsp('22.11.2018 10:17'),
+			date_print: nbsp('22.11.2018'),
+		},
+		];
+
+		function copyJson(v) {
+			return JSON.parse(JSON.stringify(v));
+		}
+
+		function extendJson(vTarget, vFrom) {
+			for (var key in vFrom) {
+				vTarget[key] = copyJson(vFrom[key]);
+			}
+		}
+
+		var data = copyJson(analysis_reports[0]);
+
+		data.cur = 0;
+		data.count = analysis_reports.length;
+
+		var app = new Vue({
+			el: '#app',
+			data: data,
+			computed: {
+				is_imprisonment_reference: function () {
+					var b = !!this.imprisonment_reference;
+					return b;
+				}
+			},
+			methods: {
+				prev: function () {
+					--this.cur;
+					if (this.cur < 0)
+						this.cur = analysis_reports.length - 1;
+
+					extendJson(this, analysis_reports[this.cur]);
+				},
+				next: function () {
+					++this.cur;
+					if (this.cur >= analysis_reports.length)
+						this.cur = 0;
+
+					extendJson(this, analysis_reports[this.cur]);
+				}
+
+			}
+		});
+
+	</script>
+</body>
+</html>

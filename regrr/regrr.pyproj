@@ -61,6 +61,8 @@
     <Folder Include="regrr\static\_design\editorial\assets\sass\layout\" />
     <Folder Include="regrr\static\_design\editorial\assets\sass\libs\" />
     <Folder Include="regrr\static\_design\editorial\images\" />
+    <Folder Include="regrr\static\_design\extern\" />
+    <Folder Include="regrr\static\_design\extern\vue.js-v2.5.22\" />
     <Folder Include="regrr\static\_design\images\" />
     <Folder Include="regrr\templates\" />
   </ItemGroup>
@@ -174,6 +176,8 @@
     <Content Include="regrr\static\_design\editorial\LICENSE.txt" />
     <Content Include="regrr\static\_design\editorial\README.txt" />
     <Content Include="regrr\static\_design\elements.html" />
+    <Content Include="regrr\static\_design\extern\vue.js-v2.5.22\vue.js" />
+    <Content Include="regrr\static\_design\extern\vue.js-v2.5.22\vue.min.js" />
     <Content Include="regrr\static\_design\generic.html" />
     <Content Include="regrr\static\_design\images\pic01.jpg" />
     <Content Include="regrr\static\_design\images\pic02.jpg" />
@@ -186,10 +190,12 @@
     <Content Include="regrr\static\_design\images\pic09.jpg" />
     <Content Include="regrr\static\_design\images\pic10.jpg" />
     <Content Include="regrr\static\_design\images\pic11.jpg" />
+    <Content Include="regrr\static\_design\link.html" />
     <Content Include="regrr\static\_design\login.html" />
     <Content Include="regrr\static\_design\index.html" />
     <Content Include="regrr\static\_design\LICENSE.txt" />
     <Content Include="regrr\static\_design\README.txt" />
+    <Content Include="regrr\static\_design\tests_viewer.html" />
     <Content Include="requirements.txt" />
     <Content Include="regrr\static\content\bootstrap.css" />
     <Content Include="regrr\static\content\bootstrap.min.css" />
