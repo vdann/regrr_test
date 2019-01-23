@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>0a1e3606-675a-4e86-b86c-22c898d75101</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <ProjectTypeGuids>{789894c7-04a9-4a11-a6b5-3f4435165112};{1b580a1a-fdb3-4b32-83e1-6407eb2722e6};{349c5851-65df-11da-9384-00065b846f21};{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <StartupFile>runserver.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <LaunchProvider>Web launcher</LaunchProvider>
+    <OutputPath>.</OutputPath>
+    <StaticUriPattern>^/static/.*</StaticUriPattern>
+    <StaticUriRewrite>^/$(MSBuildProjectName)/static/.*</StaticUriRewrite>
+    <PythonWsgiHandler>$(MSBuildProjectName).app</PythonWsgiHandler>
+    <Name>regrr</Name>
+    <RootNamespace>regrr</RootNamespace>
+    <InterpreterId>{c13054a0-9ada-4b23-a890-e2b549f5d82a}</InterpreterId>
+    <InterpreterVersion>3.5</InterpreterVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="runserver.py" />
+    <Compile Include="regrr\__init__.py" />
+    <Compile Include="regrr\views.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="regrr\" />
+    <Folder Include="regrr\static\" />
+    <Folder Include="regrr\static\content\" />
+    <Folder Include="regrr\static\fonts\" />
+    <Folder Include="regrr\static\_design\" />
+    <Folder Include="regrr\static\scripts\" />
+    <Folder Include="regrr\static\_design\assets\" />
+    <Folder Include="regrr\static\_design\assets\css\" />
+    <Folder Include="regrr\static\_design\assets\fonts\" />
+    <Folder Include="regrr\static\_design\assets\js\" />
+    <Folder Include="regrr\static\_design\assets\sass\" />
+    <Folder Include="regrr\static\_design\assets\sass\base\" />
+    <Folder Include="regrr\static\_design\assets\sass\components\" />
+    <Folder Include="regrr\static\_design\assets\sass\layout\" />
+    <Folder Include="regrr\static\_design\assets\sass\libs\" />
+    <Folder Include="regrr\static\_design\editorial\" />
+    <Folder Include="regrr\static\_design\editorial\assets\" />
+    <Folder Include="regrr\static\_design\editorial\assets\css\" />
+    <Folder Include="regrr\static\_design\editorial\assets\fonts\" />
+    <Folder Include="regrr\static\_design\editorial\assets\js\" />
+    <Folder Include="regrr\static\_design\editorial\assets\sass\" />
+    <Folder Include="regrr\static\_design\editorial\assets\sass\base\" />
+    <Folder Include="regrr\static\_design\editorial\assets\sass\components\" />
+    <Folder Include="regrr\static\_design\editorial\assets\sass\layout\" />
+    <Folder Include="regrr\static\_design\editorial\assets\sass\libs\" />
+    <Folder Include="regrr\static\_design\editorial\images\" />
+    <Folder Include="regrr\static\_design\images\" />
+    <Folder Include="regrr\templates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="regrr\static\_design\assets\css\font-awesome.min.css" />
+    <Content Include="regrr\static\_design\assets\css\main.css" />
+    <Content Include="regrr\static\_design\assets\fonts\fontawesome-webfont.eot" />
+    <Content Include="regrr\static\_design\assets\fonts\fontawesome-webfont.svg" />
+    <Content Include="regrr\static\_design\assets\fonts\fontawesome-webfont.ttf" />
+    <Content Include="regrr\static\_design\assets\fonts\fontawesome-webfont.woff" />
+    <Content Include="regrr\static\_design\assets\fonts\fontawesome-webfont.woff2" />
+    <Content Include="regrr\static\_design\assets\fonts\FontAwesome.otf" />
+    <Content Include="regrr\static\_design\assets\js\breakpoints.min.js" />
+    <Content Include="regrr\static\_design\assets\js\browser.min.js" />
+    <Content Include="regrr\static\_design\assets\js\jquery.min.js" />
+    <Content Include="regrr\static\_design\assets\js\main.js" />
+    <Content Include="regrr\static\_design\assets\js\util.js" />
+    <Content Include="regrr\static\_design\assets\sass\base\_page.scss" />
+    <Content Include="regrr\static\_design\assets\sass\base\_reset.scss" />
+    <Content Include="regrr\static\_design\assets\sass\base\_typography.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_actions.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_box.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_button.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_contact.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_features.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_form.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_icon.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_icons.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_image.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_list.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_mini-posts.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_pagination.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_posts.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_row.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_section.scss" />
+    <Content Include="regrr\static\_design\assets\sass\components\_table.scss" />
+    <Content Include="regrr\static\_design\assets\sass\layout\_banner.scss" />
+    <Content Include="regrr\static\_design\assets\sass\layout\_footer.scss" />
+    <Content Include="regrr\static\_design\assets\sass\layout\_header.scss" />
+    <Content Include="regrr\static\_design\assets\sass\layout\_main.scss" />
+    <Content Include="regrr\static\_design\assets\sass\layout\_menu.scss" />
+    <Content Include="regrr\static\_design\assets\sass\layout\_sidebar.scss" />
+    <Content Include="regrr\static\_design\assets\sass\layout\_wrapper.scss" />
+    <Content Include="regrr\static\_design\assets\sass\libs\_breakpoints.scss" />
+    <Content Include="regrr\static\_design\assets\sass\libs\_functions.scss" />
+    <Content Include="regrr\static\_design\assets\sass\libs\_html-grid.scss" />
+    <Content Include="regrr\static\_design\assets\sass\libs\_mixins.scss" />
+    <Content Include="regrr\static\_design\assets\sass\libs\_vars.scss" />
+    <Content Include="regrr\static\_design\assets\sass\libs\_vendor.scss" />
+    <Content Include="regrr\static\_design\assets\sass\main.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\css\font-awesome.min.css" />
+    <Content Include="regrr\static\_design\editorial\assets\css\main.css" />
+    <Content Include="regrr\static\_design\editorial\assets\fonts\fontawesome-webfont.eot" />
+    <Content Include="regrr\static\_design\editorial\assets\fonts\fontawesome-webfont.svg" />
+    <Content Include="regrr\static\_design\editorial\assets\fonts\fontawesome-webfont.ttf" />
+    <Content Include="regrr\static\_design\editorial\assets\fonts\fontawesome-webfont.woff" />
+    <Content Include="regrr\static\_design\editorial\assets\fonts\fontawesome-webfont.woff2" />
+    <Content Include="regrr\static\_design\editorial\assets\fonts\FontAwesome.otf" />
+    <Content Include="regrr\static\_design\editorial\assets\js\breakpoints.min.js" />
+    <Content Include="regrr\static\_design\editorial\assets\js\browser.min.js" />
+    <Content Include="regrr\static\_design\editorial\assets\js\jquery.min.js" />
+    <Content Include="regrr\static\_design\editorial\assets\js\main.js" />
+    <Content Include="regrr\static\_design\editorial\assets\js\util.js" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\base\_page.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\base\_reset.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\base\_typography.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_actions.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_box.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_button.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_contact.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_features.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_form.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_icon.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_icons.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_image.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_list.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_mini-posts.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_pagination.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_posts.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_row.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_section.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\components\_table.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\layout\_banner.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\layout\_footer.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\layout\_header.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\layout\_main.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\layout\_menu.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\layout\_sidebar.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\layout\_wrapper.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\libs\_breakpoints.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\libs\_functions.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\libs\_html-grid.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\libs\_mixins.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\libs\_vars.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\libs\_vendor.scss" />
+    <Content Include="regrr\static\_design\editorial\assets\sass\main.scss" />
+    <Content Include="regrr\static\_design\editorial\elements.html" />
+    <Content Include="regrr\static\_design\editorial\generic.html" />
+    <Content Include="regrr\static\_design\editorial\images\pic01.jpg" />
+    <Content Include="regrr\static\_design\editorial\images\pic02.jpg" />
+    <Content Include="regrr\static\_design\editorial\images\pic03.jpg" />
+    <Content Include="regrr\static\_design\editorial\images\pic04.jpg" />
+    <Content Include="regrr\static\_design\editorial\images\pic05.jpg" />
+    <Content Include="regrr\static\_design\editorial\images\pic06.jpg" />
+    <Content Include="regrr\static\_design\editorial\images\pic07.jpg" />
+    <Content Include="regrr\static\_design\editorial\images\pic08.jpg" />
+    <Content Include="regrr\static\_design\editorial\images\pic09.jpg" />
+    <Content Include="regrr\static\_design\editorial\images\pic10.jpg" />
+    <Content Include="regrr\static\_design\editorial\images\pic11.jpg" />
+    <Content Include="regrr\static\_design\editorial\index.html" />
+    <Content Include="regrr\static\_design\editorial\LICENSE.txt" />
+    <Content Include="regrr\static\_design\editorial\README.txt" />
+    <Content Include="regrr\static\_design\elements.html" />
+    <Content Include="regrr\static\_design\generic.html" />
+    <Content Include="regrr\static\_design\images\pic01.jpg" />
+    <Content Include="regrr\static\_design\images\pic02.jpg" />
+    <Content Include="regrr\static\_design\images\pic03.jpg" />
+    <Content Include="regrr\static\_design\images\pic04.jpg" />
+    <Content Include="regrr\static\_design\images\pic05.jpg" />
+    <Content Include="regrr\static\_design\images\pic06.jpg" />
+    <Content Include="regrr\static\_design\images\pic07.jpg" />
+    <Content Include="regrr\static\_design\images\pic08.jpg" />
+    <Content Include="regrr\static\_design\images\pic09.jpg" />
+    <Content Include="regrr\static\_design\images\pic10.jpg" />
+    <Content Include="regrr\static\_design\images\pic11.jpg" />
+    <Content Include="regrr\static\_design\login.html" />
+    <Content Include="regrr\static\_design\index.html" />
+    <Content Include="regrr\static\_design\LICENSE.txt" />
+    <Content Include="regrr\static\_design\README.txt" />
+    <Content Include="requirements.txt" />
+    <Content Include="regrr\static\content\bootstrap.css" />
+    <Content Include="regrr\static\content\bootstrap.min.css" />
+    <Content Include="regrr\static\content\site.css" />
+    <Content Include="regrr\static\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="regrr\static\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="regrr\static\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="regrr\static\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="regrr\static\scripts\bootstrap.js" />
+    <Content Include="regrr\static\scripts\bootstrap.min.js" />
+    <Content Include="regrr\static\scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="regrr\static\scripts\jquery-1.10.2.js" />
+    <Content Include="regrr\static\scripts\jquery-1.10.2.min.js" />
+    <Content Include="regrr\static\scripts\jquery-1.10.2.min.map" />
+    <Content Include="regrr\static\scripts\jquery.validate-vsdoc.js" />
+    <Content Include="regrr\static\scripts\jquery.validate.js" />
+    <Content Include="regrr\static\scripts\jquery.validate.min.js" />
+    <Content Include="regrr\static\scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="regrr\static\scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="regrr\static\scripts\modernizr-2.6.2.js" />
+    <Content Include="regrr\static\scripts\respond.js" />
+    <Content Include="regrr\static\scripts\respond.min.js" />
+    <Content Include="regrr\static\scripts\_references.js" />
+    <Content Include="regrr\templates\about.html" />
+    <Content Include="regrr\templates\contact.html" />
+    <Content Include="regrr\templates\index.html" />
+    <Content Include="regrr\templates\layout.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="env\">
+      <Id>{c13054a0-9ada-4b23-a890-e2b549f5d82a}</Id>
+      <BaseInterpreter>{377e6200-8b84-4366-a408-a278a90d96df}</BaseInterpreter>
+      <Version>3.5</Version>
+      <Description>env (Py3.6)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\python.exe</WindowsInterpreterPath>
+      <LibraryPath>Lib\</LibraryPath>
+      <PathEnvironmentVariable>
+      </PathEnvironmentVariable>
+      <Architecture>X86</Architecture>
+    </Interpreter>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
+  <!-- Specify pre- and post-build commands in the BeforeBuild and 
+       AfterBuild targets below. -->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <AutoAssignPort>True</AutoAssignPort>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
