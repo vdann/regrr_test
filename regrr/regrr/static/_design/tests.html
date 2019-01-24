@@ -6,6 +6,16 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
+
+		<style>
+			#table_tests > tbody > tr > td:nth-child(2),
+			#table_tests > tbody > tr > td:nth-child(3) {
+				text-align: center;
+			}
+		</style>
+
+		<script src="extern/vue.js-v2.5.22/vue.js"></script>
+
 	</head>
 <body class="is-preload">
 
@@ -25,7 +35,7 @@
 				<section id="banner">
 					<div class="content">
 						<header class="major1">
-							<h1>Пациенты</h1>
+							<h1>Тесты</h1>
 						</header>
 
 						<br>
@@ -39,125 +49,26 @@
 						<br>
 
 						<div class="table-wrapper">
-							<table class="alt">
+							<table id="table_tests" class="alt">
 								<thead>
 									<tr>
-										<th>ФИО</th>
-										<th>Отделение</th>
-										<th>Дата рождения</th>
+										<th>Тест</th>
+										<th>Еденицы измерения</th>
+										<th>Референсные значения</th>
 									</tr>
 								</thead>
 								<tbody>
-									<tr>
-										<td>Иванов Иван Иванович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Петров Петр Петрович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Сидоров Владимир Карлович</td>
-										<td>Второе</td>
-										<td>02.02.1980</td>
-									</tr>
-									<tr>
-										<td>Иванов Иван Иванович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Петров Петр Петрович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Сидоров Владимир Карлович</td>
-										<td>Второе</td>
-										<td>02.02.1980</td>
-									</tr>
-									<tr>
-										<td>Иванов Иван Иванович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Петров Петр Петрович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Сидоров Владимир Карлович</td>
-										<td>Второе</td>
-										<td>02.02.1980</td>
-									</tr>
-									<tr>
-										<td>Иванов Иван Иванович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Петров Петр Петрович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Сидоров Владимир Карлович</td>
-										<td>Второе</td>
-										<td>02.02.1980</td>
-									</tr>
-									<tr>
-										<td>Иванов Иван Иванович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Петров Петр Петрович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Сидоров Владимир Карлович</td>
-										<td>Второе</td>
-										<td>02.02.1980</td>
-									</tr>
-									<tr>
-										<td>Иванов Иван Иванович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Петров Петр Петрович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Сидоров Владимир Карлович</td>
-										<td>Второе</td>
-										<td>02.02.1980</td>
-									</tr>
-									<tr>
-										<td>Иванов Иван Иванович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Петров Петр Петрович</td>
-										<td>Первое</td>
-										<td>01.01.1980</td>
-									</tr>
-									<tr>
-										<td>Сидоров Владимир Карлович</td>
-										<td>Второе</td>
-										<td>02.02.1980</td>
+									<tr v-for="test in tests">
+										<td v-html="test.name"></td>
+										<td v-html="test.unit"></td>
+										<td v-html="test.references"></td>
 									</tr>
 								</tbody>
 								<tfoot>
 									<tr>
-										<td colspan="2"></td>
-										<td>100.00</td>
+										<td>{{ tests.length }}</td>
+										<td></td>
+										<td></td>
 									</tr>
 								</tfoot>
 							</table>
@@ -244,6 +155,84 @@
 	<script src="assets/js/breakpoints.min.js"></script>
 	<script src="assets/js/util.js"></script>
 	<script src="assets/js/main.js"></script>
+
+	<script>
+		function nbsp(s) {
+			return s.replace(/ /g, '&nbsp;');
+		}
+
+		function b(s) {
+			return '<b>' + s + '</b>';
+		}
+
+		function t(name, unit, references) {
+			return {
+				name: name,
+				unit: unit,
+				references: nbsp(references),
+			};
+		}
+
+
+		function Tests() {
+			this._map = {};
+		}
+
+		Tests.prototype.add = function(name, unit, references) {
+			this._map[name] = t(name, unit, references);
+		}
+
+		Tests.prototype.toArray = function () {
+			var keys = [];
+			for (var key in this._map) {
+				keys.push(key);
+			}
+
+			keys.sort();
+
+			var arr = [];
+			for (var i = 0, n = keys.length; i < n; ++i) {
+				arr.push(this._map[keys[i]]);
+			}
+
+			return arr;
+		}
+
+		var tests = new Tests();
+
+		tests.add('Лейкоциты', 'x10<sup>9</sup>/л', '4,00 - 9,00');
+		tests.add('Эритроциты', 'x10<sup>12</sup>/л', '4,00 - 5,00');
+		tests.add('Гемоглобин', 'г/л', '130 - 160');
+		tests.add('Гематокрит', '%', '40 - 48');
+		tests.add('Средний объем эритроцита', 'фл', '80,00 - 100,00');
+		tests.add('Среднее содержание гемоглобина в эритроците', 'пг', '27,00 - 31,00');
+		tests.add('Средняя концентрация гемоглобина в эритроците', 'г/л', '320 - 370');
+		tests.add('Коэффициент вариации относительной ширины распределения эритроцитов по объему', '%', '10,00 - 20,00');
+		tests.add('Тромбоциты', 'x10<sup>9</sup>/л', '180 - 320');
+		tests.add('Относительная ширина распределения тромбоцитов по объему', '%', '10,00 - 20,00');
+		tests.add('Средний объем тромбоцитов', 'фл', '7,40 - 10,40');
+		tests.add('Тромбокрит', '%', '0,15 - 0,40');
+
+		tests.add('АЛТ', 'Ед/л', '0,00 - 55,00');
+		tests.add('АСТ', 'Ед/л', '5,00 - 34,00');
+		tests.add('Белок общий', 'г/л', '63,00 - 83,00');
+		tests.add('Билирубин общий', 'мкмоль/л', '40 - 48');
+		tests.add('Глюкоза', 'мкмоль/л', '3,89 - 5,83');
+		tests.add('Креатинин', 'мкмоль/л', '63,60 - 110,50');
+		tests.add('Клубочковая фильтрация CKD-EPI Креатинин', 'мл/мин.1.73м^2', '> 60,00');
+		tests.add('Мочевина', 'мкмоль/л', '3,00 - 9,20');
+		tests.add('С-реактивный белок', 'мг/л', '0,00 - 5,00');
+
+		var data = {
+			tests: tests.toArray()
+		}
+
+
+		var app = new Vue({
+			el: '#table_tests',
+			data: data
+		});
+	</script>
 
 </body>
 </html>
