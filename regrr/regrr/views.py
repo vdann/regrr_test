@@ -5,19 +5,34 @@ Routes and views for the flask application.
 from datetime import datetime
 from flask import render_template
 from flask import redirect
+from flask import session
+from flask import request
 from regrr import app
+
+app.secret_key = '100' #os.urandom(12)
 
 @app.route('/')
 @app.route('/home')
+@app.route('/index.html')
 def home():
+	if not session.get('logged_in'):
+		return redirect('/static/_design/login.html')
+	else:
+		return redirect('/static/_design/index.html')
 
-	return redirect('/static/_design/index.html')
+@app.route('/login', methods=['POST'])
+def do_admin_login():
+	password = request.form['password']
+	username = request.form['username']
+	if username == 'user' and password == 'user':
+		session['logged_in'] = True
 
-	"""Renders the home page."""
-	return render_template('index.html',
-		title = 'Home Page',
-		year = datetime.now().year,
-	)
+	return home()
+
+@app.route("/logout")
+def logout():
+	session['logged_in'] = False
+	return home()
 
 @app.route('/contact')
 def contact():
