@@ -189,6 +189,7 @@
     <Content Include="regrr\static\_design\images\pic10.jpg" />
     <Content Include="regrr\static\_design\images\pic11.jpg" />
     <Content Include="regrr\static\_design\settings.html" />
+    <Content Include="regrr\static\_design\test_national_early_warning_score.html" />
     <Content Include="regrr\static\_design\tests.html" />
     <Content Include="regrr\static\_design\link.html" />
     <Content Include="regrr\static\_design\login.html" />

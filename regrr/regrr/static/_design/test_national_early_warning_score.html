@@ -1,0 +1,330 @@
+﻿<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<title>Реестр результатов анализов и тестирования</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+
+		<style>
+			.table_variants {
+				margin: 0 0 0 0;
+			}
+
+			table.table_variants tbody tr {
+				background-color: #f5f1f1;
+			}
+
+			.table_variants tbody tr:hover {
+				background-color: #ffff99;
+			}
+
+			.table_variants tbody tr.selected {
+				color: #fff;
+				background-color: #1bb193;
+			}
+
+			.selected {
+				color: #fff;
+				background-color: #1bb193;
+			}
+
+
+			.f_left {
+				float: left;
+			}
+
+			.f_right {
+				float: right;
+			}
+
+			.fw_bold {
+				font-weight: bold;
+			}
+
+		</style>
+
+		<script src="extern/vue.js-v2.5.22/vue.js"></script>
+
+	</head>
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Main -->
+		<div id="main">
+			<div class="inner">
+
+				<!-- Header -->
+				<header id="header">
+					<a href="index.html" class="logo"><h2>Реестр результатов анализов и&nbsp;тестирования</h2></a>
+				</header>
+
+				<!-- Banner -->
+				<section id="banner">
+					<div class="content">
+						<header class="major1">
+							<h1>National Early Warning Score (NEWS)</h1>
+							<p>Determines the degree of illness of a patient and prompts critical care intervention.</p>
+						</header>
+
+						<br>
+
+						<div class="row aln-center">
+							<div id="test_news" class="col-7 col-8-xlarge col-9-large col-10-medium col-12-small">
+								<ul class="alt">
+
+									<li v-for="test_row, index_row in rows">
+
+										<div class="row">
+
+											<div class="col-6 col-4-small col-12-xsmall" v-html="test_row.name">
+											</div>
+
+											<div class="col-6 col-8-small col-12-xsmall">
+												<table class="table_variants alt">
+													<tr v-for="variant, index_var in test_row.variants"
+														v-bind:class="{ selected: test_row.index == index_var }"
+														v-on:click="select(index_row, index_var)">
+														<td>
+															<span class="f_left" v-html="variant.name"
+																v-bind:class="{ fw_bold: test_row.index == index_var }">
+															</span>
+															<span class="f_right">
+																<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
+															</span>
+														</td>
+													</tr>
+												</table>
+											</div>
+
+										</div>
+
+									</li>
+
+								</ul>
+
+								<div class="box selected" v-html="result">
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+			</div>
+		</div>
+
+		<!-- Sidebar -->
+		<div id="sidebar">
+			<div class="inner">
+
+				<!-- Search -->
+				<section id="search" class="alt">
+					<form method="post" action="/#">
+						<a href="/logout" class="button fit primary">Выйти</a>
+					</form>
+
+					<form id="search_form" method="post" action="#">
+						<input type="text" name="query" id="query" placeholder="Поиск" />
+					</form>
+				</section>
+
+
+
+				<!-- Menu -->
+				<nav id="menu">
+					<header class="major">
+						<h2>Меню</h2>
+					</header>
+					<ul>
+						<li><a href="index.html">Пациенты</a></li>
+						<li><a href="tests.html">Тесты</a></li>
+						<li><a href="settings.html">Настройки</a></li>
+						<li><a href="link.html">Связь</a></li>
+
+						<li>
+							<span class="opener">Dev</span>
+							<ul>
+								<li><a href="login.html">Login</a></li>
+								<li><a href="editorial/index.html">Editorial</a></li>
+								<li><a href="tests_viewer.html">Test viewer</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+
+				<!-- Section -->
+				<!--
+				<section>
+					<header class="major">
+						<h2>Связь</h2>
+					</header>
+					<ul class="contact">
+						<li class="fa-envelope-o"><a href="#">mail@ya.ru</a></li>
+						<li style="padding-left: 0em;" class="gtr-uniform">
+							<div class="row gtr-uniform">
+								<div class="col-12">
+									<textarea name="link-message" id="link-message" placeholder="Или напишете сообщение сюда" rows="6"></textarea>
+								</div>
+								<div class="col-12">
+									<input type="submit" value="Отправить сообщение" class="primary" />
+								</div>
+							</div>
+						</li>
+					</ul>
+
+
+				</section>-->
+				<!-- Footer -->
+				<!--<footer id="footer">
+					<p class="copyright">&copy; 2019. regrr.ru. Все права защищены.<br> Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+				</footer>-->
+
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+
+	<script>
+		function nbsp(s) {
+			return s.replace(/ /g, '&nbsp;');
+		}
+
+		function b(s) {
+			return '<b>' + s + '</b>';
+		}
+
+
+
+		var rows = [
+			["Respiratory Rate",   [["≤8", 3], ["9-11", 1], ["12-20", 0], ["21-24", 2], ["≥25", 3]] ],
+			["Oxygen Saturations", [["≤91%", 3], ["92-93%", 2], ["94-95%", 1], ["≥96%", 0]] ],
+			["Any Supplemental Oxygen", [["No", 0], ["Yes", 2]] ],
+			["Temperature", [
+				["≤35°C / 95°F", 3],
+				["35.1-36°C / 95.1-96.8°F", 1],
+				["36.1-38°C / 96.9-100.4°F", 0],
+				["38.1-39°C / 100.5-102.2°F", 1],
+				["≥39.1 °C / 102.3°F", 2]] ],
+			["Systolic Blood Pressure", [["<90", 3], ["91-100", 2], ["101-110", 1], ["111-219", 0], ["≥220", 3]] ],
+			["Heart Rate", [["<40", 3], ["41-50", 1], ["51-90", 0], ["91-110", 1], ["110-130", 2], ["≥131", 3]] ],
+			["AVPU Score (Alert, Voice, Pain, Unresponsive)", [["A", 0], ["V, P or U", 3]]],
+		];
+
+		var message_not_all = 'Please fill out required fields.';
+
+		var message_RED_score = 
+'Assigned when an extreme variation in a single physiological parameter is present \
+(i.e., a score of 3 in any one physiological parameter).';
+
+		var message_0_4_points =
+'Low score: Assessment by a competent registered nurse who should decide if a change \
+to frequency of clinical monitoring or an escalation of clinical care is required.';
+
+		var message_5_6_points =
+'Medium score: Urgent review by a clinician skilled with competencies in the assessment of acute illness.';
+
+		var message_7_points =
+'High score: Emergency assessment by a clinical/critical care outreach team with critical-care \
+competencies and usually transfer of the patient to a higher dependency care area.';
+
+		function convert (rows) {
+
+			function convert_row (row) {
+				var variants = [];
+
+				for (var i = 0, n = row[1].length; i < n; ++i) {
+					variants.push({
+						name: nbsp(row[1][i][0]),
+						points: row[1][i][1],
+					});
+				}
+
+				return {
+					index: -1,
+					name: row[0],
+					variants: variants
+				};
+			}
+
+			var rows_new = [];
+			
+			for (var i = 0, n = rows.length; i < n; ++i) {
+				rows_new.push(convert_row(rows[i]));
+			}
+
+			return rows_new;
+		}
+
+		rows = convert(rows);
+
+		var app = new Vue({
+			el: '#test_news',
+			data: {
+				rows: rows,
+			},
+			computed: {
+				result: function () {
+
+					var isOk = true;
+					var isRed = false;
+					var points = 0;
+
+					for (var i = 0, n = this.rows.length; i < n; ++i) {
+						var row = this.rows[i];
+						if (row.index == -1) {
+							isOk = false;
+							continue;
+						}
+
+						var cur_points = row.variants[row.index].points;
+						if (cur_points == 3)
+							isRed = true;
+
+						points += cur_points;
+					}
+
+					var result = [];
+					result.push('<span class="fw_bold" style="font-size:1.75em;">' + points + ' points</span>');
+
+					if (!isOk) {
+						result.push(message_not_all);
+					}
+					else {
+
+						if (isRed) {
+							result.push('RED score');
+							result.push(message_RED_score);
+						}
+
+						if (points <= 4)
+							result.push(message_0_4_points);
+						else if (points <= 6)
+							result.push(message_5_6_points);
+						else
+							result.push(message_7_points);
+					}
+
+					return result.join('<br><br>');
+				}
+			},
+			methods: {
+				select: function (index_row, index_val) {
+					this.rows[index_row].index = index_val;
+				}
+			}
+		});
+	</script>
+
+</body>
+</html>
