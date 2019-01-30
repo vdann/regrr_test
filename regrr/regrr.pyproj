@@ -18,8 +18,9 @@
     <PythonWsgiHandler>$(MSBuildProjectName).app</PythonWsgiHandler>
     <Name>regrr</Name>
     <RootNamespace>regrr</RootNamespace>
-    <InterpreterId>{c13054a0-9ada-4b23-a890-e2b549f5d82a}</InterpreterId>
-    <InterpreterVersion>3.5</InterpreterVersion>
+    <InterpreterId>{ebcf6a20-7768-49d3-bc1e-8b52780f4303}</InterpreterId>
+    <InterpreterVersion>3.4</InterpreterVersion>
+    <WebBrowserPort>16090</WebBrowserPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -189,6 +190,7 @@
     <Content Include="regrr\static\_design\images\pic10.jpg" />
     <Content Include="regrr\static\_design\images\pic11.jpg" />
     <Content Include="regrr\static\_design\settings.html" />
+    <Content Include="regrr\static\_design\test_geneva_risk_score_for_vte.html" />
     <Content Include="regrr\static\_design\test_national_early_warning_score.html" />
     <Content Include="regrr\static\_design\tests.html" />
     <Content Include="regrr\static\_design\link.html" />
@@ -226,6 +228,17 @@
     <Content Include="regrr\templates\layout.html" />
   </ItemGroup>
   <ItemGroup>
+    <Interpreter Include="env34\">
+      <Id>{ebcf6a20-7768-49d3-bc1e-8b52780f4303}</Id>
+      <BaseInterpreter>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</BaseInterpreter>
+      <Version>3.4</Version>
+      <Description>env34 (Python 3.4)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <LibraryPath>Lib\</LibraryPath>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <Architecture>X86</Architecture>
+    </Interpreter>
     <Interpreter Include="env\">
       <Id>{c13054a0-9ada-4b23-a890-e2b549f5d82a}</Id>
       <BaseInterpreter>{377e6200-8b84-4366-a408-a278a90d96df}</BaseInterpreter>

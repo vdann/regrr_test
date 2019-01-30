@@ -84,20 +84,41 @@
 											</div>
 
 											<div class="col-6 col-8-small col-12-xsmall">
-												<table class="table_variants alt">
-													<tr v-for="variant, index_var in test_row.variants"
-														v-bind:class="{ selected: test_row.index == index_var }"
-														v-on:click="select(index_row, index_var)">
-														<td>
-															<span class="f_left" v-html="variant.name"
-																v-bind:class="{ fw_bold: test_row.index == index_var }">
-															</span>
-															<span class="f_right">
-																<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
-															</span>
-														</td>
-													</tr>
-												</table>
+												<template v-if="test_row.variants.length == 2">
+													<table class="table_variants alt">
+														<tr>
+															<td v-for="variant, index_var in test_row.variants"
+																v-bind:class="{ selected: test_row.index == index_var }"
+																v-on:click="select(index_row, index_var)"
+																width="50%">
+
+																<span class="f_left" v-html="variant.name"
+																	  v-bind:class="{ fw_bold: test_row.index == index_var }">
+																</span>
+																<span class="f_right">
+																	<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
+																</span>
+															</td>
+														</tr>
+													</table>
+												</template>
+
+												<template v-else>
+													<table class="table_variants alt">
+														<tr v-for="variant, index_var in test_row.variants"
+															v-bind:class="{ selected: test_row.index == index_var }"
+															v-on:click="select(index_row, index_var)">
+															<td>
+																<span class="f_left" v-html="variant.name"
+																	  v-bind:class="{ fw_bold: test_row.index == index_var }">
+																</span>
+																<span class="f_right">
+																	<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
+																</span>
+															</td>
+														</tr>
+													</table>
+												</template>
 											</div>
 
 										</div>
