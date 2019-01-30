@@ -1,0 +1,343 @@
+﻿<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<title>Реестр результатов анализов и тестирования</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+
+		<style>
+			.table_variants {
+				margin: 0 0 0 0;
+			}
+
+			table.table_variants tbody tr {
+				background-color: #f5f1f1;
+			}
+
+			.table_variants tbody tr:hover {
+				background-color: #ffff99;
+			}
+
+			.table_variants tbody tr.selected {
+				color: #fff;
+				background-color: #1bb193;
+			}
+
+			.selected {
+				color: #fff;
+				background-color: #1bb193;
+			}
+
+
+			.f_left {
+				float: left;
+			}
+
+			.f_right {
+				float: right;
+			}
+
+			.fw_bold {
+				font-weight: bold;
+			}
+
+		</style>
+
+		<script src="extern/vue.js-v2.5.22/vue.js"></script>
+
+	</head>
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Main -->
+		<div id="main">
+			<div class="inner">
+
+				<!-- Header -->
+				<header id="header">
+					<a href="index.html" class="logo"><h2>Реестр результатов анализов и&nbsp;тестирования</h2></a>
+				</header>
+
+				<!-- Banner -->
+				<section id="banner">
+					<div class="content">
+						<header class="major1">
+							<h1>Geneva Risk Score for Venous Thromboembolism (VTE) Prophylaxis</h1>
+							<p>Predicts need for VTE prophylaxis in admitted patients.</p>
+						</header>
+
+						<br>
+
+						<div class="row aln-center">
+							<div id="test_news" class="col-7 col-8-xlarge col-9-large col-10-medium col-12-small">
+								<ul class="alt">
+
+									<li v-for="test_row, index_row in rows">
+
+										<div class="row">
+
+											<div class="col-6 col-4-small col-12-xsmall" v-html="test_row.name">
+											</div>
+
+											<div class="col-6 col-8-small col-12-xsmall">
+												<template v-if="test_row.variants.length == 2">
+													<table class="table_variants alt">
+														<tr>
+															<td v-for="variant, index_var in test_row.variants"
+																v-bind:class="{ selected: test_row.index == index_var }"
+																v-on:click="select(index_row, index_var)"
+																width="50%">
+															
+																<span class="f_left" v-html="variant.name"
+																	v-bind:class="{ fw_bold: test_row.index == index_var }">
+																</span>
+																<span class="f_right">
+																	<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
+																</span>
+															</td>
+														</tr>
+													</table>
+												</template>
+												
+												<template v-else>
+													<table class="table_variants alt">
+														<tr v-for="variant, index_var in test_row.variants"
+															v-bind:class="{ selected: test_row.index == index_var }"
+															v-on:click="select(index_row, index_var)">
+															<td>
+																<span class="f_left" v-html="variant.name"
+																	  v-bind:class="{ fw_bold: test_row.index == index_var }">
+																</span>
+																<span class="f_right">
+																	<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
+																</span>
+															</td>
+														</tr>
+													</table>
+												</template>
+											</div>
+
+										</div>
+
+									</li>
+
+								</ul>
+
+								<div class="box selected" v-html="result">
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+			</div>
+		</div>
+
+		<!-- Sidebar -->
+		<div id="sidebar">
+			<div class="inner">
+
+				<!-- Search -->
+				<section id="search" class="alt">
+					<form method="post" action="/#">
+						<a href="/logout" class="button fit primary">Выйти</a>
+					</form>
+
+					<form id="search_form" method="post" action="#">
+						<input type="text" name="query" id="query" placeholder="Поиск" />
+					</form>
+				</section>
+
+
+
+				<!-- Menu -->
+				<nav id="menu">
+					<header class="major">
+						<h2>Меню</h2>
+					</header>
+					<ul>
+						<li><a href="index.html">Пациенты</a></li>
+						<li><a href="tests.html">Тесты</a></li>
+						<li><a href="settings.html">Настройки</a></li>
+						<li><a href="link.html">Связь</a></li>
+
+						<li>
+							<span class="opener">Dev</span>
+							<ul>
+								<li><a href="login.html">Login</a></li>
+								<li><a href="editorial/index.html">Editorial</a></li>
+								<li><a href="tests_viewer.html">Test viewer</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+
+				<!-- Section -->
+				<!--
+				<section>
+					<header class="major">
+						<h2>Связь</h2>
+					</header>
+					<ul class="contact">
+						<li class="fa-envelope-o"><a href="#">mail@ya.ru</a></li>
+						<li style="padding-left: 0em;" class="gtr-uniform">
+							<div class="row gtr-uniform">
+								<div class="col-12">
+									<textarea name="link-message" id="link-message" placeholder="Или напишете сообщение сюда" rows="6"></textarea>
+								</div>
+								<div class="col-12">
+									<input type="submit" value="Отправить сообщение" class="primary" />
+								</div>
+							</div>
+						</li>
+					</ul>
+
+
+				</section>-->
+				<!-- Footer -->
+				<!--<footer id="footer">
+					<p class="copyright">&copy; 2019. regrr.ru. Все права защищены.<br> Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+				</footer>-->
+
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/util.js"></script>
+	<script src="assets/js/main.js"></script>
+
+	<script>
+		function nbsp(s) {
+			return s.replace(/ /g, '&nbsp;');
+		}
+
+		function b(s) {
+			return '<b>' + s + '</b>';
+		}
+
+
+
+		var rows = [
+			["Cardiac failure", 2],
+			["Respiratory failure", 2],
+			["Recent stroke (<3 months ago)", 2],
+			["Recent myocardial infarction (<4 weeks ago)", 2],
+			["Acute infectious disease (including sepsis)", 2],
+			["Acute rheumatic disease", 2],
+			["Active malignancy", 2],
+			["Myeloproliferative syndrome", 2],
+			["Nephrotic syndrome", 2],
+			["History of venous thromboembolism", 2],
+			["Known hypercoagulable state", 2],
+			["Immobilization (<30 min walking per day) for ≥3 days", 1],
+
+			["Recent travel for >6 hrs", 1],
+			["Age >60 years", 1],
+			["Obesity (BMI >30)", 1],
+			["Chronic venous insufficiency", 1],
+			["Pregnancy", 1],
+			["Hormonal therapy (contraceptive or replacement therapy)", 1],
+			["Dehydration", 1],
+		];
+
+		function convert (rows) {
+
+			function convert_row (row) {
+				
+				var variants = [{
+					name: 'No',
+					points: 0
+				}, {
+					name: 'Yes',
+					points: row[1]
+				}];
+
+
+				return {
+					index: 0,
+					name: row[0],
+					variants: variants
+				};
+			}
+
+			var rows_new = [];
+			
+			for (var i = 0, n = rows.length; i < n; ++i) {
+				rows_new.push(convert_row(rows[i]));
+			}
+
+			return rows_new;
+		}
+
+		rows = convert(rows);
+
+		var app = new Vue({
+			el: '#test_news',
+			data: {
+				rows: rows,
+			},
+			computed: {
+				result: function () {
+
+					var isOk = true;
+					var points = 0;
+
+					for (var i = 0, n = this.rows.length; i < n; ++i) {
+						var row = this.rows[i];
+						if (row.index == -1) {
+							isOk = false;
+							continue;
+						}
+
+						var cur_points = row.variants[row.index].points;
+						points += cur_points;
+					}
+
+					var result = [];
+					result.push('<span class="fw_bold" style="font-size:2.5em;">' + points + '</span> points<br>');
+					result.push('Geneva Risk Score for VTE Prophylaxis<br>');
+					result.push('<hr>');
+
+					if (!isOk) {
+						result.push('Please fill out required fields.');
+					}
+					else {
+						if (points < 3) {
+							result.push('<span class="fw_bold" style="font-size:2.5em;">0.6</span> %<br>');
+							result.push('VTE risk (composite of symptomatic VTE or 90-day VTE mortality)<br>');
+							result.push('<hr>');
+							result.push('<span class="fw_bold" style="font-size:2.5em;">Low</span> risk<br>');
+							result.push('VTE prophylaxis NOT indicated');
+						}
+						else {
+							result.push('<span class="fw_bold" style="font-size:2.5em;">3.2</span> %<br>');
+							result.push('VTE risk (composite of symptomatic VTE or 90-day VTE mortality)<br>');
+							result.push('<hr>');
+							result.push('<span class="fw_bold" style="font-size:2.5em;">High</span> risk<br>');
+							result.push('VTE prophylaxis indicated (presuming no contraindications)');
+						}
+					}
+
+					return result.join('');
+				}
+			},
+			methods: {
+				select: function (index_row, index_val) {
+					this.rows[index_row].index = index_val;
+				}
+			}
+		});
+	</script>
+
+</body>
+</html>
