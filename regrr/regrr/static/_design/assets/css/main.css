@@ -3337,7 +3337,7 @@ input, select, textarea {
 		@media screen and (max-width: 736px) {
 
 			#header {
-				padding-top: 2.0em;
+				padding-top: 5.0em;
 			}
 
 				#header .logo {
