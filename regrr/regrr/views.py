@@ -36,7 +36,7 @@ def do_admin_login():
 @app.route("/logout")
 def logout():
 	session['logged_in'] = False
-	return home()
+	return redirect('/')
 
 @app.route('/contact')
 def contact():
