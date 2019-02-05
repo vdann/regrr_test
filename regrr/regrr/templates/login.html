@@ -8,7 +8,7 @@
 
 	<!--<link href="../bootstrap-4.2.1-dist/css/bootstrap.css" rel="stylesheet" />-->
 
-	<link rel="stylesheet" href="assets/css/main.css" />
+	<link rel="stylesheet" href="/static/_design/assets/css/main.css" />
 
 	<style>
 		body {
@@ -28,9 +28,19 @@
 				background-color: #ffffff;
 			}
 
+			#section_login > form input {
+				position: relative;
+			}
+
 			#section_login > form input:focus {
 				z-index: 2;
+				color: #495057;
+				background-color: #fff;
+				border-color: #80bdff;
+				outline: 0;
+				box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
 			}
+
 
 			#section_login > form input[type="text"] {
 				margin-bottom: -1px;
@@ -74,14 +84,14 @@
 				</header>
 
 				<section id="section_login">
-					<form class="box" method="post" action="/login">
+					<form class="box" method="post" action="{{ url_for('do_admin_login') }}">
 
 						<h2>Пожалуйста войдите</h2>
 
 						<div class="row gtr-uniform">
 							<div class="col-12">
-								<input type="text" name="username" id="username" value="" placeholder="Логин" required autofocus/>
-								<input type="password" name="password" id="password" value="" placeholder="Пароль" required/>
+								<input type="text" name="username" id="username" value="{{ username }}" placeholder="Логин" required autofocus/>
+								<input type="password" name="password" id="password" value="{{ password }}" placeholder="Пароль" required/>
 							</div>
 
 							<div class="col-12">
@@ -96,11 +106,13 @@
 							</div>
 						</div>
 
-						<div class="error display_none">
+						{% if display_error %}
+						<div class="error" >
 							<hr />
 							<i class="fa fa-exclamation-triangle fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;
 							<i>Не правильный логин или пароль!</i>
 						</div>
+						{% endif %}
 
 					</form>
 				</section>
@@ -114,11 +126,11 @@
 	</div>
 
 	<!-- Scripts -->
-	<script src="assets/js/jquery.min.js"></script>
-	<script src="assets/js/browser.min.js"></script>
-	<script src="assets/js/breakpoints.min.js"></script>
-	<script src="assets/js/util.js"></script>
-	<script src="assets/js/main.js"></script>
+	<script src="static/_design/assets/js/jquery.min.js"></script>
+	<script src="static/_design/assets/js/browser.min.js"></script>
+	<script src="static/_design/assets/js/breakpoints.min.js"></script>
+	<script src="static/_design/assets/js/util.js"></script>
+	<script src="static/_design/assets/js/main.js"></script>
 
 	<!-- Optional JavaScript -->
 	<!-- jQuery first, then Popper.js, then Bootstrap JS -->

@@ -92,11 +92,13 @@
 																v-on:click="select(index_row, index_var)"
 																width="50%">
 
-																<span class="f_left" v-html="variant.name"
+																<span 
+																	  class="f_left" 
+																	  v-html="variant.name"
 																	  v-bind:class="{ fw_bold: test_row.index == index_var }">
 																</span>
-																<span class="f_right">
-																	<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
+																<span class="f_right"
+																	  v-html="format_points(variant.points)">
 																</span>
 															</td>
 														</tr>
@@ -109,11 +111,16 @@
 															v-bind:class="{ selected: test_row.index == index_var }"
 															v-on:click="select(index_row, index_var)">
 															<td>
-																<span class="f_left" v-html="variant.name"
-																	  v-bind:class="{ fw_bold: test_row.index == index_var }">
+																<span 
+																	class="f_left"
+																	v-html="variant.name"
+																	v-bind:class="{ fw_bold: test_row.index == index_var }"
+																>
 																</span>
-																<span class="f_right">
-																	<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
+																<span
+																	class="f_right"
+																	v-html="format_points(variant.points)"
+																>
 																</span>
 															</td>
 														</tr>
@@ -342,6 +349,11 @@ competencies and usually transfer of the patient to a higher dependency care are
 			methods: {
 				select: function (index_row, index_val) {
 					this.rows[index_row].index = index_val;
+				},
+				format_points: function (points) {
+					if (points > 0)
+						return '+ ' + points;
+					return points;
 				}
 			}
 		});
