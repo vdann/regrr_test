@@ -1,12 +1,23 @@
 ﻿<!DOCTYPE HTML>
 
 <html>
-	<head>
-		<title>Реестр результатов анализов и тестирования</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-	</head>
+<head>
+	<title>Реестр результатов анализов и тестирования</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+
+	<style>
+		.f_left {
+			float: left;
+		}
+
+		.f_right {
+			float: right;
+		}
+
+	</style>
+</head>
 <body class="is-preload">
 
 	<!-- Wrapper -->
@@ -173,8 +184,16 @@
 
 				<!-- Search -->
 				<section id="search" class="alt">
-					<form method="post" action="/#">
-						<a href="/logout" class="button fit primary">Выйти</a>
+					<form method="post" action="/#" style="margin-bottom: 1.2em;">
+						<a class="button fit1 primary" href="/logout" title="Выйти" style="padding: 0 1.2em;">
+							<i class="fa fa-sign-out fa-flip-horizontal fa-2x" style="vertical-align: middle;"></i>
+						</a>
+
+						<b class="f_right" style="font-size: 1.4em; vertical-align: baseline;" >
+							<a href="/profile" title="Профиль">
+								manyagin
+							</a>
+						</b>
 					</form>
 
 					<form id="search_form" method="post" action="#">

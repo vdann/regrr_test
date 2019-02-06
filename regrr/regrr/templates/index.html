@@ -1,33 +1,226 @@
-{% extends "layout.html" %}
+﻿<!DOCTYPE HTML>
 
-{% block content %}
+<html>
+<head>
+	<title>Реестр результатов анализов и тестирования</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="/static/_design/assets/css/main.css" />
 
-<div class="jumbotron">
-    <h1>Flask</h1>
-    <p class="lead">Flask is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://flask.pocoo.org/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
-</div>
+	<style>
+		.f_left {
+			float: left;
+		}
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            Flask gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://flask.pocoo.org/docs/">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>The Python Package Index is a repository of software for the Python programming language.</p>
-        <p><a class="btn btn-default" href="https://pypi.python.org/pypi">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Microsoft Azure</h2>
-        <p>You can easily publish to Microsoft Azure using Python Tools for Visual Studio. Find out how you can host your application using a free trial today.</p>
-        <p><a class="btn btn-default" href="http://azure.microsoft.com">Learn more &raquo;</a></p>
-    </div>
-</div>
+		.f_right {
+			float: right;
+		}
 
-{% endblock %}
+	</style>
+
+	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
+
+</head>
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Main -->
+		<div id="main">
+			<div class="inner">
+
+				<!-- Header -->
+				<header id="header">
+					<a href="index.html" class="logo"><h2>Реестр результатов анализов и&nbsp;тестирования</h2></a>
+				</header>
+
+				<!-- Banner -->
+				<section id="banner">
+					<div class="content">
+						<header class="major1">
+							<h1>Пациенты</h1>
+						</header>
+
+						<br>
+
+						<div class="row">
+							<div class="col-12">
+								<input type="button" value="Добавить" class="primary" />
+							</div>
+						</div>
+
+						<br>
+
+						<div class="table-wrapper">
+							<table class="alt">
+								<thead>
+									<tr>
+										<th>ФИО</th>
+										<th>Отделение</th>
+										<th>Дата рождения</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(patient, i) in patients" v-key="i">
+										<td v-html="patient.fullname"></td>
+										<td v-html="patient.department"></td>
+										<td v-html="patient.date_of_birth"></td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td v-html="patients.length"></td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+				</section>
+
+			</div>
+		</div>
+
+		<!-- Sidebar -->
+		<div id="sidebar">
+			<div class="inner">
+
+				<!-- Search -->
+				<section id="search" class="alt">
+					<form method="post" action="/#" style="margin-bottom: 1.2em;">
+						<a class="button fit1 primary" href="/logout" title="Выйти" style="padding: 0 1.2em;">
+							<i class="fa fa-sign-out fa-flip-horizontal fa-2x" style="vertical-align: middle;"></i>
+						</a>
+
+						<b class="f_right" style="font-size: 1.4em; vertical-align: baseline;" >
+							<a href="/profile" title="Профиль" v-html="username">
+							</a>
+						</b>
+					</form>
+
+					<form id="search_form" method="post" action="#">
+						<input type="text" name="query" id="query" placeholder="Поиск" />
+					</form>
+				</section>
+
+
+
+				<!-- Menu -->
+				<nav id="menu">
+					<header class="major">
+						<h2>Меню</h2>
+					</header>
+					<ul>
+						<li><a href="index.html">Пациенты</a></li>
+						<li><a href="tests.html">Тесты</a></li>
+						<li><a href="settings.html">Настройки</a></li>
+						<li><a href="link.html">Связь</a></li>
+
+						<li>
+							<span class="opener">Dev</span>
+							<ul>
+								<li><a href="login.html">Login</a></li>
+								<li><a href="editorial/index.html">Editorial</a></li>
+								<li><a href="tests_viewer.html">Test viewer</a></li>
+								<li><a href="test_national_early_warning_score.html">Test NEWS</a></li>
+								<li><a href="test_geneva_risk_score_for_vte.html">Test VTE</a></li>
+								
+							</ul>
+						</li>
+					</ul>
+				</nav>
+
+				<!-- Section -->
+				<!--
+				<section>
+					<header class="major">
+						<h2>Связь</h2>
+					</header>
+					<ul class="contact">
+						<li class="fa-envelope-o"><a href="#">mail@ya.ru</a></li>
+						<li style="padding-left: 0em;" class="gtr-uniform">
+							<div class="row gtr-uniform">
+								<div class="col-12">
+									<textarea name="link-message" id="link-message" placeholder="Или напишете сообщение сюда" rows="6"></textarea>
+								</div>
+								<div class="col-12">
+									<input type="submit" value="Отправить сообщение" class="primary" />
+								</div>
+							</div>
+						</li>
+					</ul>
+
+
+				</section>-->
+				<!-- Footer -->
+				<!--<footer id="footer">
+					<p class="copyright">&copy; 2019. regrr.ru. Все права защищены.<br> Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+				</footer>-->
+
+			</div>
+		</div>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="/static/_design/assets/js/jquery.min.js"></script>
+	<script src="/static/_design/assets/js/browser.min.js"></script>
+	<script src="/static/_design/assets/js/breakpoints.min.js"></script>
+	<script src="/static/_design/assets/js/util.js"></script>
+	<script src="/static/_design/assets/js/main.js"></script>
+
+	<script>
+
+		function make_patient(fullname, department, date_of_birth) {
+			return {
+				fullname: fullname,
+				department: department,
+				date_of_birth: date_of_birth,
+			};
+		}
+
+		var patients = [
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+		];
+
+		var data = {
+			username: 'ivanov',
+			patients: patients
+		};
+
+
+		var app = new Vue({
+			el: '#wrapper',
+			data: data
+		});
+	</script>
+</body>
+</html>

@@ -16,9 +16,13 @@ app.secret_key = '100' #os.urandom(12)
 @app.route('/index.html')
 def home():
 	if not session.get('logged_in'):
-		return render_template('login.html')
-	else:
-		return redirect('/static/_design/index.html')
+		return redirect('/login')
+
+	return render_template('index.html')
+
+@app.route('/login', methods=['GET'])
+def login():
+	return render_template('login.html')
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
@@ -26,8 +30,8 @@ def do_admin_login():
 	username = request.form['username']
 	if username == 'user' and password == 'user':
 		session['logged_in'] = True
-		return home()
-
+		return redirect('/')
+	
 	return render_template('login.html',
 		display_error = True,
 		password = password,

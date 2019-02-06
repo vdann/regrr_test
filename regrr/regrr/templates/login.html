@@ -90,14 +90,14 @@
 				</header>
 
 				<section id="section_login">
-					<form class="form-signin box" method="post" action="{{ url_for('do_admin_login') }}">
+					<form class="form-signin box" method="post" action="(( url_for('do_admin_login') ))">
 
 						<h2>Пожалуйста войдите</h2>
 
 						<div class="row gtr-uniform">
 							<div class="col-12">
-								<input type="text" class="form-control" name="username" id="username" value="{{ username }}" placeholder="Логин" required autofocus/>
-								<input type="password" class="form-control" name="password" id="password" value="{{ password }}" placeholder="Пароль" required/>
+								<input type="text" class="form-control" name="username" id="username" value="(( username ))" placeholder="Логин" required autofocus/>
+								<input type="password" class="form-control" name="password" id="password" value="(( password ))" placeholder="Пароль" required/>
 							</div>
 
 							<div class="col-12">
@@ -112,13 +112,13 @@
 							</div>
 						</div>
 
-						{% if display_error %}
+						(% if display_error %)
 						<div class="error" >
 							<hr />
 							<i class="fa fa-exclamation-triangle fa-2x" aria-hidden="true"></i>&nbsp;&nbsp;
 							<i>Не правильный логин или пароль!</i>
 						</div>
-						{% endif %}
+						(% endif %)
 
 					</form>
 				</section>
