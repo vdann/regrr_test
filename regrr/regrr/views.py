@@ -9,6 +9,17 @@ from flask import session
 from flask import request
 from regrr import app
 
+import json
+
+
+def make_patient(fullname, department, date_of_birth):
+	return {
+		'fullname': fullname,
+		'department': department,
+		'date_of_birth': date_of_birth,
+	}
+
+
 app.secret_key = '100' #os.urandom(12)
 
 @app.route('/')
@@ -18,7 +29,20 @@ def home():
 	if not session.get('logged_in'):
 		return redirect('/login')
 
-	return render_template('index.html')
+	patients = [
+		make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+		make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+		make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+	]
+
+	data = {
+		'username': 'server',
+		'patients': patients 
+	}
+
+	str = json.dumps(data, indent=4,  ensure_ascii=False)
+	str = render_template('index.html', data = str)
+	return str
 
 @app.route('/login', methods=['GET'])
 def login():
@@ -42,6 +66,8 @@ def logout():
 	session['logged_in'] = False
 	return redirect('/')
 
+
+################################################################
 @app.route('/contact')
 def contact():
 	"""Renders the contact page."""

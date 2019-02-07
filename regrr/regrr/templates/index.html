@@ -62,7 +62,7 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr v-for="(patient, i) in patients" v-key="i">
+									<tr v-for="(patient, i) in patients" :key="i">
 										<td v-html="patient.fullname"></td>
 										<td v-html="patient.department"></td>
 										<td v-html="patient.date_of_birth"></td>
@@ -161,13 +161,6 @@
 
 	</div>
 
-	<!-- Scripts -->
-	<script src="/static/_design/assets/js/jquery.min.js"></script>
-	<script src="/static/_design/assets/js/browser.min.js"></script>
-	<script src="/static/_design/assets/js/breakpoints.min.js"></script>
-	<script src="/static/_design/assets/js/util.js"></script>
-	<script src="/static/_design/assets/js/main.js"></script>
-
 	<script>
 
 		function make_patient(fullname, department, date_of_birth) {
@@ -187,28 +180,6 @@
 			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
 			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
 			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
-			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
-			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
-			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
-			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
-			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
-			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
-			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
-			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
-			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
-			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
-			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
-			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
-			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
-			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
-			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
-			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
-			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
-			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
-			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
-			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
-			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
-			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
 		];
 
 		var data = {
@@ -216,11 +187,29 @@
 			patients: patients
 		};
 
+		try {
+			data = (( data | safe ));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы');
+		}
 
 		var app = new Vue({
 			el: '#wrapper',
-			data: data
+			data: data/*,
+			mounted: function () {
+				$('<script src="//static//_design//assets//js//main.js"><//script>')
+					.appendTo('body');
+			}*/
 		});
 	</script>
+
+	<!-- Scripts -->
+	<script src="/static/_design/assets/js/jquery.min.js"></script>
+	<script src="/static/_design/assets/js/browser.min.js"></script>
+	<script src="/static/_design/assets/js/breakpoints.min.js"></script>
+	<script src="/static/_design/assets/js/util.js"></script>
+	<script src="/static/_design/assets/js/main.js"></script>
+
 </body>
 </html>
