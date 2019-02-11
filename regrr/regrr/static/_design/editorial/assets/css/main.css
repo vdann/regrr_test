@@ -1980,6 +1980,7 @@ input, select, textarea {
 		border-radius: 100%;
 	}
 
+    /* placeholder #75aad4  */
 	::-webkit-input-placeholder {
 		color: #9fa3a6 !important;
 		opacity: 1.0;

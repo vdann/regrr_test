@@ -1985,23 +1985,24 @@ input, select, textarea {
 		border-radius: 100%;
 	}
 
+    /* #9fa3a6  */
 	::-webkit-input-placeholder {
-		color: #9fa3a6 !important;
+		color: #75aad4 !important;
 		opacity: 1.0;
 	}
 
 	:-moz-placeholder {
-		color: #9fa3a6 !important;
+		color: #75aad4 !important;
 		opacity: 1.0;
 	}
 
 	::-moz-placeholder {
-		color: #9fa3a6 !important;
+		color: #75aad4 !important;
 		opacity: 1.0;
 	}
 
 	:-ms-input-placeholder {
-		color: #9fa3a6 !important;
+		color: #75aad4 !important;
 		opacity: 1.0;
 	}
 

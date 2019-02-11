@@ -22,6 +22,14 @@ def make_patient(fullname, department, date_of_birth):
 
 app.secret_key = '100' #os.urandom(12)
 
+import os
+from flask import send_from_directory
+
+@app.route('/favicon.png')
+def favicon():
+	return send_from_directory(os.path.join(app.root_path, 'static'),
+		'favicon.png', mimetype='image/png')
+
 @app.route('/')
 @app.route('/home')
 @app.route('/index.html')
