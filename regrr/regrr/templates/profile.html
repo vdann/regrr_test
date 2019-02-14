@@ -26,6 +26,72 @@
 			line-height: 1.5;
 			margin: 0 0 1em 0;
 		}
+
+		.form-profile {
+			max-width: 600px;
+		}
+
+
+		input[type="text"].input-static,
+		input[type="password"].input-static,
+		input[type="email"].input-static,
+		input[type="tel"].input-static,
+		input[type="search"].input-static,
+		input[type="url"].input-static {
+			border: solid 1px transparent;
+		}
+
+
+		input[type="text"].input-static-bold,
+		input[type="password"].input-static-bold,
+		input[type="email"].input-static-bold,
+		input[type="tel"].input-static-bold,
+		input[type="search"].input-static-bold,
+		input[type="url"].input-static-bold {
+			font-weight: 700;
+		}
+
+		.col-0 {
+			display: none !important;
+		}
+
+		@media screen and (max-width: 1680px) {
+			.col-0-xlarge {
+				display: none !important;
+			}
+		}
+
+		@media screen and (max-width: 1280px) {
+			.col-0-large {
+				display: none !important;
+			}
+		}
+
+		@media screen and (max-width: 980px) {
+			.col-0-medium {
+				display: none !important;
+			}
+		}
+
+		@media screen and (max-width: 736px) {
+			.col-0-small {
+				display: none !important;
+			}
+		}
+
+		@media screen and (max-width: 480px) {
+			.col-0-xsmall {
+				display: none !important;
+			}
+		}
+
+		.va-m {
+			vertical-align: middle;
+		}
+
+		.row.gtr-uniform > * {
+			padding-top: 1.0em;
+		}
 	</style>
 
 	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
@@ -51,43 +117,83 @@
 						<header class="major1">
 							<!--Breadcrumbs-->
 							<div class="breadcrumbs"><a href="./profile.html">Профиль</a></div>
-							<!--<h2><a href="#">Пациенты</a> / Пациент / Анализ</h2>-->
-
 						</header>
 
 						<br>
 
-						<div class="row">
-							<div class="col-12">
-								<input type="button" value="Добавить" class="primary" />
+						<form method="post" action="#" class="form-profile">
+							<div class="row gtr-uniform">
+
+								<div class="col-4 col-12-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Логин" disabled />
+								</div>
+								<div class="col-8 col-12-xsmall">
+									<input class="input-static" type="text" value="username" disabled />
+								</div>
+
+
+								<div class="col-4 col-12-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Фамилия" disabled />
+								</div>
+								<div class="col-8 col-12-xsmall">
+									<input type="text" name="lastname" id="lastname" class="{'input-static': !editing}" value="lastname" placeholder="Фамилия" />
+								</div>
+
+
+								<div class="col-4 col-12-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Имя" disabled />
+								</div>
+								<div class="col-8 col-12-xsmall">
+									<input type="text" name="firstname" id="firstname" class="{'input-static': !editing}" value="firstname" placeholder="Имя" />
+								</div>
+
+
+								<div class="col-4 col-12-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Отчество" disabled />
+								</div>
+								<div class="col-8 col-12-xsmall">
+									<input type="text" name="middlename" id="middlename" class="{'input-static': !editing}" value="middlename" placeholder="Отчество" />
+								</div>
+
+
+								<div class="col-4 col-12-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Дата рождения" disabled />
+								</div>
+								<div class="col-8 col-12-xsmall">
+									<input type="text" name="date_of_birth" id="date_of_birth" class="{'input-static': !editing}" value="date_of_birth" placeholder="Дата рождения" />
+								</div>
+
+
+								<div class="col-4 col-12-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Почта" disabled />
+								</div>
+								<div class="col-8 col-12-xsmall">
+									<input type="email" name="email" id="email" class="{'input-static': !editing}" value="email" placeholder="email@ya.ru" />
+								</div>
+
+								<div class="col-12">
+									<ul class="actions">
+										<li>
+											<input type="button"
+												   value="!editing ? 'Изменить' : 'Отменить'"
+												   class="{primary: !editing}"
+												   @click="editing = !editing"
+												   disabled="saving" />
+										</li>
+										<li v-if="editing">
+											<input type="button" value="Сохранить" class="primary"
+												   @click="save"
+												   disabled="saving" />
+											<template v-if="saving">
+												&nbsp;&nbsp;
+												<i class="va-m fa fa-refresh fa-spin fa-2x fa-fw"> </i>
+											</template>
+										</li>
+									</ul>
+								</div>
 							</div>
-						</div>
+						</form>
 
-						<br>
-
-						<div class="table-wrapper">
-							<table class="alt">
-								<thead>
-									<tr>
-										<th>ФИО</th>
-										<th>Отделение</th>
-										<th>Дата рождения</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr v-for="(patient, i) in patients" key="i">
-										<td v-html="patient.fullname"></td>
-										<td v-html="patient.department"></td>
-										<td v-html="patient.date_of_birth"></td>
-									</tr>
-								</tbody>
-								<tfoot>
-									<tr>
-										<td v-html="patients.length"></td>
-									</tr>
-								</tfoot>
-							</table>
-						</div>
 					</div>
 				</section>
 
@@ -178,28 +284,15 @@
 
 	<script>
 
-		function make_patient(fullname, department, date_of_birth) {
-			return {
-				fullname: fullname,
-				department: department,
-				date_of_birth: date_of_birth,
-			};
-		}
-
-		var patients = [
-			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
-			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
-			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
-			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
-			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
-			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
-			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
-			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
-		];
-
 		var data = {
 			username: 'ivanov',
-			patients: patients
+			lastname: 'Иванов',
+			firstname: 'Иван',
+			middlename: 'Иванович',
+			date_of_birth: '01.01.1980',
+			email: 'ivanov@yan.ru',
+			editing: false,
+			saving: false,
 		};
 
 		try {
@@ -215,7 +308,17 @@
 			mounted: function () {
 				$('<script src="//static//_design//assets//js//main.js"><//script>')
 					.appendTo('body');
-			}*/
+			}*/,
+			methods: {
+				save: function () {
+					this.saving = true;
+
+					setTimeout(function () {
+						this.saving = false;
+						this.editing = false;
+					}.bind(this), 600);
+				}
+			}
 		});
 	</script>
 

@@ -9,9 +9,10 @@ from flask import session
 from flask import request
 from regrr import app
 
+import regrr.models as db
+
+#############################################################
 import json
-
-
 def make_patient(fullname, department, date_of_birth):
 	return {
 		'fullname': fullname,
@@ -22,6 +23,7 @@ def make_patient(fullname, department, date_of_birth):
 
 app.secret_key = '100' #os.urandom(12)
 
+#############################################################
 import os
 from flask import send_from_directory
 
@@ -30,11 +32,14 @@ def favicon():
 	return send_from_directory(os.path.join(app.root_path, 'static'),
 		'favicon.png', mimetype='image/png')
 
+#############################################################
+
 @app.route('/')
-@app.route('/home')
-@app.route('/index.html')
+#@app.route('/home')
+#@app.route('/index.html')
 def home():
-	if not session.get('logged_in'):
+	user_id = session.get('user_id')
+	if not user_id:
 		return redirect('/login')
 
 	patients = [
@@ -43,8 +48,15 @@ def home():
 		make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
 	]
 
+	db_session = db.Session()
+	query = db_session.query(db.User).filter(
+		db.User.id.in_([user_id])
+		)
+
+	result = query.first()
+
 	data = {
-		'username': 'server',
+		'username': result.username,
 		'patients': patients 
 	}
 
@@ -52,16 +64,26 @@ def home():
 	str = render_template('index.html', data = str)
 	return str
 
+#############################################################
 @app.route('/login', methods=['GET'])
 def login():
 	return render_template('login.html')
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
-	password = request.form['password']
 	username = request.form['username']
-	if username == 'user' and password == 'user':
-		session['logged_in'] = True
+	password = request.form['password']
+
+	db_session = db.Session()
+
+	query = db_session.query(db.User).filter(
+		db.User.username.in_([username]),
+		db.User.password.in_([password])
+		)
+
+	result = query.first()
+	if result:
+		session['user_id'] = result.id
 		return redirect('/')
 	
 	return render_template('login.html',
@@ -71,7 +93,22 @@ def do_admin_login():
 
 @app.route("/logout")
 def logout():
-	session['logged_in'] = False
+	session['user_id'] = None
+	return redirect('/')
+
+@app.route("/profile")
+def profile():
+	#session['user_id'] = None
+
+	'''
+	username: 'ivanov',
+	lastname: 'Иванов',
+	firstname: 'Иван',
+	middlename: 'Иванович',
+	date_of_birth: '01.01.1980',
+	email: 'ivanov@yan.ru',
+	'''
+
 	return redirect('/')
 
 
