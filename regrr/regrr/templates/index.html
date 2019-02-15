@@ -2,7 +2,7 @@
 
 <html>
 <head>
-	<title>Реестр результатов анализов и тестирования</title>
+	<title>(( server.title )) - Реестр результатов анализов и тестирования</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
@@ -49,6 +49,7 @@
 				<section id="banner">
 					<div class="content">
 						<header class="major1">
+							<h2>(( server.title ))</h2>
 							<!--Breadcrumbs-->
 							<div class="breadcrumbs"><a href="#">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp;  <a href="#">Иванов</a> &nbsp;&nbsp;/&nbsp;&nbsp; <a href=".">Анализ</a></div>
 							<!--<h2><a href="#">Пациенты</a> / Пациент / Анализ</h2>-->
@@ -125,22 +126,20 @@
 						<h2>Меню</h2>
 					</header>
 					<ul>
-						<li><a href="index.html">Пациенты</a></li>
-						<li><a href="tests.html">Тесты</a></li>
-						<li><a href="settings.html">Настройки</a></li>
-						<li><a href="link.html">Связь</a></li>
-
+						(% for menu in server.menus %)
+						(% if not menu.submenus %)
+						<li><a href="(( menu.href ))">(( menu.text ))</a></li>
+						(% else %)
 						<li>
-							<span class="opener">Dev</span>
+							<span class="opener">(( menu.text ))</span>
 							<ul>
-								<li><a href="login.html">Login</a></li>
-								<li><a href="editorial/index.html">Editorial</a></li>
-								<li><a href="tests_viewer.html">Test viewer</a></li>
-								<li><a href="test_national_early_warning_score.html">Test NEWS</a></li>
-								<li><a href="test_geneva_risk_score_for_vte.html">Test VTE</a></li>
-
+								(% for submenu in menu.submenus %)
+								<li><a href="(( submenu.href ))">(( submenu.text ))</a></li>
+								(% endfor %)
 							</ul>
 						</li>
+						(% endif %)
+						(% endfor %)
 					</ul>
 				</nav>
 
@@ -183,6 +182,17 @@
 				fullname: fullname,
 				department: department,
 				date_of_birth: date_of_birth,
+
+/*				id = sa.Column(sa.Integer, primary_key=True)
+				username = sa.Column(sa.String, unique=True, index=True)
+				password = sa.Column(sa.String)
+				role = sa.Column(sa.Integer)
+
+				lastname = sa.Column(sa.String)
+				firstname = sa.Column(sa.String)
+				middlename = sa.Column(sa.String)
+				email = sa.Column(sa.String)
+*/
 			};
 		}
 
@@ -203,7 +213,7 @@
 		};
 
 		try {
-			data = (( data | safe ));
+			(( server.data | safe));
 		}
 		catch (e) {
 			console.log('Серверные данные не были проинициализированы');

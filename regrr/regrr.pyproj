@@ -7,7 +7,7 @@
     <ProjectGuid>0a1e3606-675a-4e86-b86c-22c898d75101</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <ProjectTypeGuids>{789894c7-04a9-4a11-a6b5-3f4435165112};{1b580a1a-fdb3-4b32-83e1-6407eb2722e6};{349c5851-65df-11da-9384-00065b846f21};{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
-    <StartupFile>regrr\models.py</StartupFile>
+    <StartupFile>runserver.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -18,9 +18,9 @@
     <PythonWsgiHandler>$(MSBuildProjectName).app</PythonWsgiHandler>
     <Name>regrr</Name>
     <RootNamespace>regrr</RootNamespace>
-    <InterpreterId>{ebcf6a20-7768-49d3-bc1e-8b52780f4303}</InterpreterId>
-    <InterpreterVersion>3.4</InterpreterVersion>
-    <WebBrowserPort>16090</WebBrowserPort>
+    <InterpreterId>{dfc66e9c-452e-4195-93de-2defbc58cbed}</InterpreterId>
+    <InterpreterVersion>3.5</InterpreterVersion>
+    <WebBrowserPort>16091</WebBrowserPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -192,6 +192,8 @@
     <Content Include="regrr\static\_design\images\pic09.jpg" />
     <Content Include="regrr\static\_design\images\pic10.jpg" />
     <Content Include="regrr\static\_design\images\pic11.jpg" />
+    <Content Include="regrr\static\_design\patient.html" />
+    <Content Include="regrr\static\_design\profile.html" />
     <Content Include="regrr\static\_design\settings.html" />
     <Content Include="regrr\static\_design\test_geneva_risk_score_for_vte.html" />
     <Content Include="regrr\static\_design\test_national_early_warning_score.html" />
@@ -202,6 +204,8 @@
     <Content Include="regrr\static\_design\LICENSE.txt" />
     <Content Include="regrr\static\_design\README.txt" />
     <Content Include="regrr\static\_design\tests_viewer.html" />
+    <Content Include="regrr\templates\login.html" />
+    <Content Include="regrr\templates\profile.html" />
     <Content Include="requirements.txt" />
     <Content Include="regrr\static\content\bootstrap.css" />
     <Content Include="regrr\static\content\bootstrap.min.css" />
@@ -231,22 +235,11 @@
     <Content Include="regrr\templates\layout.html" />
   </ItemGroup>
   <ItemGroup>
-    <Interpreter Include="env34\">
-      <Id>{ebcf6a20-7768-49d3-bc1e-8b52780f4303}</Id>
-      <BaseInterpreter>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</BaseInterpreter>
-      <Version>3.4</Version>
-      <Description>env34 (Python 3.4)</Description>
-      <InterpreterPath>Scripts\python.exe</InterpreterPath>
-      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
-      <LibraryPath>Lib\</LibraryPath>
-      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
-      <Architecture>X86</Architecture>
-    </Interpreter>
-    <Interpreter Include="env\">
-      <Id>{c13054a0-9ada-4b23-a890-e2b549f5d82a}</Id>
+    <Interpreter Include="env36\">
+      <Id>{dfc66e9c-452e-4195-93de-2defbc58cbed}</Id>
       <BaseInterpreter>{377e6200-8b84-4366-a408-a278a90d96df}</BaseInterpreter>
       <Version>3.5</Version>
-      <Description>env (Py3.6)</Description>
+      <Description>env36 (Py3.6)</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
       <WindowsInterpreterPath>Scripts\python.exe</WindowsInterpreterPath>
       <LibraryPath>Lib\</LibraryPath>

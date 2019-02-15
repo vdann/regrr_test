@@ -2,7 +2,7 @@
 
 <html>
 <head>
-	<title>Профиль - Реестр результатов анализов и тестирования</title>
+	<title>Иванов (#1) - Реестр результатов анализов и тестирования</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
@@ -41,7 +41,7 @@
 			border: solid 1px transparent;
 		}
 
-
+		
 		input[type="text"].input-static-bold,
 		input[type="password"].input-static-bold,
 		input[type="email"].input-static-bold,
@@ -89,9 +89,23 @@
 			vertical-align: middle;
 		}
 
+		.mb-2 {
+			margin-bottom: 2em;
+		}
+
+		.mb-1_5 {
+			margin-bottom: 1.5em;
+		}
+
 		.row.gtr-uniform > * {
 			padding-top: 1.0em;
 		}
+
+		.row.gtr-uniform a.button,
+		.row.gtr-uniform input[type="button"] {
+			margin-top: 2.0em;
+		} 
+
 	</style>
 
 	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
@@ -115,91 +129,68 @@
 				<section id="banner">
 					<div class="content">
 						<header class="major1">
-							<!--Breadcrumbs-->
-							<div class="breadcrumbs"><a href="./profile">Профиль</a></div>
+
+							<!--Breadcrumbs
+			<div class="breadcrumbs">
+				<a href="./index.html">Пациенты</a>
+				&nbsp;&nbsp;/&nbsp;&nbsp;
+				<a href="./patient.html">Иванов (#1)</a>
+			</div>-->
+
+							<h2>
+								Иванов Иван Иванович (#1) <br /> 10.10.1980
+							</h2>
 						</header>
 
-						<br>
+						<br />
 
 						<form method="post" action="#" class="form-profile">
 							<div class="row gtr-uniform">
 
-								<div class="col-4 col-12-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Логин" disabled />
-								</div>
-								<div class="col-8 col-12-xsmall">
-									<input class="input-static" type="text" :value="username" disabled />
-								</div>
-
-
-								<div class="col-4 col-12-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Фамилия" disabled />
-								</div>
-								<div class="col-8 col-12-xsmall">
-									<input type="text" name="lastname" id="lastname" :class="{'input-static': !inputing}"
-										:disabled="!inputing" :value="lastname" placeholder="Фамилия" />
-								</div>
-
-
-								<div class="col-4 col-12-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Имя" disabled />
-								</div>
-								<div class="col-8 col-12-xsmall">
-									<input type="text" name="firstname" id="firstname" :class="{'input-static': !inputing}"
-										:disabled="!inputing" :value="firstname" placeholder="Имя" />
-								</div>
-
-
-								<div class="col-4 col-12-xsmall">
-									<input type="text" class="input-static input-static-bold" value="Отчество" disabled />
-								</div>
-								<div class="col-8 col-12-xsmall">
-									<input type="text" name="middlename" id="middlename" :class="{'input-static': !inputing}"
-										:disabled="!inputing" :value="middlename" placeholder="Отчество" />
-								</div>
-
-
-								<div class="col-4 col-12-xsmall">
-									<input
-										type="text"
-										value="Дата рождения"
-										class="input-static input-static-bold"
+								<div class="col-3">
+									<input type="text"
+										class="input-static input-static-bold" 
+										value="Отделение"
 										disabled />
 								</div>
-								<div class="col-8 col-12-xsmall">
+								<div class="col-9">
 									<input type="text"
-										name="date_of_birth"
-										id="date_of_birth"
 										:class="{'input-static': !inputing}"
 										:disabled="!inputing"
-										:value="date_of_birth"
-										placeholder="Дата рождения" />
+										:value="department"
+										placeholder="" />
 								</div>
 
 
-								<div class="col-4 col-12-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Почта" disabled />
+								<div class="col-3">
+									<input
+										type="text"
+										class="input-static input-static-bold" 
+										value="Диагноз"
+										disabled />
 								</div>
-								<div class="col-8 col-12-xsmall">
-									<input type="email" name="email" id="email" :class="{'input-static': !inputing}" :disabled="!inputing" :value="email" placeholder="email@ya.ru" />
+								<div class="col-9">
+									<input type="text"
+										:class="{'input-static': !inputing}"
+										:disabled="!inputing"
+										:value="diagnosis"
+										placeholder="" />
 								</div>
+
 
 								<div class="col-12">
 									<ul class="actions">
 										<li>
-											<input 
-												type="button"
+											<input type="button"
 												:value="!editing ? 'Изменить' : 'Отменить'"
 												:class="{primary: !editing}"
 												@click="editing = !editing"
-												:disabled="saving"
-												/>
+												:disabled="saving" />
 										</li>
 										<li v-if="editing">
 											<input type="button" value="Сохранить" class="primary"
 												@click="save"
-												:disabled="saving"
-												/>
+												:disabled="saving" />
 											<template v-if="saving">
 												&nbsp;&nbsp;
 												<i class="va-m fa fa-refresh fa-spin fa-2x fa-fw"> </i>
@@ -210,6 +201,32 @@
 							</div>
 						</form>
 
+						<br />
+
+						<div class="row">
+							<div class="col-10 col-12-small">
+								<div class="row">
+									<div class="col-4 col-6-xlarge col-12-small mb-1_5">
+										<a href="#" class="button fit primary">Клинический анализ крови</a>
+									</div>
+									<div class="col-4 col-6-xlarge col-12-small mb-1_5">
+										<a href="#" class="button fit primary">Биохимический анализ крови</a>
+									</div>
+									<div class="col-4 col-6-xlarge col-12-small mb-1_5">
+										<a href="#" class="button fit primary">Коагулограмма</a>
+									</div>
+									<div class="col-4 col-6-xlarge col-12-small mb-1_5">
+										<a href="#" class="button fit primary">Общий анализ мочи</a>
+									</div>
+									<div class="col-4 col-6-xlarge col-12-small mb-1_5">
+										<a href="#" class="button fit primary">News (тест по вопросам)</a>
+									</div>
+									<div class="col-4 col-6-xlarge col-12-small mb-1_5">
+										<a href="#" class="button fit primary">Другие</a>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</section>
 
@@ -309,19 +326,12 @@
 			email: 'ivanov@yan.ru',
 			editing: false,
 			saving: false,
+			department: '9. Отделение анестезиологии-реанимации',
+			diagnosis: 'Переведен на амбулаторное лечение'
 		};
 
 		try {
-			data = ((data | safe));
-
-			data.username = data.username || 'й';
-			data.lastname = data.lastname || '';
-			data.firstname = data.firstname || '';
-			data.middlename = data.middlename || '';
-			data.date_of_birth = data.date_of_birth || '';
-			data.email = data.email || '';
-			data.editing = data.editing || false;
-			data.saving = data.saving || false;
+			data = (( data | safe ));
 		}
 		catch (e) {
 			console.log('Серверные данные не были проинициализированы');
@@ -347,7 +357,7 @@
 					setTimeout(function () {
 						this.saving = false;
 						this.editing = false;
-					}.bind(this), 1000);
+					}.bind(this), 600);
 				}
 			}
 		});

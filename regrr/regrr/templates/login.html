@@ -6,8 +6,7 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
-	<!--<link href="../bootstrap-4.2.1-dist/css/bootstrap.css" rel="stylesheet" />-->
-
+	<link rel="shortcut icon" type="image/png" href="/favicon.png">
 	<link rel="stylesheet" href="/static/_design/assets/css/main.css" />
 
 	<style>
@@ -90,18 +89,19 @@
 				</header>
 
 				<section id="section_login">
-					<form class="form-signin box" method="post" action="(( url_for('do_admin_login') ))">
+					<form class="form-signin box" method="post" action="(( url_for('login_post') ))">
 
 						<h2>Пожалуйста войдите</h2>
 
 						<div class="row gtr-uniform">
 							<div class="col-12">
 								<input type="text" class="form-control" name="username" id="username" value="(( username ))" placeholder="Логин" required autofocus/>
-								<input type="password" class="form-control" name="password" id="password" value="(( password ))" placeholder="Пароль" required/>
+								<input type="password" class="form-control" name="password" id="password" value="(( password ))" placeholder="Пароль" required />
+								<input type="hidden" name="next" id="next" value="(( next ))"/>
 							</div>
 
 							<div class="col-12">
-								<input type="checkbox" id="remember" name="remember" checked>
+								<input type="checkbox" id="remember" name="remember" value="remember" (( remember )) >
 								<label for="remember">запомнить меня</label>
 							</div>
 

@@ -43,15 +43,6 @@ class User(Base):
 	email = sa.Column(sa.String)
 	#date_of_birth = sa.Column(sa.String)
 
-	'''
-	username: 'ivanov',
-	: 'Иванов',
-	firstname: 'Иван',
-	: 'Иванович',
-	date_of_birth: '01.01.1980',
-	: 'ivanov@yan.ru',
-	'''
-
 	#----------------------------------------------------------------------
 	def __init__(self, username, password, role,
 		lastname, firstname, middlename, email):
@@ -64,34 +55,36 @@ class User(Base):
 		self.middlename = middlename
 		self.email = email
 
+	def __repr__(self):
+		return "<User('%s', id: %s)>" % (self.username, self.id)
+
 # create tables
 Base.metadata.create_all(engine)
 
+# import datetime
+
 ########################################################################
 import sqlalchemy.orm
-
 Session = sa.orm.sessionmaker(bind=engine)
-session = Session()
 
-query = session.query(User).filter(User.username.in_(['admin']))
-result = query.first()
-if not result:
+def initAdmin():
+
+	session = Session()
+	query = session.query(User).filter(User.username.in_(['admin']))
+	result = query.first()
+	if result:
+		return
 
 	user = User("admin", "admin", UserRole.ADMIN, '-', '-', '-', 'admin@yan.ru')
 	session.add(user)
-
 	session.commit()
 
 
-	#if __name__ == "__main__":
-
-	import datetime
-	Session = sa.orm.sessionmaker(bind=engine)
+def initTestUsers():
 	session = Session()
 
-	query = session.query(User).filter(User.username.in_(['user']))
-	result = query.first()
-	if not result:
+	result = session.query(User).all()
+	if len(result) == 1:
 		user = User("user", "user", UserRole.USER, 'Userov', 'User', 'Userovich', 'user@yan.ru')
 		session.add(user)
 
@@ -101,5 +94,10 @@ if not result:
 		user = User("petrov", "petrov", UserRole.USER, 'Петров', 'Петр', 'Петрович', 'petrov@yan.ru')
 		session.add(user)
 
-	session.commit()
+		session.commit()
+
+initAdmin()
+
+if True: #__name__ == "__main__":
+	initTestUsers()
 
