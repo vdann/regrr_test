@@ -9,6 +9,7 @@ from flask import session
 from flask import request
 from flask import url_for
 from flask import abort
+from flask import jsonify
 from regrr import app
 
 import regrr.models as db
@@ -88,8 +89,8 @@ def before_request():
 		print('before_request static:' + path)
 		return
 	
-	user_id = session.get(SESSION_KEY_USER)
-	if not user_id:
+	user_info = session.get(SESSION_KEY_USER)
+	if not user_info:
 		print('before_request fail:' + path)
 		return redirect('/login')
 
@@ -99,30 +100,28 @@ def before_request():
 @app.route('/')
 def index():
 
-	user_id = session.get(SESSION_KEY_USER)
+	user_info = session.get(SESSION_KEY_USER)
 
 	title = ''
 	menus = []
 	data = {}
 
-	data['username'] = user_id.get('username')
+	data['username'] = user_info.get('username')
 
-	user_role = user_id.get('role')
+	user_role = user_info.get('role')
 	if user_role == db.UserRole.ADMIN:
 		title = 'Пользователи'
 		menus = menus_admin
 
-		patients = []
+		users = []
 
 		db_session = db.Session()
-		users = db_session.query(db.User).all()
-		for user in users:
-			patients.append(make_patient(
-				user.lastname + ' ' + user.firstname + ' ' + user.middlename,
-				user.email,
-				user.username))
+		db_users = db_session.query(db.User).all()
+		for db_user in db_users:
+			users.append(db_user.toJson())
 		
-		data['patients'] = patients
+		#data['patients'] = patients
+		data['users'] = users
 
 	elif user_role == db.UserRole.USER:
 		title = 'Пациенты'
@@ -197,7 +196,7 @@ def logout():
 
 @app.route("/profile")
 def profile():
-	#session['user_id'] = None
+	#session['user_info'] = None
 
 	'''
 	username: 'ivanov',
@@ -212,6 +211,70 @@ def profile():
 
 	return render_template('profile.html', data = data)
 
+################################################################
+import werkzeug.exceptions as exceptions
+
+@app.route('/user_add', methods=['GET'])
+def user_add():
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+	if user_role != db.UserRole.ADMIN:
+		exceptions.abort(403)
+
+	title = 'Добавить нового пользователя'
+	menus = []
+	data = {}
+
+	data['username'] = user_info.get('username')
+
+	menus = menus_admin
+
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+
+	server = {
+		'title': title,
+		'data': data,
+		'menus': menus
+	}
+
+	str = render_template('user_add.html', server = server)
+	return str
+
+@app.route('/user_add', methods=['POST'])
+def user_add_post():
+
+	username = request.form.get('username')
+	password = username #request.form['password']
+	lastname = request.form.get('lastname')
+	firstname = request.form.get('firstname')
+	middlename = request.form.get('middlename')
+	date_of_birth = request.form.get('date_of_birth')
+	position = request.form.get('position')
+	email = request.form.get('email')
+
+	user = db.User(username, password, db.UserRole.USER, lastname, firstname, middlename, position, email)
+
+	db_session = db.Session()
+	db_session.add(user)
+	db_session.commit()
+
+	return redirect('/')
+
+@app.route('/api/v1.0/test_username', methods=['POST'])
+def api_test_username():
+	if not request.json:
+		abort(400)
+
+	username = request.json.get('username')
+	if not username or username == '':
+		abort(400)
+
+	db_session = db.Session()
+	query = db_session.query(db.User).filter(
+		db.User.username.in_([username]))
+	result = query.first() == None
+	return jsonify({'result': result})
 
 ################################################################
 @app.route('/contact')

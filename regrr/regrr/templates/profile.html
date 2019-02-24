@@ -108,7 +108,7 @@
 
 				<!-- Header -->
 				<header id="header">
-					<a href="index.html" class="logo"><h2>Реестр результатов анализов и&nbsp;тестирования</h2></a>
+					<a href="/" class="logo"><h2>Реестр результатов анализов и&nbsp;тестирования</h2></a>
 				</header>
 
 				<!-- Banner -->
@@ -116,7 +116,7 @@
 					<div class="content">
 						<header class="major1">
 							<!--Breadcrumbs-->
-							<div class="breadcrumbs"><a href="./profile">Профиль</a></div>
+							<div class="breadcrumbs"><a href="/profile">Профиль</a></div>
 						</header>
 
 						<br>
@@ -314,7 +314,7 @@
 		try {
 			data = ((data | safe));
 
-			data.username = data.username || 'й';
+			data.username = data.username || '';
 			data.lastname = data.lastname || '';
 			data.firstname = data.firstname || '';
 			data.middlename = data.middlename || '';
