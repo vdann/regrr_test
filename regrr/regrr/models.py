@@ -40,12 +40,15 @@ class User(Base):
 	lastname = sa.Column(sa.String)
 	firstname = sa.Column(sa.String)
 	middlename = sa.Column(sa.String)
+
+	position = sa.Column(sa.String)
+
 	email = sa.Column(sa.String)
 	#date_of_birth = sa.Column(sa.String)
 
 	#----------------------------------------------------------------------
 	def __init__(self, username, password, role,
-		lastname, firstname, middlename, email):
+		lastname, firstname, middlename, position, email):
 		""""""
 		self.username = username
 		self.password = password
@@ -53,10 +56,24 @@ class User(Base):
 		self.lastname = lastname
 		self.firstname = firstname
 		self.middlename = middlename
+		self.position = position
 		self.email = email
 
 	def __repr__(self):
 		return "<User('%s', id: %s)>" % (self.username, self.id)
+
+	def toJson(self):
+		j = {}
+		j['id'] = self.id
+		j['username'] = self.username
+		#j['password'] = self.password
+		#j['role'] = self.role
+		j['lastname'] = self.lastname
+		j['firstname'] = self.firstname
+		j['middlename'] = self.middlename
+		j['position'] = self.position
+		j['email'] = self.email
+		return j
 
 # create tables
 Base.metadata.create_all(engine)
@@ -65,17 +82,25 @@ Base.metadata.create_all(engine)
 
 ########################################################################
 import sqlalchemy.orm
+from sqlalchemy import exc
+
 Session = sa.orm.sessionmaker(bind=engine)
 
 def initAdmin():
 
+	result = None
 	session = Session()
-	query = session.query(User).filter(User.username.in_(['admin']))
-	result = query.first()
+	try:
+		query = session.query(User).filter(User.username.in_(['admin']))
+		result = query.first()
+	except exc.SQLAlchemyError:
+		Base.metadata.drop_all(engine)
+		Base.metadata.create_all(engine)
+
 	if result:
 		return
 
-	user = User("admin", "admin", UserRole.ADMIN, '-', '-', '-', 'admin@yan.ru')
+	user = User("admin", "admin", UserRole.ADMIN, '-', '-', '-', '-', 'admin@yan.ru')
 	session.add(user)
 	session.commit()
 
@@ -85,13 +110,13 @@ def initTestUsers():
 
 	result = session.query(User).all()
 	if len(result) == 1:
-		user = User("user", "user", UserRole.USER, 'Userov', 'User', 'Userovich', 'user@yan.ru')
+		user = User("user", "user", UserRole.USER, 'Userov', 'User', 'Userovich', 'Врач', 'user@yan.ru')
 		session.add(user)
 
-		user = User("ivanov", "ivanov", UserRole.USER, 'Иванов', 'Иван', 'Иванович', 'ivan@yan.ru')
+		user = User("ivanov", "ivanov", UserRole.USER, 'Иванов', 'Иван', 'Иванович', 'Асистент', 'ivan@yan.ru')
 		session.add(user)
 
-		user = User("petrov", "petrov", UserRole.USER, 'Петров', 'Петр', 'Петрович', 'petrov@yan.ru')
+		user = User("petrov", "petrov", UserRole.USER, 'Петров', 'Петр', 'Петрович', 'Заведующий', 'petrov@yan.ru')
 		session.add(user)
 
 		session.commit()
