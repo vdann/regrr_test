@@ -216,6 +216,8 @@
     <Content Include="regrr\static\_design\LICENSE.txt" />
     <Content Include="regrr\static\_design\README.txt" />
     <Content Include="regrr\static\_design\tests_viewer.html" />
+    <Content Include="regrr\templates\feedback_result.html" />
+    <Content Include="regrr\templates\feedback.html" />
     <Content Include="regrr\templates\user.html" />
     <Content Include="regrr\templates\user_add.html" />
     <Content Include="regrr\templates\login.html" />

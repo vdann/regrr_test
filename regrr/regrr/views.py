@@ -10,7 +10,11 @@ from flask import request
 from flask import url_for
 from flask import abort
 from flask import jsonify
+
+import werkzeug.exceptions as exceptions
+
 from regrr import app
+from regrr import mail
 
 import regrr.models as db
 
@@ -55,6 +59,7 @@ def make_menu_subitems (text, submenus):
 
 
 menus_all = [
+	make_menu_item('/feedback', 'Связь'),
 	make_menu_subitems(
 		'Макеты', [
 				make_menu_item('/static/_design/index.html', 'Главная'),
@@ -212,7 +217,6 @@ def logout():
 
 @app.route("/profile")
 def profile():
-	#session['user_info'] = None
 
 	user_info = session.get(SESSION_KEY_USER)
 
@@ -252,6 +256,13 @@ def user_view(username):
 	if user_role != db.UserRole.ADMIN:
 		exceptions.abort(403)
 
+	server = {
+		'username': user_info.get('username'),
+		'menus': menus_admin,
+		'title': username
+	}
+	data = {}
+
 	db_session = db.Session()
 	db_user = db_session.query(db.User).filter(
 		db.User.username.in_([username])
@@ -259,31 +270,13 @@ def user_view(username):
 	db_user = db_user.first()
 	
 	if not db_user:
-		title = '404'
-		menus = menus_admin
-		data = {}
-		data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
-		server = {
-			'title': title,
-			'username': user_info.get('username'),
-			'data': data,
-			'menus': menus
-		}
-		str = render_template('user.html', server = server)
+		server['isOk'] = False
+	else:
+		server['isOk'] = True
+		data = db_user.toJson()
 
-	# user
-	title = username
-	menus = menus_admin
-	data = db_user.toJson()
-	#data['username'] = user_info.get('username')
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
-
-	server = {
-		'title': title,
-		'username': user_info.get('username'),
-		'data': data,
-		'menus': menus
-	}
+	server['data'] = data
 
 	str = render_template('user.html', server = server)
 	return str
@@ -316,8 +309,14 @@ def user_add():
 	str = render_template('user_add.html', server = server)
 	return str
 
+
 @app.route('/user_add', methods=['POST'])
 def user_add_post():
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+	if user_role != db.UserRole.ADMIN:
+		exceptions.abort(403)
 
 	username = request.form.get('username')
 	password = username #request.form['password']
@@ -337,8 +336,6 @@ def user_add_post():
 	return redirect('/')
 
 ################################################################
-import werkzeug.exceptions as exceptions
-
 @app.route('/api/v1.0/test_username', methods=['POST'])
 def api_test_username():
 	if not request.json:
@@ -353,6 +350,94 @@ def api_test_username():
 		db.User.username.in_([username]))
 	result = query.first() == None
 	return jsonify({'result': result})
+
+################################################################
+@app.route('/feedback', methods=['GET'])
+def feedback():
+	user_info = session.get(SESSION_KEY_USER)
+
+	title = 'Связь'
+	menus = []
+	data = {}
+	isAdmin = False
+
+	username = user_info.get('username')
+	user_role = user_info.get('role')
+
+	if user_role == db.UserRole.ADMIN:
+		isAdmin = True
+		menus = menus_admin
+	else:
+		menus = menus_user
+
+
+	data['username'] = username
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+	server = {
+		'title': title,
+		'username': username,
+		'isAdmin': isAdmin,
+		'data': data,
+		'menus': menus
+	}
+
+	return render_template('feedback.html', server = server)
+
+
+@app.route('/feedback_result', methods=['GET'])
+def feedback_result():
+	user_info = session.get(SESSION_KEY_USER)
+
+	title = 'Связь'
+	menus = []
+	data = {}
+	isAdmin = False
+
+	username = user_info.get('username')
+	user_role = user_info.get('role')
+
+	if user_role == db.UserRole.ADMIN:
+		isAdmin = True
+		menus = menus_admin
+	else:
+		menus = menus_user
+
+	data['username'] = username
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+	server = {
+		'title': title,
+		'username': username,
+		'isAdmin': isAdmin,
+		'data': data,
+		'menus': menus
+	}
+
+	return render_template('feedback_result.html', server = server)
+
+
+
+from flask_mail import Message
+
+@app.route('/feedback', methods=['POST'])
+def feedback_post():
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+	username = user_info.get('username')
+
+	feedback_title = request.form.get('feedback-title')
+	feedback_message = request.form.get('feedback-message')
+
+	title = '[reqrr] от: {username}, тема: {feedback_title}'.format(username=username,
+		feedback_title=feedback_title)
+	
+	recipients = app.config.get('APP_ADMIN_MAILS')
+	msg = Message(title, recipients = recipients)
+	msg.body = feedback_message
+	msg.html = feedback_message
+	mail.send(msg)
+
+	return redirect('/feedback_result')
 
 
 ################################################################
