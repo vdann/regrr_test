@@ -229,6 +229,10 @@
 			console.log('Серверные данные не были проинициализированы');
 		}
 
+		data.url_user = data.url_user || '/user';
+		data.users = data.users || [];
+
+
 		var app = new Vue({
 			el: '#wrapper',
 			data: data/*,

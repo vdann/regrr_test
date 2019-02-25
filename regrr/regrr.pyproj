@@ -18,7 +18,7 @@
     <PythonWsgiHandler>$(MSBuildProjectName).app</PythonWsgiHandler>
     <Name>regrr</Name>
     <RootNamespace>regrr</RootNamespace>
-    <InterpreterId>{dfc66e9c-452e-4195-93de-2defbc58cbed}</InterpreterId>
+    <InterpreterId>{5ee9a088-b572-4657-b794-2bacafb384dd}</InterpreterId>
     <InterpreterVersion>3.5</InterpreterVersion>
     <WebBrowserPort>16091</WebBrowserPort>
   </PropertyGroup>
@@ -236,11 +236,11 @@
     <Content Include="regrr\templates\layout.html" />
   </ItemGroup>
   <ItemGroup>
-    <Interpreter Include="env36\">
-      <Id>{dfc66e9c-452e-4195-93de-2defbc58cbed}</Id>
+    <Interpreter Include="env\">
+      <Id>{5ee9a088-b572-4657-b794-2bacafb384dd}</Id>
       <BaseInterpreter>{377e6200-8b84-4366-a408-a278a90d96df}</BaseInterpreter>
       <Version>3.5</Version>
-      <Description>env36 (Py3.6)</Description>
+      <Description>env (Py3.6)</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
       <WindowsInterpreterPath>Scripts\python.exe</WindowsInterpreterPath>
       <LibraryPath>Lib\</LibraryPath>
