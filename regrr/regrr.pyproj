@@ -66,6 +66,9 @@
     <Folder Include="regrr\static\_design\editorial\assets\sass\libs\" />
     <Folder Include="regrr\static\_design\editorial\images\" />
     <Folder Include="regrr\static\_design\extern\" />
+    <Folder Include="regrr\static\_design\extern\axios.js-v0.18.0\" />
+    <Folder Include="regrr\static\_design\extern\es6-promise.js-v4.2.6\" />
+    <Folder Include="regrr\static\_design\extern\lodash.js-v4.17.11\" />
     <Folder Include="regrr\static\_design\extern\vue.js-v2.5.22\" />
     <Folder Include="regrr\static\_design\images\" />
     <Folder Include="regrr\templates\" />
@@ -180,6 +183,13 @@
     <Content Include="regrr\static\_design\editorial\index.html" />
     <Content Include="regrr\static\_design\editorial\LICENSE.txt" />
     <Content Include="regrr\static\_design\editorial\README.txt" />
+    <Content Include="regrr\static\_design\extern\axios.js-v0.18.0\axios.js" />
+    <Content Include="regrr\static\_design\extern\axios.js-v0.18.0\axios.min.js" />
+    <Content Include="regrr\static\_design\extern\es6-promise.js-v4.2.6\es6-promise.auto.js" />
+    <Content Include="regrr\static\_design\extern\es6-promise.js-v4.2.6\es6-promise.auto.min.js" />
+    <Content Include="regrr\static\_design\extern\es6-promise.js-v4.2.6\es6-promise.min.js" />
+    <Content Include="regrr\static\_design\extern\lodash.js-v4.17.11\lodash.js" />
+    <Content Include="regrr\static\_design\extern\lodash.js-v4.17.11\lodash.min.js" />
     <Content Include="regrr\static\_design\extern\vue.js-v2.5.22\vue.js" />
     <Content Include="regrr\static\_design\extern\vue.js-v2.5.22\vue.min.js" />
     <Content Include="regrr\static\_design\images\pic01.jpg" />
@@ -205,6 +215,7 @@
     <Content Include="regrr\static\_design\LICENSE.txt" />
     <Content Include="regrr\static\_design\README.txt" />
     <Content Include="regrr\static\_design\tests_viewer.html" />
+    <Content Include="regrr\templates\user_add.html" />
     <Content Include="regrr\templates\login.html" />
     <Content Include="regrr\templates\profile.html" />
     <Content Include="requirements.txt" />

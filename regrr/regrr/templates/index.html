@@ -47,7 +47,7 @@
 
 				<!-- Header -->
 				<header id="header">
-					<a href="index.html" class="logo"><h2>Реестр результатов анализов и&nbsp;тестирования</h2></a>
+					<a href="/" class="logo"><h2>Реестр результатов анализов и&nbsp;тестирования</h2></a>
 				</header>
 
 				<!-- Banner -->
@@ -56,21 +56,18 @@
 						<header class="major1">
 							<h2>(( server.title ))</h2>
 							<!--Breadcrumbs - ->
-							<div class="breadcrumbs">
-								<a href="#">Пациенты</a>
-								&nbsp;&nbsp;/&nbsp;&nbsp;
-								<a href="#">Иванов</a>
-								&nbsp;&nbsp;/&nbsp;&nbsp;
-								<a href=".">Анализ</a>
-							</div>
-							-->
+							<!--
+								<div class="breadcrumbs"><a href="#">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp;  <a href="#">Иванов</a> &nbsp;&nbsp;/&nbsp;&nbsp; <a href=".">Анализ</a>
+								</div>
+								-->
+
 						</header>
 
 						<br>
 
 						<div class="row">
 							<div class="col-12">
-								<input type="button" value="Добавить" class="primary" />
+								<a class="button primary" href="/user_add" title="Добавить нового пользователя">Добавить</a>
 							</div>
 						</div>
 
@@ -80,22 +77,26 @@
 							<table class="alt">
 								<thead>
 									<tr>
+										<th>№</th>
+										<th>Логин</th>
 										<th>ФИО</th>
-										<th>Отделение</th>
-										<th>Дата рождения</th>
+										<th>Должность</th>
+										<th>email</th>
 									</tr>
 								</thead>
 								<tbody>
-									<tr v-for="(patient, i) in patients" :key="i">
-										<td v-html="patient.fullname"></td>
-										<td v-html="patient.department"></td>
-										<td v-html="patient.date_of_birth"></td>
+									<tr v-for="(user, i) in users" :key="user.id">
+										<td v-html="i + 1"></td>
+										<td v-html="getUsername(user)"></td>
+										<td v-html="getFullname(user)"></td>
+										<td v-html="user.position"></td>
+										<td v-html="user.email"></td>
 									</tr>
 								</tbody>
 								<tfoot>
 									<tr>
-										<td v-html="patients.length"></td>
-									</tr>
+<!--										<td v-html="users.length"></td>
+-->									</tr>
 								</tfoot>
 							</table>
 						</div>
@@ -219,7 +220,8 @@
 
 		var data = {
 			username: 'ivanov',
-			patients: patients
+			patients: patients,
+			url_user: '/user'
 		};
 
 		try {
@@ -235,11 +237,23 @@
 
 		var app = new Vue({
 			el: '#wrapper',
-			data: data/*,
+			data: data,/*,
 			mounted: function () {
 				$('<script src="//static//_design//assets//js//main.js"><//script>')
 					.appendTo('body');
 			}*/
+			methods: {
+				_makeA: function (href, text) {
+					return '<a href="' + href + '">' + text + '</a>';
+				},
+				getUsername: function (user) {
+					return this._makeA(this.url_user + '/' + user.username, user.username);
+				},
+				getFullname: function (user) {
+					var fullname = user.lastname + ' ' + user.firstname + ' ' + user.middlename;
+					return this._makeA(this.url_user + '/' + user.username, fullname);
+				}
+			}
 		});
 	</script>
 

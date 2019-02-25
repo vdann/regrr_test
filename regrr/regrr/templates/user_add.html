@@ -564,16 +564,16 @@
 
 					var vm = this;
 					axios.post('/api/v1.0/test_username', {
-							username: this.username
-						})
-						.then(function (response) {
-							console.log(response.data.result);
-							vm.username_icon = response.data.result ? icon_ok : icon_fail;
-						})
-						.catch(function (error) {
-							vm.username_icon = icon_fail;
-							console.log('Error!');
-						})
+						username: this.username
+					})
+					.then(function (response) {
+						console.log(response.data.result);
+						vm.username_icon = response.data.result ? icon_ok : icon_fail;
+					})
+					.catch(function (error) {
+						vm.username_icon = icon_fail;
+						console.log('Error!');
+					});
 				}
 			}
 		});
