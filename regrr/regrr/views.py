@@ -117,9 +117,7 @@ def index():
 	isAdmin = False
 
 	data['username'] = user_id.get('username')
-
 	user_role = user_id.get('role')
-
 
 	if user_role == db.UserRole.ADMIN:
 
@@ -215,7 +213,7 @@ def profile():
 
 	user_info = session.get(SESSION_KEY_USER)
 
-	title = ''
+	title = 'Профиль'
 	menus = []
 	data = {}
 	isAdmin = False
@@ -225,10 +223,8 @@ def profile():
 
 	if user_role == db.UserRole.ADMIN:
 		isAdmin = True
-		title = 'Профиль'
 		menus = menus_admin
 	else:
-		title = 'Профиль'
 		menus = menus_user
 
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
@@ -242,43 +238,6 @@ def profile():
 	return render_template('profile.html', server = server)
 ################################################################
 import werkzeug.exceptions as exceptions
-
-	if user_role == db.UserRole.ADMIN:
-		isAdmin = True
-		title = 'Профиль'
-		menus = menus_admin
-	else:
-		title = 'Профиль'
-		menus = menus_user
-
-	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
-	server = {
-		'title': title,
-		'isAdmin': isAdmin,
-		'data': data,
-		'menus': menus
-	}
-
-	return render_template('profile.html', server = server)
-
-
-	username = request.form.get('username')
-	password = username #request.form['password']
-	lastname = request.form.get('lastname')
-	firstname = request.form.get('firstname')
-	middlename = request.form.get('middlename')
-	# date_of_birth = request.form.get('date_of_birth')
-	position = request.form.get('position')
-	email = request.form.get('email')
-
-	user = db.User(username, password, db.UserRole.USER, lastname, firstname, middlename, position, email)
-
-	db_session = db.Session()
-	db_session.add(user)
-	db_session.commit()
-
-	return redirect('/')
-
 
 @app.route('/api/v1.0/test_username', methods=['POST'])
 def api_test_username():
