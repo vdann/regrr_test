@@ -180,3 +180,8 @@ input[type="url"].input-static-bold {
 	margin: 0 0 1em 0;
 }
 
+/* vue.js */
+[v-cloak] {
+	display: none;
+}
+
