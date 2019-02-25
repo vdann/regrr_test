@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="regrr\static\_design\assets\css\font-awesome.min.css" />
+    <Content Include="regrr\static\_design\assets\css\main_ext.css" />
     <Content Include="regrr\static\_design\assets\css\main_red.css" />
     <Content Include="regrr\static\_design\assets\css\main.css" />
     <Content Include="regrr\static\_design\assets\fonts\fontawesome-webfont.eot" />
@@ -215,6 +216,7 @@
     <Content Include="regrr\static\_design\LICENSE.txt" />
     <Content Include="regrr\static\_design\README.txt" />
     <Content Include="regrr\static\_design\tests_viewer.html" />
+    <Content Include="regrr\templates\user.html" />
     <Content Include="regrr\templates\user_add.html" />
     <Content Include="regrr\templates\login.html" />
     <Content Include="regrr\templates\profile.html" />

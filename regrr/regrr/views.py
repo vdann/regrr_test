@@ -117,7 +117,7 @@ def index():
 	data = {}
 	isAdmin = False
 
-	data['username'] = user_info.get('username')
+	username = user_info.get('username')
 	user_role = user_info.get('role')
 
 	user_role = user_info.get('role')
@@ -147,9 +147,11 @@ def index():
 	else:
 		abort(500)
 
+	data['username'] = username
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 	server = {
 		'title': title,
+		'username': username,
 		'isAdmin': isAdmin,
 		'data': data,
 		'menus': menus
@@ -219,7 +221,7 @@ def profile():
 	data = {}
 	isAdmin = False
 
-	data['username'] = user_info.get('username')
+	username = user_info.get('username')
 	user_role = user_info.get('role')
 
 	if user_role == db.UserRole.ADMIN:
@@ -228,15 +230,63 @@ def profile():
 	else:
 		menus = menus_user
 
+
+	data['username'] = username
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 	server = {
 		'title': title,
+		'username': username,
 		'isAdmin': isAdmin,
 		'data': data,
 		'menus': menus
 	}
 
 	return render_template('profile.html', server = server)
+
+################################################################
+@app.route('/user/<username>', methods=['GET'])
+def user_view(username):
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+	if user_role != db.UserRole.ADMIN:
+		exceptions.abort(403)
+
+	db_session = db.Session()
+	db_user = db_session.query(db.User).filter(
+		db.User.username.in_([username])
+		)
+	db_user = db_user.first()
+	
+	if not db_user:
+		title = '404'
+		menus = menus_admin
+		data = {}
+		data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+		server = {
+			'title': title,
+			'username': user_info.get('username'),
+			'data': data,
+			'menus': menus
+		}
+		str = render_template('user.html', server = server)
+
+	# user
+	title = username
+	menus = menus_admin
+	data = db_user.toJson()
+	#data['username'] = user_info.get('username')
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+
+	server = {
+		'title': title,
+		'username': user_info.get('username'),
+		'data': data,
+		'menus': menus
+	}
+
+	str = render_template('user.html', server = server)
+	return str
 
 ################################################################
 @app.route('/user_add', methods=['GET'])
@@ -247,18 +297,18 @@ def user_add():
 	if user_role != db.UserRole.ADMIN:
 		exceptions.abort(403)
 
+	username = user_info.get('username')
+
 	title = 'Добавить нового пользователя'
-	menus = []
+	menus = menus_admin
 	data = {}
 
-	data['username'] = user_info.get('username')
-
-	menus = menus_admin
-
+	data['username'] = username
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 
 	server = {
 		'title': title,
+		'username': username,
 		'data': data,
 		'menus': menus
 	}

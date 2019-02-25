@@ -13,24 +13,9 @@
 	(% else %)
 	<link rel="stylesheet" href="/static/_design/assets/css/main.css" />
 	(% endif %)
+	<link rel="stylesheet" href="/static/_design/assets/css/main_ext.css" />
 
 	<style>
-		.f_left {
-			float: left;
-		}
-
-		.f_right {
-			float: right;
-		}
-
-		.breadcrumbs {
-			font-size: 1.75em;
-			color: #3d4449;
-			font-family: "Roboto Slab", serif;
-			font-weight: 700;
-			line-height: 1.5;
-			margin: 0 0 1em 0;
-		}
 	</style>
 
 	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
@@ -118,8 +103,8 @@
 						</a>
 
 						<b class="f_right" style="font-size: 1.4em; vertical-align: baseline;">
-							<a href="/profile" title="Профиль" v-html="username">
-								username
+							<a href="/profile" title="Профиль">
+								(( server.username ))
 							</a>
 						</b>
 					</form>

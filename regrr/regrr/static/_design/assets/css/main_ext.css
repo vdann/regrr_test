@@ -1,0 +1,182 @@
+
+/* {{ цвет */
+.clr-red {
+	color: red;
+}
+.clr-green {
+	color: green;
+}
+.clr-blue {
+	color: blue;
+}
+
+
+/* выравнивает иконку внутри себя */
+.icon-va-center {
+	display: inline-flex;
+	align-items: center;
+	height: 100%;
+}
+
+
+/* выравнивание по горизонтали */
+.f_left {
+	float: left;
+}
+
+.f_right {
+	float: right;
+}
+
+/* выравнивание по горизонтали */
+.va-m {
+	vertical-align: middle;
+}
+
+/* поля ввода как текст */
+input[type="text"].input-static,
+input[type="password"].input-static,
+input[type="email"].input-static,
+input[type="tel"].input-static,
+input[type="search"].input-static,
+input[type="url"].input-static {
+	border: solid 1px transparent;
+}
+
+
+/* поля ввода как bold-текст */
+input[type="text"].input-static-bold,
+input[type="password"].input-static-bold,
+input[type="email"].input-static-bold,
+input[type="tel"].input-static-bold,
+input[type="search"].input-static-bold,
+input[type="url"].input-static-bold {
+	font-weight: 700;
+}
+
+
+/* блоки 0-размера */
+.row > .col-0 {
+	display: none !important;
+}
+
+@media screen and (max-width: 1680px) {
+	.row > .col-0-xlarge {
+		display: none !important;
+	}
+
+	.row > .col-1-xlarge,
+	.row > .col-2-xlarge,
+	.row > .col-3-xlarge,
+	.row > .col-4-xlarge,
+	.row > .col-5-xlarge,
+	.row > .col-6-xlarge,
+	.row > .col-7-xlarge,
+	.row > .col-8-xlarge,
+	.row > .col-9-xlarge,
+	.row > .col-10-xlarge,
+	.row > .col-11-xlarge,
+	.row > .col-12-xlarge {
+		display: inline !important;
+	}
+}
+
+@media screen and (max-width: 1280px) {
+	.row > .col-0-large {
+		display: none !important;
+	}
+
+	.row > .col-1-large,
+	.row > .col-2-large,
+	.row > .col-3-large,
+	.row > .col-4-large,
+	.row > .col-5-large,
+	.row > .col-6-large,
+	.row > .col-7-large,
+	.row > .col-8-large,
+	.row > .col-9-large,
+	.row > .col-10-large,
+	.row > .col-11-large,
+	.row > .col-12-large {
+		display: inline !important;
+	}
+}
+
+@media screen and (max-width: 980px) {
+	.row > .col-0-medium {
+		display: none !important;
+	}
+
+	.row > .col-1-medium,
+	.row > .col-2-medium,
+	.row > .col-3-medium,
+	.row > .col-4-medium,
+	.row > .col-5-medium,
+	.row > .col-6-medium,
+	.row > .col-7-medium,
+	.row > .col-8-medium,
+	.row > .col-9-medium,
+	.row > .col-10-medium,
+	.row > .col-11-medium,
+	.row > .col-12-medium {
+		display: inline !important;
+	}
+}
+
+@media screen and (max-width: 736px) {
+	.row > .col-0-small {
+		display: none !important;
+	}
+
+	.row > .col-1-small,
+	.row > .col-2-small,
+	.row > .col-3-small,
+	.row > .col-4-small,
+	.row > .col-5-small,
+	.row > .col-6-small,
+	.row > .col-7-small,
+	.row > .col-8-small,
+	.row > .col-9-small,
+	.row > .col-10-small,
+	.row > .col-11-small,
+	.row > .col-12-small {
+		display: inline !important;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	.row > .col-0-xsmall {
+		display: none !important;
+	}
+
+	.row > .col-1-xsmall,
+	.row > .col-2-xsmall,
+	.row > .col-3-xsmall,
+	.row > .col-4-xsmall,
+	.row > .col-5-xsmall,
+	.row > .col-6-xsmall,
+	.row > .col-7-xsmall,
+	.row > .col-8-xsmall,
+	.row > .col-9-xsmall,
+	.row > .col-10-xsmall,
+	.row > .col-11-xsmall,
+	.row > .col-12-xsmall {
+		display: inline !important;
+	}
+}
+
+/* формы */
+.row.gtr-uniform > * {
+	padding-top: 1.0em;
+}
+
+/* навигация в глубину */
+.breadcrumbs {
+	font-size: 1.75em;
+	color: #3d4449;
+	font-family: "Roboto Slab", serif;
+	font-weight: 700;
+	line-height: 1.5;
+	margin: 0 0 1em 0;
+}
+

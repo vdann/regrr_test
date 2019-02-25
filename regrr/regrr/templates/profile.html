@@ -9,96 +9,21 @@
 	<link rel="shortcut icon" type="image/png" href="/favicon.png">
 
 	(% if server.isAdmin %)
-	<link rel="stylesheet" href="/static/_design/editorial/assets/css/main.css" />
+	<link rel="stylesheet" href="/static/_design/assets/css/main_red.css" />
 	(% else %)
 	<link rel="stylesheet" href="/static/_design/assets/css/main.css" />
 	(% endif %)
+	<link rel="stylesheet" href="/static/_design/assets/css/main_ext.css" />
 
 	<style>
-		.f_left {
-			float: left;
-		}
-
-		.f_right {
-			float: right;
-		}
-
-		.breadcrumbs {
-			font-size: 1.75em;
-			color: #3d4449;
-			font-family: "Roboto Slab", serif;
-			font-weight: 700;
-			line-height: 1.5;
-			margin: 0 0 1em 0;
-		}
-
 		.form-profile {
-			max-width: 600px;
-		}
-
-
-		input[type="text"].input-static,
-		input[type="password"].input-static,
-		input[type="email"].input-static,
-		input[type="tel"].input-static,
-		input[type="search"].input-static,
-		input[type="url"].input-static {
-			border: solid 1px transparent;
-		}
-
-
-		input[type="text"].input-static-bold,
-		input[type="password"].input-static-bold,
-		input[type="email"].input-static-bold,
-		input[type="tel"].input-static-bold,
-		input[type="search"].input-static-bold,
-		input[type="url"].input-static-bold {
-			font-weight: 700;
-		}
-
-		.col-0 {
-			display: none !important;
-		}
-
-		@media screen and (max-width: 1680px) {
-			.col-0-xlarge {
-				display: none !important;
-			}
-		}
-
-		@media screen and (max-width: 1280px) {
-			.col-0-large {
-				display: none !important;
-			}
-		}
-
-		@media screen and (max-width: 980px) {
-			.col-0-medium {
-				display: none !important;
-			}
-		}
-
-		@media screen and (max-width: 736px) {
-			.col-0-small {
-				display: none !important;
-			}
-		}
-
-		@media screen and (max-width: 480px) {
-			.col-0-xsmall {
-				display: none !important;
-			}
-		}
-
-		.va-m {
-			vertical-align: middle;
-		}
-
-		.row.gtr-uniform > * {
-			padding-top: 1.0em;
+			max-width: 700px;
 		}
 	</style>
 
+	<script src="/static/_design/extern/es6-promise.js-v4.2.6/es6-promise.auto.js"></script>
+	<script src="/static/_design/extern/axios.js-v0.18.0/axios.js"></script>
+	<script src="/static/_design/extern/lodash.js-v4.17.11/lodash.js"></script>
 	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
 
 </head>
@@ -121,7 +46,10 @@
 					<div class="content">
 						<header class="major1">
 							<!--Breadcrumbs-->
-							<div class="breadcrumbs"><a href="/profile">(( server.title ))</a></div>
+							<h2>(( server.title ))</h2>
+							<!--
+								<div class="breadcrumbs"><a href="/profile">(( server.title ))</a></div>
+							-->
 						</header>
 
 						<br>
@@ -165,16 +93,14 @@
 
 
 								<div class="col-4 col-12-xsmall">
-									<input
-										type="text"
+									<input type="text"
 										value="Дата рождения"
 										class="input-static input-static-bold"
 										disabled />
 								</div>
 								<div class="col-8 col-12-xsmall">
 									<input type="text"
-										name="date_of_birth"
-										id="date_of_birth"
+										name="date_of_birth" id="date_of_birth"
 										:class="{'input-static': !inputing}"
 										:disabled="!inputing"
 										:value="date_of_birth"
@@ -186,25 +112,26 @@
 									<input class="input-static input-static-bold" type="text" value="Почта" disabled />
 								</div>
 								<div class="col-8 col-12-xsmall">
-									<input type="email" name="email" id="email" :class="{'input-static': !inputing}" :disabled="!inputing" :value="email" placeholder="email@ya.ru" />
+									<input type="email" name="email" id="email"
+										:class="{'input-static': !inputing}"
+										:disabled="!inputing"
+										:value="email"
+										placeholder="email@ya.ru" />
 								</div>
 
 								<div class="col-12">
 									<ul class="actions">
 										<li>
-											<input 
-												type="button"
+											<input type="button"
 												:value="!editing ? 'Изменить' : 'Отменить'"
 												:class="{primary: !editing}"
 												@click="editing = !editing"
-												:disabled="saving"
-												/>
+												:disabled="saving" />
 										</li>
 										<li v-if="editing">
 											<input type="button" value="Сохранить" class="primary"
 												@click="save"
-												:disabled="saving"
-												/>
+												:disabled="saving" />
 											<template v-if="saving">
 												&nbsp;&nbsp;
 												<i class="va-m fa fa-refresh fa-spin fa-2x fa-fw"> </i>
@@ -233,8 +160,8 @@
 						</a>
 
 						<b class="f_right" style="font-size: 1.4em; vertical-align: baseline;">
-							<a href="/profile" title="Профиль" v-html="username">
-								username
+							<a href="/profile" title="Профиль">
+								(( server.username ))
 							</a>
 						</b>
 					</form>
