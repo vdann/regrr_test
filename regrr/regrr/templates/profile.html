@@ -1,13 +1,18 @@
 ﻿<!DOCTYPE HTML>
-
 <html>
 <head>
-	<title>Профиль - Реестр результатов анализов и тестирования</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
+	<title>(( server.title )) - Реестр результатов анализов и тестирования</title>
+
 	<link rel="shortcut icon" type="image/png" href="/favicon.png">
+
+	(% if server.isAdmin %)
+	<link rel="stylesheet" href="/static/_design/editorial/assets/css/main.css" />
+	(% else %)
 	<link rel="stylesheet" href="/static/_design/assets/css/main.css" />
+	(% endif %)
 
 	<style>
 		.f_left {
@@ -116,7 +121,7 @@
 					<div class="content">
 						<header class="major1">
 							<!--Breadcrumbs-->
-							<div class="breadcrumbs"><a href="./profile">Профиль</a></div>
+							<div class="breadcrumbs"><a href="./profile">(( server.title ))</a></div>
 						</header>
 
 						<br>
@@ -228,7 +233,7 @@
 						</a>
 
 						<b class="f_right" style="font-size: 1.4em; vertical-align: baseline;">
-							<a href="./profile.html" title="Профиль" v-html="username">
+							<a href="/profile" title="Профиль" v-html="username">
 								username
 							</a>
 						</b>
@@ -247,22 +252,20 @@
 						<h2>Меню</h2>
 					</header>
 					<ul>
-						<li><a href="index.html">Пациенты</a></li>
-						<li><a href="tests.html">Тесты</a></li>
-						<li><a href="settings.html">Настройки</a></li>
-						<li><a href="link.html">Связь</a></li>
-
+						(% for menu in server.menus %)
+						(% if not menu.submenus %)
+						<li><a href="(( menu.href ))">(( menu.text ))</a></li>
+						(% else %)
 						<li>
-							<span class="opener">Dev</span>
+							<span class="opener">(( menu.text ))</span>
 							<ul>
-								<li><a href="login.html">Login</a></li>
-								<li><a href="editorial/index.html">Editorial</a></li>
-								<li><a href="tests_viewer.html">Test viewer</a></li>
-								<li><a href="test_national_early_warning_score.html">Test NEWS</a></li>
-								<li><a href="test_geneva_risk_score_for_vte.html">Test VTE</a></li>
-
+								(% for submenu in menu.submenus %)
+								<li><a href="(( submenu.href ))">(( submenu.text ))</a></li>
+								(% endfor %)
 							</ul>
 						</li>
+						(% endif %)
+						(% endfor %)
 					</ul>
 				</nav>
 
@@ -312,14 +315,14 @@
 		};
 
 		try {
-			data = ((data | safe));
+			((server.data | safe));
 
-			data.username = data.username || 'й';
-			data.lastname = data.lastname || '';
-			data.firstname = data.firstname || '';
-			data.middlename = data.middlename || '';
-			data.date_of_birth = data.date_of_birth || '';
-			data.email = data.email || '';
+			data.username = data.username || ' ';
+			data.lastname = data.lastname || ' ';
+			data.firstname = data.firstname || ' ';
+			data.middlename = data.middlename || ' ';
+			data.date_of_birth = data.date_of_birth || ' ';
+			data.email = data.email || ' ';
 			data.editing = data.editing || false;
 			data.saving = data.saving || false;
 		}

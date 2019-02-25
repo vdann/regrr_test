@@ -46,26 +46,36 @@ def make_menu_item (href, text):
 		'text': text
 		}
 
+def make_menu_subitems (text, submenus):
+	return {
+		'text': text,
+		'submenus': submenus
+		}
+
 
 menus_all = [
-	make_menu_item('/static/_design/index.html', '(Design) Главная'),
-	make_menu_item('/static/_design/link.html', '(Design) Связь'),
-	make_menu_item('/static/_design/login.html', '(Design) Login'),
-	make_menu_item('/static/_design/patient.html', '(Design) Пациент'),
-	make_menu_item('/static/_design/profile.html', '(Design) Профиль'),
-	make_menu_item('/static/_design/settings.html', '(Design) Настройки'),
-	make_menu_item('/static/_design/tests.html', '(Design) Тесты'),
-	make_menu_item('/static/_design/tests_viewer.html', '(Design) Test viewer'),
-	make_menu_item('/static/_design/test_national_early_warning_score.html', '(Design) Test NEWS'),
-	make_menu_item('/static/_design/test_geneva_risk_score_for_vte.html', '(Design) Test VTE'),
-	{
-		'text': 'Исходный шаблон Editorial',
-		'submenus': [
-			make_menu_item('/static/_design/editorial/index.html', 'index'),
-			make_menu_item('/static/_design/editorial/generic.html', 'generic'),
-			make_menu_item('/static/_design/editorial/elements.html', 'elements'),
+	make_menu_subitems(
+		'Макеты', [
+				make_menu_item('/static/_design/index.html', 'Главная'),
+				make_menu_item('/static/_design/link.html', 'Связь'),
+				make_menu_item('/static/_design/login.html', 'Login'),
+				make_menu_item('/static/_design/patient.html', 'Пациент'),
+				make_menu_item('/static/_design/profile.html', 'Профиль'),
+				make_menu_item('/static/_design/settings.html', 'Настройки'),
+				make_menu_item('/static/_design/tests.html', 'Тесты'),
+				make_menu_item('/static/_design/tests_viewer.html', 'Test viewer'),
+				make_menu_item('/static/_design/test_national_early_warning_score.html', 'Test NEWS'),
+				make_menu_item('/static/_design/test_geneva_risk_score_for_vte.html', 'Test VTE'),
 			]
-	}]
+		),
+	make_menu_subitems(
+		'Исходный шаблон Editorial', [
+				make_menu_item('/static/_design/editorial/index.html', 'index'),
+				make_menu_item('/static/_design/editorial/generic.html', 'generic'),
+				make_menu_item('/static/_design/editorial/elements.html', 'elements'),
+			]
+		)
+	]
 
 
 menus_admin = [
@@ -104,11 +114,15 @@ def index():
 	title = ''
 	menus = []
 	data = {}
+	isAdmin = False
 
 	data['username'] = user_id.get('username')
 
 	user_role = user_id.get('role')
+
 	if user_role == db.UserRole.ADMIN:
+
+		isAdmin = True
 		title = 'Пользователи'
 		menus = menus_admin
 
@@ -135,9 +149,9 @@ def index():
 		abort(500)
 
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
-
 	server = {
 		'title': title,
+		'isAdmin': isAdmin,
 		'data': data,
 		'menus': menus
 	}
@@ -197,20 +211,35 @@ def logout():
 
 @app.route("/profile")
 def profile():
-	#session['user_id'] = None
 
-	'''
-	username: 'ivanov',
-	lastname: 'Иванов',
-	firstname: 'Иван',
-	middlename: 'Иванович',
-	date_of_birth: '01.01.1980',
-	email: 'ivanov@yan.ru',
-	'''
+	user_id = session.get(SESSION_KEY_USER)
 
+	title = ''
+	menus = []
 	data = {}
+	isAdmin = False
 
-	return render_template('profile.html', data = data)
+	data['username'] = user_id.get('username')
+
+	user_role = user_id.get('role')
+
+	if user_role == db.UserRole.ADMIN:
+		isAdmin = True
+		title = 'Профиль'
+		menus = menus_admin
+	else:
+		title = 'Профиль'
+		menus = menus_user
+
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+	server = {
+		'title': title,
+		'isAdmin': isAdmin,
+		'data': data,
+		'menus': menus
+	}
+
+	return render_template('profile.html', server = server)
 
 
 ################################################################
