@@ -18,8 +18,10 @@
     <PythonWsgiHandler>$(MSBuildProjectName).app</PythonWsgiHandler>
     <Name>regrr</Name>
     <RootNamespace>regrr</RootNamespace>
-    <InterpreterId>{5ee9a088-b572-4657-b794-2bacafb384dd}</InterpreterId>
-    <InterpreterVersion>3.5</InterpreterVersion>
+    <InterpreterId>
+    </InterpreterId>
+    <InterpreterVersion>
+    </InterpreterVersion>
     <WebBrowserPort>16091</WebBrowserPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -31,6 +33,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="regrr\config.py" />
     <Compile Include="regrr\models.py">
       <SubType>Code</SubType>
     </Compile>
@@ -74,6 +77,7 @@
     <Folder Include="regrr\templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="regrr\static\favicon.png" />
     <Content Include="regrr\static\_design\assets\css\font-awesome.min.css" />
     <Content Include="regrr\static\_design\assets\css\main_ext.css" />
     <Content Include="regrr\static\_design\assets\css\main_red.css" />
@@ -216,6 +220,11 @@
     <Content Include="regrr\static\_design\LICENSE.txt" />
     <Content Include="regrr\static\_design\README.txt" />
     <Content Include="regrr\static\_design\tests_viewer.html" />
+    <Content Include="regrr\templates\feedback.html" />
+    <Content Include="regrr\templates\feedback_result.html" />
+    <Content Include="regrr\templates\patient.html" />
+    <Content Include="regrr\templates\patient_add.html" />
+    <Content Include="regrr\templates\_src_index.html" />
     <Content Include="regrr\templates\user.html" />
     <Content Include="regrr\templates\user_add.html" />
     <Content Include="regrr\templates\login.html" />
@@ -243,24 +252,10 @@
     <Content Include="regrr\static\scripts\respond.js" />
     <Content Include="regrr\static\scripts\respond.min.js" />
     <Content Include="regrr\static\scripts\_references.js" />
-    <Content Include="regrr\templates\about.html" />
-    <Content Include="regrr\templates\contact.html" />
+    <Content Include="regrr\templates\_src_about.html" />
+    <Content Include="regrr\templates\_src_contact.html" />
     <Content Include="regrr\templates\index.html" />
-    <Content Include="regrr\templates\layout.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <Interpreter Include="env\">
-      <Id>{5ee9a088-b572-4657-b794-2bacafb384dd}</Id>
-      <BaseInterpreter>{377e6200-8b84-4366-a408-a278a90d96df}</BaseInterpreter>
-      <Version>3.5</Version>
-      <Description>env (Py3.6)</Description>
-      <InterpreterPath>Scripts\python.exe</InterpreterPath>
-      <WindowsInterpreterPath>Scripts\python.exe</WindowsInterpreterPath>
-      <LibraryPath>Lib\</LibraryPath>
-      <PathEnvironmentVariable>
-      </PathEnvironmentVariable>
-      <Architecture>X86</Architecture>
-    </Interpreter>
+    <Content Include="regrr\templates\_src_layout.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

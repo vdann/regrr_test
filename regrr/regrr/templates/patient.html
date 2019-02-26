@@ -8,7 +8,7 @@
 	<title>(( server.title )) - Реестр результатов анализов и тестирования</title>
 
 	<link rel="shortcut icon" type="image/png" href="/favicon.png">
-	<link rel="stylesheet" href="/static/_design/assets/css/main_red.css" />
+	<link rel="stylesheet" href="/static/_design/assets/css/main.css" />
 	<link rel="stylesheet" href="/static/_design/assets/css/main_ext.css" />
 
 	<style>
@@ -42,39 +42,39 @@
 					<div class="content">
 						<header class="major1">
 							<!--Breadcrumbs-->
-							<div class="breadcrumbs"><a href="/">Пользователи</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title )) </div>
+							<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title )) </div>
 						</header>
 
 						<br>
 
 						(% if not server.isOk %)
-							<h2>Пользователь, <b>"(( server.title ))"</b>, не найден!</h2>
+							<h2>Пациент, <b>"(( server.title ))"</b>, не найден!</h2>
 						(% else %)
 							<form method="post" action="#" class="form-profile">
 								<div v-cloak class="row gtr-uniform">
 
 									<!-- label + input - username -->
 									<div class="col-4 col-10-xsmall">
-										<input class="input-static input-static-bold" type="text" value="Логин" disabled />
+										<input class="input-static input-static-bold" type="text" value="id" disabled />
 									</div>
 									<div class="col-0 col-2-xsmall align-right">
-										<div v-if="username_icon" class="icon-va-center">
-											<i class="[username_icon]"></i>
+										<div v-if="id_icon" class="icon-va-center">
+											<i class="[id_icon]"></i>
 										</div>
 									</div>
 
 									<div class="col-7 col-12-xsmall">
-										<input type="text" name="username" id="username"
+										<input type="text" name="id" id="id"
 											class="input-static"
-											:value="username"
-											@input="username = $event.target.value"
-											placeholder="Логин"
+											:value="id"
+											@input="id = $event.target.value"
+											placeholder="id"
 											required
 											disabled />
 									</div>
 									<div class="col-1 col-0-xsmall">
-										<div v-if="username_icon" class="icon-va-center">
-											<i class="[username_icon]"></i>
+										<div v-if="id_icon" class="icon-va-center">
+											<i class="[id_icon]"></i>
 										</div>
 									</div>
 
@@ -332,8 +332,8 @@
 		var icon_wait = 'fa fa-2x fa-refresh fa-spin clr-blue';
 
 
-		data.username = data.username || '';
-		data.username_icon = null;
+		data.id = data.id || '';
+		data.id_icon = null;
 		data.lastname = data.lastname || '';
 		data.lastname_icon = null;
 		data.firstname = data.firstname || '';

@@ -2,19 +2,19 @@
 
 <html>
 <head>
+	<title>(( server.title )) - Реестр результатов анализов и тестирования</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
-	<title>(( server.title )) - Реестр результатов анализов и тестирования</title>
-
 	<link rel="shortcut icon" type="image/png" href="/favicon.png">
-	<link rel="stylesheet" href="/static/_design/assets/css/main_red.css" />
+	<link rel="stylesheet" href="/static/_design/assets/css/main.css" />
 	<link rel="stylesheet" href="/static/_design/assets/css/main_ext.css" />
 
 	<style>
 		.form-profile {
 			max-width: 700px;
 		}
+
 	</style>
 
 	<script src="/static/_design/extern/es6-promise.js-v4.2.6/es6-promise.auto.js"></script>
@@ -41,195 +41,154 @@
 				<section id="banner">
 					<div class="content">
 						<header class="major1">
-							<!--Breadcrumbs-->
-							<div class="breadcrumbs"><a href="/">Пользователи</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title )) </div>
+							<h2>(( server.title ))</h2>
 						</header>
 
 						<br>
 
-						(% if not server.isOk %)
-							<h2>Пользователь, <b>"(( server.title ))"</b>, не найден!</h2>
-						(% else %)
-							<form method="post" action="#" class="form-profile">
-								<div v-cloak class="row gtr-uniform">
+						<form method="post" action="/patient_add" class="form-profile">
+							<div class="row gtr-uniform">
 
-									<!-- label + input - username -->
-									<div class="col-4 col-10-xsmall">
-										<input class="input-static input-static-bold" type="text" value="Логин" disabled />
-									</div>
-									<div class="col-0 col-2-xsmall align-right">
-										<div v-if="username_icon" class="icon-va-center">
-											<i class="[username_icon]"></i>
-										</div>
-									</div>
-
-									<div class="col-7 col-12-xsmall">
-										<input type="text" name="username" id="username"
-											class="input-static"
-											:value="username"
-											@input="username = $event.target.value"
-											placeholder="Логин"
-											required
-											disabled />
-									</div>
-									<div class="col-1 col-0-xsmall">
-										<div v-if="username_icon" class="icon-va-center">
-											<i class="[username_icon]"></i>
-										</div>
-									</div>
-
-
-									<!-- label + input - lastname -->
-									<div class="col-4 col-10-xsmall">
-										<input class="input-static input-static-bold" type="text" value="Фамилия" disabled />
-									</div>
-
-									<div class="col-0 col-2-xsmall align-right">
-										<div v-if="lastname_icon" class="icon-va-center">
-											<i class="[lastname_icon]"></i>
-										</div>
-									</div>
-
-									<div class="col-7 col-12-xsmall">
-										<input type="text" name="lastname" id="lastname"
-											class="input-static"
-											:value="lastname"
-											@input="lastname = $event.target.value"
-											placeholder="Фамилия"
-											required
-											disabled />
-									</div>
-									<div class="col-1 col-0-xsmall">
-										<div v-if="lastname_icon" class="icon-va-center">
-											<i class="[lastname_icon]"></i>
-										</div>
-									</div>
-
-									<!-- label + input - firstname -->
-									<div class="col-4 col-10-xsmall">
-										<input class="input-static input-static-bold" type="text" value="Имя" disabled />
-									</div>
-
-									<div class="col-0 col-2-xsmall align-right">
-										<div v-if="firstname_icon" class="icon-va-center">
-											<i class="[firstname_icon]"></i>
-										</div>
-									</div>
-
-									<div class="col-7 col-12-xsmall">
-										<input type="text" name="firstname" id="firstname"
-											class="input-static"
-											:value="firstname"
-											@input="firstname = $event.target.value"
-											placeholder="Имя"
-											required
-											disabled />
-									</div>
-									<div class="col-1 col-0-xsmall">
-										<div v-if="firstname_icon" class="icon-va-center">
-											<i class="[firstname_icon]"></i>
-										</div>
-									</div>
-
-									<!-- label + input - middlename -->
-									<div class="col-4 col-10-xsmall">
-										<input class="input-static input-static-bold" type="text" value="Отчество" disabled />
-									</div>
-
-									<div class="col-0 col-2-xsmall align-right">
-										<div v-if="middlename_icon" class="icon-va-center">
-											<i class="[middlename_icon]"></i>
-										</div>
-									</div>
-
-									<div class="col-7 col-12-xsmall">
-										<input type="text" name="middlename" id="middlename"
-											class="input-static"
-											:value="middlename"
-											@input="middlename = $event.target.value"
-											placeholder="Отчество"
-											required
-											disabled />
-									</div>
-									<div class="col-1 col-0-xsmall">
-										<div v-if="middlename_icon" class="icon-va-center">
-											<i class="[middlename_icon]"></i>
-										</div>
-									</div>
-
-
-									<!-- label + input -->
-									<div class="col-4 col-10-xsmall">
-										<input class="input-static input-static-bold" type="text" value="Должность" disabled />
-									</div>
-
-									<div class="col-0 col-2-xsmall align-right">
-										<div v-if="position_icon" class="icon-va-center">
-											<i class="[position_icon]"></i>
-										</div>
-									</div>
-
-									<div class="col-7 col-12-xsmall">
-										<input type="text" name="position" id="position"
-											class="input-static"
-											:value="position"
-											@input="position = $event.target.value"
-											placeholder="Должность"
-											required
-											disabled />
-									</div>
-									<div class="col-1 col-0-xsmall">
-										<div v-if="position_icon" class="icon-va-center">
-											<i class="[position_icon]"></i>
-										</div>
-									</div>
-
-
-									<!-- label + input -->
-									<div class="col-4 col-10-xsmall">
-										<input class="input-static input-static-bold" type="text" value="Почта" disabled />
-									</div>
-
-									<div class="col-0 col-2-xsmall align-right">
-										<div v-if="email_icon" class="icon-va-center">
-											<i class="[email_icon]"></i>
-										</div>
-									</div>
-
-									<div class="col-7 col-12-xsmall">
-										<input type="email" name="email" id="email"
-											class="input-static"
-											:value="email"
-											@input="email = $event.target.value"
-											placeholder="Почта"
-											required
-											disabled />
-									</div>
-									<div class="col-1 col-0-xsmall">
-										<div v-if="email_icon" class="icon-va-center">
-											<i class="[email_icon]"></i>
-										</div>
-									</div>
-
-
-									<!-- submit -->
-									<!--
-						<div class="col-12">
-							<ul class="actions">
-								<li>
-									<input
-										type="submit"
-										value="Добавить"
-										class="primary"
-										:disabled="!isEnableAdd"
-										/>
-								</li>
-							</ul>
-						</div>
-						-->
+								<!-- label + input - lastname -->
+								<div class="col-4 col-10-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Фамилия" disabled />
 								</div>
-							</form>
-						(% endif %)
+
+								<div class="col-0 col-2-xsmall align-right">
+									<div v-if="lastname_icon" class="icon-va-center">
+										<i :class="[lastname_icon]"></i>
+									</div>
+								</div>
+
+								<div class="col-7 col-12-xsmall">
+									<input type="text" name="lastname" id="lastname"
+										:value="lastname"
+										@input="lastname = $event.target.value"
+										placeholder="Фамилия"
+										required />
+								</div>
+								<div class="col-1 col-0-xsmall">
+									<div v-if="lastname_icon" class="icon-va-center">
+										<i :class="[lastname_icon]"></i>
+									</div>
+								</div>
+
+								<!-- label + input - firstname -->
+								<div class="col-4 col-10-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Имя" disabled />
+								</div>
+
+								<div class="col-0 col-2-xsmall align-right">
+									<div v-if="firstname_icon" class="icon-va-center">
+										<i :class="[firstname_icon]"></i>
+									</div>
+								</div>
+
+								<div class="col-7 col-12-xsmall">
+									<input type="text" name="firstname" id="firstname"
+										:value="firstname"
+										@input="firstname = $event.target.value"
+										placeholder="Имя"
+										required />
+								</div>
+								<div class="col-1 col-0-xsmall">
+									<div v-if="firstname_icon" class="icon-va-center">
+										<i :class="[firstname_icon]"></i>
+									</div>
+								</div>
+
+								<!-- label + input - middlename -->
+								<div class="col-4 col-10-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Отчество" disabled />
+								</div>
+
+								<div class="col-0 col-2-xsmall align-right">
+									<div v-if="middlename_icon" class="icon-va-center">
+										<i :class="[middlename_icon]"></i>
+									</div>
+								</div>
+
+								<div class="col-7 col-12-xsmall">
+									<input type="text" name="middlename" id="middlename"
+										:value="middlename"
+										@input="middlename = $event.target.value"
+										placeholder="Отчество"
+										required />
+								</div>
+								<div class="col-1 col-0-xsmall">
+									<div v-if="middlename_icon" class="icon-va-center">
+										<i :class="[middlename_icon]"></i>
+									</div>
+								</div>
+
+
+								<!-- label + input -->
+								<div class="col-4 col-10-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Должность" disabled />
+								</div>
+
+								<div class="col-0 col-2-xsmall align-right">
+									<div v-if="position_icon" class="icon-va-center">
+										<i :class="[position_icon]"></i>
+									</div>
+								</div>
+
+								<div class="col-7 col-12-xsmall">
+									<input type="text" name="position" id="position"
+										:value="position"
+										@input="position = $event.target.value"
+										placeholder="Должность"
+										required />
+								</div>
+								<div class="col-1 col-0-xsmall">
+									<div v-if="position_icon" class="icon-va-center">
+										<i :class="[position_icon]"></i>
+									</div>
+								</div>
+
+
+								<!-- label + input -->
+								<div class="col-4 col-10-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Почта" disabled />
+								</div>
+
+								<div class="col-0 col-2-xsmall align-right">
+									<div v-if="email_icon" class="icon-va-center">
+										<i :class="[email_icon]"></i>
+									</div>
+								</div>
+
+								<div class="col-7 col-12-xsmall">
+									<input type="email" name="email" id="email"
+										:value="email"
+										@input="email = $event.target.value"
+										placeholder="Почта"
+										required />
+								</div>
+								<div class="col-1 col-0-xsmall">
+									<div v-if="email_icon" class="icon-va-center">
+										<i :class="[email_icon]"></i>
+									</div>
+								</div>
+
+
+								<!-- submit -->
+								<div class="col-12">
+									<ul class="actions">
+										<li>
+											<input 
+												type="submit"
+												value="Добавить"
+												class="primary"
+												:disabled="!isEnableAdd"
+												/>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</form>
+
+
 					</div>
 				</section>
 
@@ -321,7 +280,7 @@
 		var data = {};
 
 		try {
-			((server.data | safe));
+			((data | safe));
 		}
 		catch (e) {
 			console.log('Серверные данные не были проинициализированы');
@@ -359,8 +318,8 @@
 			computed: {
 				isEnableAdd: function () {
 					if (
-						this.username_icon == icon_ok
-						&& this.lastname_icon == icon_ok
+						//this.username_icon == icon_ok
+						/*&&*/ this.lastname_icon == icon_ok
 						&& this.firstname_icon == icon_ok
 						&& this.middlename_icon == icon_ok
 						&& this.position_icon == icon_ok
