@@ -46,19 +46,10 @@ app.config['MAIL_PASSWORD'] = '654321Q!'
 
 
 # administrator list
-<<<<<<< HEAD
 # app.config['APP_ADMIN_MAILS'] = ['vdann@ya.ru', 'gleb.manyagin@gmail.com']
 app.config['APP_ADMIN_MAILS'] = ['vdann@ya.ru']
-=======
-app.config['APP_ADMIN_MAILS'] = ['vdann@ya.ru', 'gleb.manyagin@gmail.com']
->>>>>>> add_patients
-
 
 from flask_mail import Mail
 mail = Mail(app)
-<<<<<<< HEAD
-=======
-
->>>>>>> add_patients
 
 import regrr.views
