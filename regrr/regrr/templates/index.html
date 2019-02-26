@@ -40,15 +40,11 @@
 					<div class="content">
 						<header class="major1">
 							<h2>(( server.title ))</h2>
-							<!--Breadcrumbs - ->
-							<!--
-								<div class="breadcrumbs"><a href="#">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp;  <a href="#">Иванов</a> &nbsp;&nbsp;/&nbsp;&nbsp; <a href=".">Анализ</a>
-								</div>
-								-->
-
 						</header>
 
 						<br>
+
+						(% if server.isAdmin %)
 
 						<div class="row">
 							<div class="col-12">
@@ -85,6 +81,41 @@
 								</tfoot>
 							</table>
 						</div>
+
+						(% else %) <!-- !server.isAdmin -->
+
+						<div class="row">
+							<div class="col-12">
+								<a class="button primary" href="/patient_add" title="Добавить нового пациента">Добавить</a>
+							</div>
+						</div>
+						<br>
+						<div class="table-wrapper">
+							<table class="alt">
+								<thead>
+									<tr>
+										<th>№</th>
+										<th>ФИО</th>
+										<th>Отеделение</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(patient, i) in patients" key="patient.id">
+										<td v-html="i + 1"></td>
+										<td v-html="getFullname(patient)"></td>
+										<td v-html="patient.department"></td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<!--										<td v-html="patients.length"></td>
+					-->
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+
+						(% endif %) <!-- !server.isAdmin -->
 					</div>
 				</section>
 
@@ -171,6 +202,51 @@
 
 	</div>
 
+	(% if server.isAdmin %)
+
+	<script>
+
+		var data = {
+			username: 'ivanov',
+			users: [],
+			url_user: '/user'
+		};
+
+		try {
+			(( server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы (users)');
+		}
+
+		data.url_user = data.url_user || '/user';
+		data.users = data.users || [];
+
+
+		var appUsers = new Vue({
+			el: '#wrapper',
+			data: data,/*,
+			mounted: function () {
+				$('<script src="//static//_design//assets//js//main.js"><//script>')
+					.appendTo('body');
+			}*/
+			methods: {
+				_makeA: function (href, text) {
+					return '<a href="' + href + '">' + text + '</a>';
+				},
+				getUsername: function (user) {
+					return this._makeA(this.url_user + '/' + user.username, user.username);
+				},
+				getFullname: function (user) {
+					var fullname = user.lastname + ' ' + user.firstname + ' ' + user.middlename;
+					return this._makeA(this.url_user + '/' + user.username, fullname);
+				}
+			}
+		});
+	</script>
+
+	(% else %)
+
 	<script>
 
 		function make_patient(fullname, department, date_of_birth) {
@@ -178,17 +254,6 @@
 				fullname: fullname,
 				department: department,
 				date_of_birth: date_of_birth,
-
-/*				id = sa.Column(sa.Integer, primary_key=True)
-				username = sa.Column(sa.String, unique=True, index=True)
-				password = sa.Column(sa.String)
-				role = sa.Column(sa.Integer)
-
-				lastname = sa.Column(sa.String)
-				firstname = sa.Column(sa.String)
-				middlename = sa.Column(sa.String)
-				email = sa.Column(sa.String)
-*/
 			};
 		}
 
@@ -213,14 +278,14 @@
 			(( server.data | safe));
 		}
 		catch (e) {
-			console.log('Серверные данные не были проинициализированы');
+			console.log('Серверные данные не были проинициализированы (patients)');
 		}
 
-		data.url_user = data.url_user || '/user';
+		data.url_patient = data.url_patient || '/patient';
 		data.users = data.users || [];
 
 
-		var app = new Vue({
+		var appPatients = new Vue({
 			el: '#wrapper',
 			data: data,/*,
 			mounted: function () {
@@ -231,16 +296,15 @@
 				_makeA: function (href, text) {
 					return '<a href="' + href + '">' + text + '</a>';
 				},
-				getUsername: function (user) {
-					return this._makeA(this.url_user + '/' + user.username, user.username);
-				},
-				getFullname: function (user) {
-					var fullname = user.lastname + ' ' + user.firstname + ' ' + user.middlename;
-					return this._makeA(this.url_user + '/' + user.username, fullname);
+				getFullname: function (patient) {
+					var fullname = patient.lastname + ' ' + patient.firstname + ' ' + patient.middlename;
+					return this._makeA(this.url_patient + '/' + patient.id, fullname);
 				}
 			}
 		});
 	</script>
+
+	(% endif %)
 
 	<!-- Scripts -->
 	<script src="/static/_design/assets/js/jquery.min.js"></script>

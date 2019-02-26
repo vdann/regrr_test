@@ -139,7 +139,6 @@ def index():
 		for db_user in db_users:
 			users.append(db_user.toJson())
 		
-		#data['patients'] = patients
 		data['users'] = users
 
 	elif user_role == db.UserRole.USER:
@@ -147,6 +146,12 @@ def index():
 		menus = menus_user
 
 		patients = []
+
+		db_session = db.Session()
+		db_patients = db_session.query(db.Patient).all()
+		for db_patient in db_patients:
+			patients.append(db_patient.toJson())
+
 		data['patients'] = patients
 
 	else:
@@ -334,6 +339,95 @@ def user_add_post():
 	db_session.commit()
 
 	return redirect('/')
+
+################################################################
+@app.route('/patient/<id>', methods=['GET'])
+def patient_view(id):
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+	if user_role != db.UserRole.USER:
+		exceptions.abort(403)
+
+	server = {
+		'username': user_info.get('username'),
+		'menus': menus_user,
+		'title': id
+	}
+	data = {}
+
+	db_session = db.Session()
+	db_patient = db_session.query(db.Patient).filter(
+		db.Patient.id.in_([id])
+		)
+	db_patient = db_patient.first()
+	
+	if not db_patient:
+		server['isOk'] = False
+	else:
+		server['isOk'] = True
+		data = db_patient.toJson()
+
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+	server['data'] = data
+
+	str = render_template('patient.html', server = server)
+	return str
+
+################################################################
+@app.route('/patient_add', methods=['GET'])
+def patient_add():
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+	if user_role != db.UserRole.USER:
+		exceptions.abort(403)
+
+	username = user_info.get('username')
+
+	title = 'Добавить нового пациента'
+	menus = menus_user
+	data = {}
+
+	data['username'] = username
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+
+	server = {
+		'title': title,
+		'username': username,
+		'data': data,
+		'menus': menus
+	}
+
+	str = render_template('patient_add.html', server = server)
+	return str
+
+
+@app.route('/patient_add', methods=['POST'])
+def patient_add_post():
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+	if user_role != db.UserRole.USER:
+		exceptions.abort(403)
+
+	#username = request.form.get('username')
+	#password = username #request.form['password']
+	lastname = request.form.get('lastname')
+	firstname = request.form.get('firstname')
+	middlename = request.form.get('middlename')
+	date_of_birth = request.form.get('date_of_birth')
+	departament = request.form.get('departament')
+	#email = request.form.get('email')
+
+	patient = db.Patient(lastname, firstname, middlename, departament, date_of_birth)
+
+	db_session = db.Session()
+	db_session.add(patient)
+	db_session.commit()
+
+	return redirect('/')
+
 
 ################################################################
 @app.route('/api/v1.0/test_username', methods=['POST'])

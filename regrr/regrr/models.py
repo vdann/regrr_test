@@ -60,7 +60,7 @@ class User(Base):
 		self.email = email
 
 	def __repr__(self):
-		return "<User('%s', id: %s)>" % (self.username, self.id)
+		return "<User(id: %s, %s)>" % (self.id, self.username)
 
 	def toJson(self):
 		j = {}
@@ -74,6 +74,58 @@ class User(Base):
 		j['position'] = self.position
 		j['email'] = self.email
 		return j
+
+########################################################################
+class Patient(Base):
+	"""Пациенты"""
+	__tablename__ = "patients"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	#username = sa.Column(sa.String, unique=True, index=True)
+	#password = sa.Column(sa.String)
+	#role = sa.Column(sa.Integer)
+
+	lastname = sa.Column(sa.String)
+	firstname = sa.Column(sa.String)
+	middlename = sa.Column(sa.String)
+
+	department = sa.Column(sa.String)
+
+	#email = sa.Column(sa.String)
+	date_of_birth = sa.Column(sa.String)
+
+	#----------------------------------------------------------------------
+	def __init__(self,#username, password, role,
+		lastname, firstname, middlename,
+		department,
+		date_of_birth):
+		""""""
+		#self.username = username
+		#self.password = password
+		#self.role = role
+		self.lastname = lastname
+		self.firstname = firstname
+		self.middlename = middlename
+		self.department = department
+		self.date_of_birth = date_of_birth
+
+	def __repr__(self):
+		return "<Patient(id: %s, %s %s %s)>" % (self.id, self.lastname, self.firstname, self.middlename)
+
+	def toJson(self):
+		j = {}
+		j['id'] = self.id
+		#j['username'] = self.username
+		#j['password'] = self.password
+		#j['role'] = self.role
+		j['lastname'] = self.lastname
+		j['firstname'] = self.firstname
+		j['middlename'] = self.middlename
+		j['department'] = self.department
+		j['date_of_birth'] = self.date_of_birth
+		return j
+
+
 
 # create tables
 Base.metadata.create_all(engine)
@@ -108,8 +160,8 @@ def initAdmin():
 def initTestUsers():
 	session = Session()
 
-	result = session.query(User).all()
-	if len(result) == 1:
+	resultUsers = session.query(User).all()
+	if len(resultUsers) == 1:
 		user = User("user", "user", UserRole.USER, 'Userov', 'User', 'Userovich', 'Врач', 'user@yan.ru')
 		session.add(user)
 
@@ -119,6 +171,17 @@ def initTestUsers():
 		user = User("petrov", "petrov", UserRole.USER, 'Петров', 'Петр', 'Петрович', 'Заведующий', 'petrov@yan.ru')
 		session.add(user)
 
+	resultPatients = session.query(Patient).all()
+	if len(resultPatients) != 3:
+		patient = Patient('Петров', 'Петр', 'Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980')
+		session.add(patient)
+		
+		patient = Patient('Иванов', 'Иван', 'Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1965')
+		session.add(patient)
+
+		patient = Patient('Сидоров', 'Сидор', 'Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.03.1970')
+		session.add(patient)
+
 		session.commit()
 
 initAdmin()
@@ -126,3 +189,27 @@ initAdmin()
 if True: #__name__ == "__main__":
 	initTestUsers()
 
+	arrs = [
+		['Лейкоциты', 'x10<sup>9</sup>/л', '4,00 - 9,00'],
+		['Эритроциты', 'x10<sup>12</sup>/л', '4,00 - 5,00'],
+		['Гемоглобин', 'г/л', '130 - 160'],
+		['Гематокрит', '%', '40 - 48'],
+		['Средний объем эритроцита', 'фл', '80,00 - 100,00'],
+		['Среднее содержание гемоглобина в эритроците', 'пг', '27,00 - 31,00'],
+		['Средняя концентрация гемоглобина в эритроците', 'г/л', '320 - 370'],
+		['Коэффициент вариации относительной ширины распределения эритроцитов по объему', '%', '10,00 - 20,00'],
+		['Тромбоциты', 'x10<sup>9</sup>/л', '180 - 320'],
+		['Относительная ширина распределения тромбоцитов по объему', '%', '10,00 - 20,00'],
+		['Средний объем тромбоцитов', 'фл', '7,40 - 10,40'],
+		['Тромбокрит', '%', '0,15 - 0,40'],
+
+		['АЛТ', 'Ед/л', '0,00 - 55,00'],
+		['АСТ', 'Ед/л', '5,00 - 34,00'],
+		['Белок общий', 'г/л', '63,00 - 83,00'],
+		['Билирубин общий', 'мкмоль/л', '40 - 48'],
+		['Глюкоза', 'мкмоль/л', '3,89 - 5,83'],
+		['Креатинин', 'мкмоль/л', '63,60 - 110,50'],
+		['Клубочковая фильтрация CKD-EPI Креатинин', 'мл/мин.1.73м^2', '> 60,00'],
+		['Мочевина', 'мкмоль/л', '3,00 - 9,20'],
+		['С-реактивный белок', 'мг/л', '0,00 - 5,00'],
+	];
