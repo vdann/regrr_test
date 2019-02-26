@@ -25,5 +25,32 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.permanent_session_lifetime = timedelta(days=365)
 app.secret_key = '100' #os.urandom(12)
 
+#app.debug = True
+'''
+app.config['MAIL_SERVER'] = 'smtp.yandex.ru'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'regrr.noreply@ya.ru'
+app.config['MAIL_DEFAULT_SENDER'] = 'regrr.noreply@ya.ru'
+app.config['MAIL_PASSWORD'] = '654321Q'
+'''
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+#app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'regrr.noreply@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = 'regrr.noreply@gmail.com'
+app.config['MAIL_PASSWORD'] = '654321Q!'
+
+
+# administrator list
+# app.config['APP_ADMIN_MAILS'] = ['vdann@ya.ru', 'gleb.manyagin@gmail.com']
+app.config['APP_ADMIN_MAILS'] = ['vdann@ya.ru']
+
+
+from flask_mail import Mail
+mail = Mail(app)
 
 import regrr.views
