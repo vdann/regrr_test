@@ -46,7 +46,7 @@ app.config['MAIL_PASSWORD'] = '654321Q!'
 
 
 # administrator list
-app.config['APP_ADMIN_MAILS'] = ['vdann@ya.ru']
+app.config['APP_ADMIN_MAILS'] = ['vdann@ya.ru', 'gleb.manyagin@gmail.com']
 
 
 from flask_mail import Mail
