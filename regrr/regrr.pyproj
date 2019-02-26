@@ -18,8 +18,10 @@
     <PythonWsgiHandler>$(MSBuildProjectName).app</PythonWsgiHandler>
     <Name>regrr</Name>
     <RootNamespace>regrr</RootNamespace>
-    <InterpreterId>{5ee9a088-b572-4657-b794-2bacafb384dd}</InterpreterId>
-    <InterpreterVersion>3.5</InterpreterVersion>
+    <InterpreterId>
+    </InterpreterId>
+    <InterpreterVersion>
+    </InterpreterVersion>
     <WebBrowserPort>16091</WebBrowserPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -249,20 +251,6 @@
     <Content Include="regrr\templates\contact.html" />
     <Content Include="regrr\templates\index.html" />
     <Content Include="regrr\templates\layout.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <Interpreter Include="env\">
-      <Id>{5ee9a088-b572-4657-b794-2bacafb384dd}</Id>
-      <BaseInterpreter>{377e6200-8b84-4366-a408-a278a90d96df}</BaseInterpreter>
-      <Version>3.5</Version>
-      <Description>env (Py3.6)</Description>
-      <InterpreterPath>Scripts\python.exe</InterpreterPath>
-      <WindowsInterpreterPath>Scripts\python.exe</WindowsInterpreterPath>
-      <LibraryPath>Lib\</LibraryPath>
-      <PathEnvironmentVariable>
-      </PathEnvironmentVariable>
-      <Architecture>X86</Architecture>
-    </Interpreter>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 
