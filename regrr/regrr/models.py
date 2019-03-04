@@ -172,7 +172,7 @@ def initTestUsers():
 		session.add(user)
 
 	resultPatients = session.query(Patient).all()
-	if len(resultPatients) != 3:
+	if len(resultPatients) == 0:
 		patient = Patient('Петров', 'Петр', 'Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980')
 		session.add(patient)
 		
