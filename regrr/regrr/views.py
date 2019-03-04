@@ -417,10 +417,14 @@ def patient_add_post():
 	firstname = request.form.get('firstname')
 	middlename = request.form.get('middlename')
 	date_of_birth = request.form.get('date_of_birth')
-	departament = request.form.get('departament')
+	department = request.form.get('department')
 	#email = request.form.get('email')
+	diagnosis = request.form.get('diagnosis')
 
-	patient = db.Patient(lastname, firstname, middlename, departament, date_of_birth)
+	if not date_of_birth:
+		date_of_birth = '01.01.1900'
+
+	patient = db.Patient(lastname, firstname, middlename, date_of_birth, department, diagnosis)
 
 	db_session = db.Session()
 	db_session.add(patient)

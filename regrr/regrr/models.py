@@ -20,12 +20,31 @@ db_file = 'sqlite:///' + db_file
 engine = sa.create_engine(db_file, echo=True)
 Base = sa.ext.declarative.declarative_base()
 
+db_version = 1
+
 ########################################################################
 from enum import IntEnum
 class UserRole(IntEnum):
 	ADMIN = 1
 	USER = 2
 	#PATIENT = 3
+
+########################################################################
+class Metadata(Base):
+	"""Метаданные"""
+	__tablename__ = "metadata"
+
+	key = sa.Column(sa.String, primary_key=True, unique=True, index=True)
+	value = sa.Column(sa.String)
+
+	def __init__(self, key, value):
+		""""""
+		self.key = key
+		self.value = value
+
+	def __repr__(self):
+		return "<Metadata (%s, %s)>" % (self.key, self.value)
+
 
 ########################################################################
 class User(Base):
@@ -60,7 +79,7 @@ class User(Base):
 		self.email = email
 
 	def __repr__(self):
-		return "<User(id: %s, %s)>" % (self.id, self.username)
+		return "<User (id: %s, %s)>" % (self.id, self.username)
 
 	def toJson(self):
 		j = {}
@@ -88,17 +107,18 @@ class Patient(Base):
 	lastname = sa.Column(sa.String)
 	firstname = sa.Column(sa.String)
 	middlename = sa.Column(sa.String)
-
-	department = sa.Column(sa.String)
-
-	#email = sa.Column(sa.String)
 	date_of_birth = sa.Column(sa.String)
+
+	department = sa.Column(sa.String) # отделение
+	diagnosis = sa.Column(sa.String) # диагноз
+
 
 	#----------------------------------------------------------------------
 	def __init__(self,#username, password, role,
 		lastname, firstname, middlename,
+		date_of_birth,
 		department,
-		date_of_birth):
+		diagnosis):
 		""""""
 		#self.username = username
 		#self.password = password
@@ -106,11 +126,12 @@ class Patient(Base):
 		self.lastname = lastname
 		self.firstname = firstname
 		self.middlename = middlename
-		self.department = department
 		self.date_of_birth = date_of_birth
+		self.department = department
+		self.diagnosis = diagnosis
 
 	def __repr__(self):
-		return "<Patient(id: %s, %s %s %s)>" % (self.id, self.lastname, self.firstname, self.middlename)
+		return "<Patient (id: %s, %s %s %s)>" % (self.id, self.lastname, self.firstname, self.middlename)
 
 	def toJson(self):
 		j = {}
@@ -121,8 +142,9 @@ class Patient(Base):
 		j['lastname'] = self.lastname
 		j['firstname'] = self.firstname
 		j['middlename'] = self.middlename
-		j['department'] = self.department
 		j['date_of_birth'] = self.date_of_birth
+		j['department'] = self.department
+		j['diagnosis'] = self.diagnosis
 		return j
 
 
@@ -140,17 +162,45 @@ Session = sa.orm.sessionmaker(bind=engine)
 
 def initAdmin():
 
-	result = None
-	session = Session()
-	try:
-		query = session.query(User).filter(User.username.in_(['admin']))
-		result = query.first()
-	except exc.SQLAlchemyError:
-		Base.metadata.drop_all(engine)
-		Base.metadata.create_all(engine)
+	isOk = True
 
-	if result:
+	try:
+		session = Session()
+	
+		query = session.query(Metadata).filter(Metadata.key.in_(['version']))
+		version = query.first()
+		version = int(version.value)
+		if version != db_version:
+			isOk = False
+
+		if isOk:
+			query = session.query(User).filter(User.username.in_(['admin']))
+			query = query.first()
+			if not query:
+				isOk = False
+
+		if isOk:
+			query = session.query(Patient)
+			query = query.first()
+
+	except exc.SQLAlchemyError as err:
+		print ("models.init: except exc.SQLAlchemyError", err)
+		isOk = False
+	except ValueError:
+		print ("models.init: except ValueError")
+		isOk = False
+	except:
+		print ("models.init: except")
+		isOk = False
+
+	if isOk:
 		return
+
+	Base.metadata.drop_all(engine)
+	Base.metadata.create_all(engine)
+
+	metadata_version = Metadata('version', str(db_version))
+	session.add(metadata_version)
 
 	user = User("admin", "admin", UserRole.ADMIN, '-', '-', '-', '-', 'admin@yan.ru')
 	session.add(user)
@@ -173,13 +223,13 @@ def initTestUsers():
 
 	resultPatients = session.query(Patient).all()
 	if len(resultPatients) == 0:
-		patient = Patient('Петров', 'Петр', 'Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980')
+		patient = Patient('Петров', 'Петр', 'Петрович', '01.01.1980', '9. Отделение анестезиологии-реанимации', 'Диагноз 1')
 		session.add(patient)
 		
-		patient = Patient('Иванов', 'Иван', 'Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1965')
+		patient = Patient('Иванов', 'Иван', 'Иванович', '02.02.1965', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 2')
 		session.add(patient)
 
-		patient = Patient('Сидоров', 'Сидор', 'Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.03.1970')
+		patient = Patient('Сидоров', 'Сидор', 'Сидорович', '12.03.1970', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 3')
 		session.add(patient)
 
 		session.commit()

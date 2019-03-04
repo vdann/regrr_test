@@ -121,53 +121,79 @@
 									</div>
 								</div>
 
-
-								<!-- label + input -->
+								<!-- label + input - date_of_birth -->
 								<div class="col-4 col-10-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Должность" disabled />
+									<input class="input-static input-static-bold" type="text" value="Дата рождения" disabled />
 								</div>
 
 								<div class="col-0 col-2-xsmall align-right">
-									<div v-if="position_icon" class="icon-va-center">
-										<i :class="[position_icon]"></i>
+									<div v-if="date_of_birth_icon" class="icon-va-center">
+										<i :class="[date_of_birth_icon]"></i>
 									</div>
 								</div>
 
 								<div class="col-7 col-12-xsmall">
-									<input type="text" name="position" id="position"
-										:value="position"
-										@input="position = $event.target.value"
-										placeholder="Должность"
+									<input type="text" name="date_of_birth" id="date_of_birth"
+										:value="date_of_birth"
+										@input="date_of_birth = $event.target.value"
+										placeholder="Дата рождения"
 										required />
 								</div>
 								<div class="col-1 col-0-xsmall">
-									<div v-if="position_icon" class="icon-va-center">
-										<i :class="[position_icon]"></i>
+									<div v-if="date_of_birth_icon" class="icon-va-center">
+										<i :class="[date_of_birth_icon]"></i>
 									</div>
 								</div>
 
 
-								<!-- label + input -->
+								<!-- label + input department -->
 								<div class="col-4 col-10-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Почта" disabled />
+									<input class="input-static input-static-bold" type="text" value="Отделение" disabled />
 								</div>
 
 								<div class="col-0 col-2-xsmall align-right">
-									<div v-if="email_icon" class="icon-va-center">
-										<i :class="[email_icon]"></i>
+									<div v-if="department_icon" class="icon-va-center">
+										<i :class="[department_icon]"></i>
 									</div>
 								</div>
 
 								<div class="col-7 col-12-xsmall">
-									<input type="email" name="email" id="email"
-										:value="email"
-										@input="email = $event.target.value"
-										placeholder="Почта"
+									<input type="text" name="department" id="department"
+										:value="department"
+										@input="department = $event.target.value"
+										placeholder="Отделение"
 										required />
 								</div>
 								<div class="col-1 col-0-xsmall">
-									<div v-if="email_icon" class="icon-va-center">
-										<i :class="[email_icon]"></i>
+									<div v-if="department_icon" class="icon-va-center">
+										<i :class="[department_icon]"></i>
+									</div>
+								</div>
+
+
+								<!-- label + input diagnosis -->
+								<div class="col-4 col-10-xsmall">
+									<input class="input-static input-static-bold" type="text" value="Диагноз" disabled />
+								</div>
+
+								<div class="col-0 col-2-xsmall align-right">
+									<div v-if="diagnosis_icon" class="icon-va-center">
+										<i :class="[diagnosis_icon]"></i>
+									</div>
+								</div>
+
+								<div class="col-7 col-12-xsmall">
+									<textarea name="diagnosis" id="diagnosis"
+										:value="diagnosis"
+										@input="diagnosis = $event.target.value"
+										placeholder="Диагноз"
+										rows="6"
+										required>
+									</textarea>
+								</div>
+								<div class="col-1 col-0-xsmall">
+									<div v-if="diagnosis_icon" class="icon-va-center">
+										<i :class="[diagnosis_icon]"></i>
 									</div>
 								</div>
 
@@ -299,10 +325,12 @@
 		data.firstname_icon = null;
 		data.middlename = data.middlename || '';
 		data.middlename_icon = null;
-		data.position = data.position || '';
-		data.position_icon = null;
-		data.email = data.email || '';
-		data.email_icon = null;
+		data.date_of_birth = data.date_of_birth || '';
+		data.date_of_birth_icon = null;
+		data.department = data.department || '';
+		data.department_icon = null;
+		data.diagnosis = data.diagnosis || '';
+		data.diagnosis_icon = null;
 
 		//data.editing = data.editing || true;
 		//data.saving = data.saving || false;
@@ -322,8 +350,9 @@
 						/*&&*/ this.lastname_icon == icon_ok
 						&& this.firstname_icon == icon_ok
 						&& this.middlename_icon == icon_ok
-						&& this.position_icon == icon_ok
-						&& this.email_icon == icon_ok
+						&& this.date_of_birth_icon == icon_ok
+						&& this.department_icon == icon_ok
+						&& this.diagnosis_icon == icon_ok
 						)
 						return true;
 
@@ -345,13 +374,14 @@
 				middlename: function (val, valOld) {
 					this.middlename_icon = val != '' ? icon_ok : icon_fail;
 				},
-				position: function (val, valOld) {
-					this.position_icon = val != '' ? icon_ok : icon_fail;
+				date_of_birth: function (val, valOld) {
+					this.date_of_birth_icon = val != '' ? icon_ok : icon_fail;
 				},
-				email: function (val, valOld) {
-					// var isOk = rx_email.test(val);
-					var isOk = val.search(rx_email) != -1;
-					this.email_icon = isOk ? icon_ok : icon_fail;
+				department: function (val, valOld) {
+					this.department_icon = val != '' ? icon_ok : icon_fail;
+				},
+				diagnosis: function (val, valOld) {
+					this.diagnosis_icon = val != '' ? icon_ok : icon_fail;
 				},
 			},
 			methods: {
