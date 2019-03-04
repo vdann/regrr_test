@@ -349,10 +349,12 @@ def patient_view(id):
 	if user_role != db.UserRole.USER:
 		exceptions.abort(403)
 
+	# title
+	# 
+
 	server = {
 		'username': user_info.get('username'),
-		'menus': menus_user,
-		'title': id
+		'menus': menus_user
 	}
 	data = {}
 
@@ -364,8 +366,11 @@ def patient_view(id):
 	
 	if not db_patient:
 		server['isOk'] = False
+		server['title'] = "Пациент, #%s, не найден!" % id
 	else:
 		server['isOk'] = True
+		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, id)
+		server['patient'] = db_patient
 		data = db_patient.toJson()
 
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'

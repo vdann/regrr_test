@@ -33,6 +33,16 @@
 	vertical-align: middle;
 }
 
+/* margin */
+.mb-2em {
+	margin-bottom: 2em;
+}
+
+.mb-1_5em {
+	margin-bottom: 1.5em;
+}
+
+
 /* поля ввода как текст */
 input[type="text"].input-static,
 input[type="password"].input-static,

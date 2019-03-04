@@ -40,224 +40,53 @@
 				<!-- Banner -->
 				<section id="banner">
 					<div class="content">
-						<header class="major1">
-							<!--Breadcrumbs-->
-							<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title )) </div>
-						</header>
-
-						<br>
 
 						(% if not server.isOk %)
-							<h2>Пациент, <b>"(( server.title ))"</b>, не найден!</h2>
+							<header class="major1">
+								<!--Breadcrumbs-->
+								<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe )) </div>
+							</header>
+						
 						(% else %)
-							<form method="post" action="#" class="form-profile">
-								<div v-cloak class="row gtr-uniform">
+							<header class="major1">
+								<!--Breadcrumbs-->
+								<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe )) </div>
 
-									<!-- label + input - username -->
-									<div class="col-4 col-10-xsmall">
-										<input class="input-static input-static-bold" type="text" value="id" disabled />
-									</div>
-									<div class="col-0 col-2-xsmall align-right">
-										<div v-if="id_icon" class="icon-va-center">
-											<i class="[id_icon]"></i>
-										</div>
-									</div>
+							</header>
+							<br>
 
-									<div class="col-7 col-12-xsmall">
-										<input type="text" name="id" id="id"
-											class="input-static"
-											:value="id"
-											@input="id = $event.target.value"
-											placeholder="id"
-											required
-											disabled />
-									</div>
-									<div class="col-1 col-0-xsmall">
-										<div v-if="id_icon" class="icon-va-center">
-											<i class="[id_icon]"></i>
-										</div>
-									</div>
-
-
-									<!-- label + input - lastname -->
-									<div class="col-4 col-10-xsmall">
-										<input class="input-static input-static-bold" type="text" value="Фамилия" disabled />
-									</div>
-
-									<div class="col-0 col-2-xsmall align-right">
-										<div v-if="lastname_icon" class="icon-va-center">
-											<i class="[lastname_icon]"></i>
-										</div>
-									</div>
-
-									<div class="col-7 col-12-xsmall">
-										<input type="text" name="lastname" id="lastname"
-											class="input-static"
-											:value="lastname"
-											@input="lastname = $event.target.value"
-											placeholder="Фамилия"
-											required
-											disabled />
-									</div>
-									<div class="col-1 col-0-xsmall">
-										<div v-if="lastname_icon" class="icon-va-center">
-											<i class="[lastname_icon]"></i>
-										</div>
-									</div>
-
-									<!-- label + input - firstname -->
-									<div class="col-4 col-10-xsmall">
-										<input class="input-static input-static-bold" type="text" value="Имя" disabled />
-									</div>
-
-									<div class="col-0 col-2-xsmall align-right">
-										<div v-if="firstname_icon" class="icon-va-center">
-											<i class="[firstname_icon]"></i>
-										</div>
-									</div>
-
-									<div class="col-7 col-12-xsmall">
-										<input type="text" name="firstname" id="firstname"
-											class="input-static"
-											:value="firstname"
-											@input="firstname = $event.target.value"
-											placeholder="Имя"
-											required
-											disabled />
-									</div>
-									<div class="col-1 col-0-xsmall">
-										<div v-if="firstname_icon" class="icon-va-center">
-											<i class="[firstname_icon]"></i>
-										</div>
-									</div>
-
-									<!-- label + input - middlename -->
-									<div class="col-4 col-10-xsmall">
-										<input class="input-static input-static-bold" type="text" value="Отчество" disabled />
-									</div>
-
-									<div class="col-0 col-2-xsmall align-right">
-										<div v-if="middlename_icon" class="icon-va-center">
-											<i class="[middlename_icon]"></i>
-										</div>
-									</div>
-
-									<div class="col-7 col-12-xsmall">
-										<input type="text" name="middlename" id="middlename"
-											class="input-static"
-											:value="middlename"
-											@input="middlename = $event.target.value"
-											placeholder="Отчество"
-											required
-											disabled />
-									</div>
-									<div class="col-1 col-0-xsmall">
-										<div v-if="middlename_icon" class="icon-va-center">
-											<i class="[middlename_icon]"></i>
-										</div>
-									</div>
-
-
-								<!-- label + input - date_of_birth -->
-								<div class="col-4 col-10-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Дата рождения" disabled />
-								</div>
-
-								<div class="col-0 col-2-xsmall align-right">
-									<div v-if="date_of_birth_icon" class="icon-va-center">
-										<i :class="[date_of_birth_icon]"></i>
-									</div>
-								</div>
-
-								<div class="col-7 col-12-xsmall">
-									<input type="text" name="date_of_birth" id="date_of_birth"
-										class="input-static"
-										:value="date_of_birth"
-										@input="date_of_birth = $event.target.value"
-										placeholder="Дата рождения"
-										required
-										disabled />
-								</div>
-								<div class="col-1 col-0-xsmall">
-									<div v-if="date_of_birth_icon" class="icon-va-center">
-										<i :class="[date_of_birth_icon]"></i>
-									</div>
-								</div>
-
-
-								<!-- label + input department -->
-								<div class="col-4 col-10-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Отделение" disabled />
-								</div>
-
-								<div class="col-0 col-2-xsmall align-right">
-									<div v-if="department_icon" class="icon-va-center">
-										<i :class="[department_icon]"></i>
-									</div>
-								</div>
-
-								<div class="col-7 col-12-xsmall">
-									<input type="text" name="department" id="department"
-										class="input-static"
-										:value="department"
-										@input="department = $event.target.value"
-										placeholder="Отделение"
-										required
-										disabled />
-								</div>
-								<div class="col-1 col-0-xsmall">
-									<div v-if="department_icon" class="icon-va-center">
-										<i :class="[department_icon]"></i>
-									</div>
-								</div>
-
-
-								<!-- label + input diagnosis -->
-								<div class="col-4 col-10-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Диагноз" disabled />
-								</div>
-
-								<div class="col-0 col-2-xsmall align-right">
-									<div v-if="diagnosis_icon" class="icon-va-center">
-										<i :class="[diagnosis_icon]"></i>
-									</div>
-								</div>
-
-								<div class="col-7 col-12-xsmall">
-									<textarea name="diagnosis" id="diagnosis"
-										class="input-static"
-										:value="diagnosis"
-										@input="diagnosis = $event.target.value"
-										placeholder="Диагноз"
-										rows="6"
-										required
-										disabled>
-									</textarea>
-								</div>
-								<div class="col-1 col-0-xsmall">
-									<div v-if="diagnosis_icon" class="icon-va-center">
-										<i :class="[diagnosis_icon]"></i>
-									</div>
-								</div>
-
-
-									<!-- submit -->
-									<!--
-						<div class="col-12">
-							<ul class="actions">
-								<li>
-									<input
-										type="submit"
-										value="Добавить"
-										class="primary"
-										:disabled="!isEnableAdd"
-										/>
-								</li>
+							<ul class="alt">
+								<li><b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;(( server.patient.date_of_birth ))</li>
+								<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
+								<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
 							</ul>
-						</div>
-						-->
+							<br>
+
+							<div class="row">
+								<div class="col-10 col-12-small">
+									<div class="row">
+										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
+											<a href="#" class="button fit primary">Клинический анализ крови</a>
+										</div>
+										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
+											<a href="#" class="button fit primary">Биохимический анализ крови</a>
+										</div>
+										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
+											<a href="#" class="button fit primary">Коагулограмма</a>
+										</div>
+										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
+											<a href="#" class="button fit primary">Общий анализ мочи</a>
+										</div>
+										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
+											<a href="#" class="button fit primary">News (тест по вопросам)</a>
+										</div>
+										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
+											<a href="#" class="button fit primary">Другие</a>
+										</div>
+									</div>
 								</div>
-							</form>
+							</div>
+
 						(% endif %)
 					</div>
 				</section>
