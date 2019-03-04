@@ -50,43 +50,46 @@
 						(% else %)
 							<header class="major1">
 								<!--Breadcrumbs-->
-								<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe )) </div>
+								<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe )) &nbsp;&nbsp;/&nbsp;&nbsp; (( server.analysis_type_name )) </div>
 
 							</header>
 							<br>
 
-							<ul class="alt">
-								<li><b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;(( server.patient.date_of_birth ))</li>
-								<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
-								<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
-							</ul>
-							<br>
 
 							<div class="row">
-								<div class="col-10 col-12-small">
-									<div class="row">
-										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
-											<a href="/patient/(( server.patient.id))/analysis_type/1" class="button fit primary">Клинический анализ крови</a>
-										</div>
-										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
-											<a href="/patient/(( server.patient.id))/analysis_type/2" class="button fit primary">Биохимический анализ крови</a>
-										</div>
-										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
-											<a href="/patient/(( server.patient.id))/analysis_type/3" class="button fit primary">Коагулограмма</a>
-										</div>
-										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
-											<a href="/patient/(( server.patient.id))/analysis_type/4" class="button fit primary">Общий анализ мочи</a>
-										</div>
-										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
-											<a href="/patient/(( server.patient.id))/analysis_type/5" class="button fit primary">News (тест по вопросам)</a>
-										</div>
-										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
-											<a href="/patient/(( server.patient.id))/analysis_type/6" class="button fit primary">Другие</a>
-										</div>
-									</div>
+								<div class="col-12">
+									<a class="button primary"
+										href="/patient/((server.patient_id))/analysis_add/((server.analysis_type))"
+										title="Добавить новый анализ"
+										>Добавить</a>
 								</div>
 							</div>
-
+							<br>
+							<div class="table-wrapper">
+								<table class="alt">
+									<thead>
+										<tr>
+											<th>№</th>
+											<th>ФИО</th>
+											<th>Отеделение</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr v-for="(patient, i) in patients" key="patient.id">
+											<td v-html="i + 1"></td>
+											<td v-html="getFullname(patient)"></td>
+											<td v-html="patient.department"></td>
+											<td v-html="patient.diagnosis"></td>
+										</tr>
+									</tbody>
+									<tfoot>
+										<tr>
+											<!--										<td v-html="patients.length"></td>
+						-->
+										</tr>
+									</tfoot>
+								</table>
+							</div>
 						(% endif %)
 					</div>
 				</section>

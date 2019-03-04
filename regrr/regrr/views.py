@@ -341,16 +341,13 @@ def user_add_post():
 	return redirect('/')
 
 ################################################################
-@app.route('/patient/<id>', methods=['GET'])
-def patient_view(id):
+@app.route('/patient/<patient_id>', methods=['GET'])
+def patient_view(patient_id):
 
 	user_info = session.get(SESSION_KEY_USER)
 	user_role = user_info.get('role')
 	if user_role != db.UserRole.USER:
 		exceptions.abort(403)
-
-	# title
-	# 
 
 	server = {
 		'username': user_info.get('username'),
@@ -360,7 +357,7 @@ def patient_view(id):
 
 	db_session = db.Session()
 	db_patient = db_session.query(db.Patient).filter(
-		db.Patient.id.in_([id])
+		db.Patient.id.in_([patient_id])
 		)
 	db_patient = db_patient.first()
 	
@@ -369,7 +366,7 @@ def patient_view(id):
 		server['title'] = "Пациент, #%s, не найден!" % id
 	else:
 		server['isOk'] = True
-		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, id)
+		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
 		server['patient'] = db_patient
 		data = db_patient.toJson()
 
@@ -437,6 +434,72 @@ def patient_add_post():
 
 	return redirect('/')
 
+AnalysisType = {
+	'1': 'Клинический анализ крови',
+	'2': 'Биохимический анализ крови',
+	'3': 'Коагулограмма',
+	'4': 'Общий анализ мочи',
+	'5': 'News (тест по вопросам)',
+	'6': 'Другие'
+}
+
+@app.route('/patient/<patient_id>/analysis_type/<analysis_type>', methods=['GET'])
+def patient_analysis_type_viewer(patient_id, analysis_type):
+	"""Просмотр анализов по типам"""
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+	if user_role != db.UserRole.USER:
+		exceptions.abort(403)
+
+	server = {
+		'patient_id': patient_id,
+		'analysis_type': analysis_type,
+		'username': user_info.get('username'),
+		'menus': menus_user
+	}
+	data = {}
+
+	db_session = db.Session()
+	db_patient = db_session.query(db.Patient).filter(
+		db.Patient.id.in_([patient_id])
+		)
+	db_patient = db_patient.first()
+	
+	if not db_patient:
+		server['isOk'] = False
+		server['title'] = "Пациент, #%s, не найден!" % id
+	else:
+		server['isOk'] = True
+		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
+		server['analysis_type_name'] = AnalysisType.get(analysis_type)
+		server['patient'] = db_patient
+		data = db_patient.toJson()
+
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+	server['data'] = data
+
+	str = render_template('analysis_type.html', server = server)
+	return str
+
+@app.route('/patient/<patient_id>/analysis/<analysis_id>', methods=['GET'])
+def patient_analysis_viewer(patient_id, analysis_id):
+	"""Просмотр анализа по id"""
+	return 'Не реализовано'
+
+@app.route('/patient/<patient_id>/analysis_add/<analysis_type>', methods=['GET'])
+def patient_analysis_add(patient_id, analysis_type):
+	"""Добавить анализ (форма)"""
+	return 'Не реализовано'
+
+@app.route('/patient/<patient_id>/analysis_add/<analysis_type>', methods=['POST'])
+def patient_analysis_add_post(patient_id, analysis_type):
+	"""Добавить анализ (данные)"""
+	if not request.json:
+		# abort(400)
+		pass
+	return 'Не реализовано'
+	return jsonify({'result': result})
 
 ################################################################
 @app.route('/api/v1.0/test_username', methods=['POST'])

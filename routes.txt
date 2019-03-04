@@ -1,0 +1,30 @@
+/
+/favicon.png
+
+/login
+/login POST
+/logout
+
+/profile
+
+/user/<username>
+/user_add
+/user_add POST
+
+/patient/<id>
+/patient_add
+/patient_add POST
+
+/patient/<id>/analysis_type/<analysis_type>
+/patient/<id>/analysis/<analysis_id>
+/patient/<id>/analysis_add/<analysis_id>
+/patient/<id>/analysis_add/<analysis_id> POST:json
+
+/api/v1.0/test_username POST:json
+
+/feedback
+/feedback_result
+/feedback POST
+
+/contact
+/about
