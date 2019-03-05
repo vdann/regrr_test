@@ -82,7 +82,7 @@
 							<br>
 
 
-						<div class="row aln-center">
+						<div class="row aln-center1">
 							<div id="test_news" class="col-7 col-8-xlarge col-9-large col-10-medium col-12-small">
 								<ul class="alt">
 
@@ -142,6 +142,16 @@
 								<div class="box selected" v-html="result">
 
 								</div>
+
+								<ul class="actions">
+									<li>
+										<input type="submit"
+												value="Добавить"
+												class="primary"
+												:disabled="!isOk" />
+									</li>
+								</ul>
+
 							</div>
 						</div>
 
@@ -222,6 +232,7 @@ competencies and usually transfer of the patient to a higher dependency care are
 			el: '#test_news',
 			data: {
 				rows: rows,
+				isOk: false
 			},
 			computed: {
 				result: function () {
@@ -247,6 +258,7 @@ competencies and usually transfer of the patient to a higher dependency care are
 					var result = [];
 					result.push('<span class="fw-bold" style="font-size:1.75em;">' + points + ' points</span>');
 
+					this.isOk = isOk;
 					if (!isOk) {
 						result.push(message_not_all);
 					}
