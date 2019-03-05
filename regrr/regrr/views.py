@@ -500,7 +500,44 @@ def patient_analysis_viewer(patient_id, analysis_id):
 @app.route('/patient/<patient_id>/analysis_add/<analysis_type>', methods=['GET'])
 def patient_analysis_add(patient_id, analysis_type):
 	"""Добавить анализ (форма)"""
-	return 'Не реализовано'
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+	if user_role != db.UserRole.USER:
+		exceptions.abort(403)
+
+	server = {
+		'patient_id': patient_id,
+		'analysis_type': analysis_type,
+		'username': user_info.get('username'),
+		'menus': menus_user
+	}
+	data = {}
+
+	db_session = db.Session()
+	db_patient = db_session.query(db.Patient).filter(
+		db.Patient.id.in_([patient_id])
+		)
+	db_patient = db_patient.first()
+	
+	if not db_patient:
+		server['isOk'] = False
+		server['title'] = "Пациент, #%s, не найден!" % id
+	elif analysis_type != '5':
+		server['isOk'] = False
+		server['title'] = "Данный анализ не реализован"
+	else:
+		server['isOk'] = True
+		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
+		server['analysis_type_name'] = AnalysisType.get(analysis_type)
+		server['patient'] = db_patient
+		data = db_patient.toJson()
+
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+	server['data'] = data
+
+	str = render_template('analysis_add.html', server = server)
+	return str
 
 @app.route('/patient/<patient_id>/analysis_add/<analysis_type>', methods=['POST'])
 def patient_analysis_add_post(patient_id, analysis_type):

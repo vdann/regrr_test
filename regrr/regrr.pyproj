@@ -220,6 +220,7 @@
     <Content Include="regrr\static\_design\LICENSE.txt" />
     <Content Include="regrr\static\_design\README.txt" />
     <Content Include="regrr\static\_design\tests_viewer.html" />
+    <Content Include="regrr\templates\analysis_add.html" />
     <Content Include="regrr\templates\feedback.html" />
     <Content Include="regrr\templates\feedback_result.html" />
     <Content Include="regrr\templates\analysis_type.html" />

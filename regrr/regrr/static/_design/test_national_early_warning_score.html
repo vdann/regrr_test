@@ -6,6 +6,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="stylesheet" href="assets/css/main_ext.css" />
 
 		<style>
 			.table_variants {
@@ -16,7 +17,7 @@
 				background-color: #f5f1f1;
 			}
 
-			.table_variants tbody tr:hover {
+			.table_variants tbody td:hover {
 				background-color: #ffff99;
 			}
 
@@ -28,19 +29,6 @@
 			.selected {
 				color: #fff;
 				background-color: #1bb193;
-			}
-
-
-			.f_left {
-				float: left;
-			}
-
-			.f_right {
-				float: right;
-			}
-
-			.fw_bold {
-				font-weight: bold;
 			}
 
 		</style>
@@ -93,11 +81,11 @@
 																width="50%">
 
 																<span 
-																	  class="f_left" 
+																	  class="f-left" 
 																	  v-html="variant.name"
-																	  v-bind:class="{ fw_bold: test_row.index == index_var }">
+																	  v-bind:class="{ fw-bold: test_row.index == index_var }">
 																</span>
-																<span class="f_right"
+																<span class="f-right"
 																	  v-html="format_points(variant.points)">
 																</span>
 															</td>
@@ -112,13 +100,13 @@
 															v-on:click="select(index_row, index_var)">
 															<td>
 																<span 
-																	class="f_left"
+																	class="f-left"
 																	v-html="variant.name"
-																	v-bind:class="{ fw_bold: test_row.index == index_var }"
+																	v-bind:class="{ fw-bold: test_row.index == index_var }"
 																>
 																</span>
 																<span
-																	class="f_right"
+																	class="f-right"
 																	v-html="format_points(variant.points)"
 																>
 																</span>
@@ -323,7 +311,7 @@ competencies and usually transfer of the patient to a higher dependency care are
 					}
 
 					var result = [];
-					result.push('<span class="fw_bold" style="font-size:1.75em;">' + points + ' points</span>');
+					result.push('<span class="fw-bold" style="font-size:1.75em;">' + points + ' points</span>');
 
 					if (!isOk) {
 						result.push(message_not_all);

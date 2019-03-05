@@ -31,15 +31,15 @@
 			}
 
 
-			.f_left {
+			.f-left {
 				float: left;
 			}
 
-			.f_right {
+			.f-right {
 				float: right;
 			}
 
-			.fw_bold {
+			.fw-bold {
 				font-weight: bold;
 			}
 
@@ -92,10 +92,10 @@
 																v-on:click="select(index_row, index_var)"
 																width="50%">
 															
-																<span class="f_left" v-html="variant.name"
-																	v-bind:class="{ fw_bold: test_row.index == index_var }">
+																<span class="f-left" v-html="variant.name"
+																	v-bind:class="{ fw-bold: test_row.index == index_var }">
 																</span>
-																<span class="f_right">
+																<span class="f-right">
 																	<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
 																</span>
 															</td>
@@ -109,10 +109,10 @@
 															v-bind:class="{ selected: test_row.index == index_var }"
 															v-on:click="select(index_row, index_var)">
 															<td>
-																<span class="f_left" v-html="variant.name"
-																	  v-bind:class="{ fw_bold: test_row.index == index_var }">
+																<span class="f-left" v-html="variant.name"
+																	  v-bind:class="{ fw-bold: test_row.index == index_var }">
 																</span>
-																<span class="f_right">
+																<span class="f-right">
 																	<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
 																</span>
 															</td>
@@ -304,7 +304,7 @@
 					}
 
 					var result = [];
-					result.push('<span class="fw_bold" style="font-size:2.5em;">' + points + '</span> points<br>');
+					result.push('<span class="fw-bold" style="font-size:2.5em;">' + points + '</span> points<br>');
 					result.push('Geneva Risk Score for VTE Prophylaxis<br>');
 					result.push('<hr>');
 
@@ -313,17 +313,17 @@
 					}
 					else {
 						if (points < 3) {
-							result.push('<span class="fw_bold" style="font-size:2.5em;">0.6</span> %<br>');
+							result.push('<span class="fw-bold" style="font-size:2.5em;">0.6</span> %<br>');
 							result.push('VTE risk (composite of symptomatic VTE or 90-day VTE mortality)<br>');
 							result.push('<hr>');
-							result.push('<span class="fw_bold" style="font-size:2.5em;">Low</span> risk<br>');
+							result.push('<span class="fw-bold" style="font-size:2.5em;">Low</span> risk<br>');
 							result.push('VTE prophylaxis NOT indicated');
 						}
 						else {
-							result.push('<span class="fw_bold" style="font-size:2.5em;">3.2</span> %<br>');
+							result.push('<span class="fw-bold" style="font-size:2.5em;">3.2</span> %<br>');
 							result.push('VTE risk (composite of symptomatic VTE or 90-day VTE mortality)<br>');
 							result.push('<hr>');
-							result.push('<span class="fw_bold" style="font-size:2.5em;">High</span> risk<br>');
+							result.push('<span class="fw-bold" style="font-size:2.5em;">High</span> risk<br>');
 							result.push('VTE prophylaxis indicated (presuming no contraindications)');
 						}
 					}

@@ -20,11 +20,11 @@
 
 
 /* выравнивание по горизонтали */
-.f_left {
+.f-left {
 	float: left;
 }
 
-.f_right {
+.f-right {
 	float: right;
 }
 
@@ -40,6 +40,10 @@
 
 .mb-1_5em {
 	margin-bottom: 1.5em;
+}
+
+.fw-bold {
+	font-weight: bold;
 }
 
 
