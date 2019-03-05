@@ -158,7 +158,7 @@
 									</div>
 
 
-									<!-- label + input -->
+									<!-- label + input position -->
 									<div class="col-4 col-10-xsmall">
 										<input class="input-static input-static-bold" type="text" value="Должность" disabled />
 									</div>
@@ -185,7 +185,7 @@
 									</div>
 
 
-									<!-- label + input -->
+									<!-- label + input email -->
 									<div class="col-4 col-10-xsmall">
 										<input class="input-static input-static-bold" type="text" value="Почта" disabled />
 									</div>
@@ -211,6 +211,56 @@
 										</div>
 									</div>
 
+									<!-- label + input date_of_creation -->
+									<div class="col-4 col-10-xsmall">
+										<input class="input-static input-static-bold" type="text" value="Дата создания" disabled />
+									</div>
+
+									<div class="col-0 col-2-xsmall align-right">
+										<div v-if="date_of_creation_icon" class="icon-va-center">
+											<i class="[date_of_creation_icon]"></i>
+										</div>
+									</div>
+
+									<div class="col-7 col-12-xsmall">
+										<input type="text" name="date_of_creation" id="date_of_creation"
+											class="input-static"
+											:value="date_of_creation"
+											@input="date_of_creation = $event.target.value"
+											placeholder="Дата создания"
+											required
+											disabled />
+									</div>
+									<div class="col-1 col-0-xsmall">
+										<div v-if="date_of_creation_icon" class="icon-va-center">
+											<i class="[date_of_creation_icon]"></i>
+										</div>
+									</div>
+
+
+									<!-- label + input date_of_last_visit -->
+									<div class="col-4 col-10-xsmall">
+										<input class="input-static input-static-bold" type="text" value="Последний визит" disabled />
+									</div>
+									<div class="col-0 col-2-xsmall align-right">
+										<div v-if="date_of_last_visit_icon" class="icon-va-center">
+											<i class="[date_of_last_visit_icon]"></i>
+										</div>
+									</div>
+									<div class="col-7 col-12-xsmall">
+										<input type="text" name="date_of_last_visit" id="date_of_last_visit"
+											class="input-static"
+											:value="date_of_last_visit"
+											@input="date_of_last_visit = $event.target.value"
+											placeholder="Последний визит"
+											required
+											disabled />
+									</div>
+									<div class="col-1 col-0-xsmall">
+										<div v-if="date_of_last_visit_icon" class="icon-va-center">
+											<i class="[date_of_last_visit_icon]"></i>
+										</div>
+									</div>
 
 									<!-- submit -->
 									<!--
@@ -344,6 +394,12 @@
 		data.position_icon = null;
 		data.email = data.email || '';
 		data.email_icon = null;
+		data.date_of_creation = data.date_of_creation || '';
+		data.date_of_creation_icon = null;
+		data.date_of_last_visit = data.date_of_last_visit || '';
+		data.date_of_last_visit_icon = null;
+
+		
 
 		//data.editing = data.editing || true;
 		//data.saving = data.saving || false;

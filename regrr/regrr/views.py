@@ -109,6 +109,12 @@ def before_request():
 		# print('before_request fail:' + path)
 		return redirect('/login')
 
+	#db_session = db.Session()
+	#db_query = db_session.query(db.User).get(user_info.get('id'))
+	#user = db_query.first()
+	#db_session.add(user)
+	#db_session.commit()
+
 	# print('before_request ok:' + path)
 
 #############################################################
@@ -204,6 +210,10 @@ def login_post():
 		'username': result.username,
 		'role': result.role
 	}
+
+	result.date_of_last_visit = datetime.utcnow()
+	db_session.commit()
+
 
 	session[SESSION_KEY_USER] = user_lite
 	session.permanent = remember

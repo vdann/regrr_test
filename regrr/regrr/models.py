@@ -5,6 +5,8 @@ import sqlalchemy.ext.declarative
 #from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
+from datetime import datetime
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 db_file = '../data/tutorial.db'
@@ -45,6 +47,12 @@ class Metadata(Base):
 	def __repr__(self):
 		return "<Metadata (%s, %s)>" % (self.key, self.value)
 
+import time
+
+def utc2local (utc):
+	epoch = time.mktime(utc.timetuple())
+	offset = datetime.fromtimestamp (epoch) - datetime.utcfromtimestamp (epoch)
+	return utc + offset
 
 ########################################################################
 class User(Base):
@@ -52,17 +60,21 @@ class User(Base):
 	__tablename__ = "users"
 
 	id = sa.Column(sa.Integer, primary_key=True)
-	username = sa.Column(sa.String, unique=True, index=True)
-	password = sa.Column(sa.String)
-	role = sa.Column(sa.Integer)
+	username = sa.Column(sa.String(50), unique=True, index=True)
+	password = sa.Column(sa.String(100), nullable=False)
+	role = sa.Column(sa.Integer, nullable=False)
 
-	lastname = sa.Column(sa.String)
-	firstname = sa.Column(sa.String)
-	middlename = sa.Column(sa.String)
+	lastname = sa.Column(sa.String(50), nullable=False)
+	firstname = sa.Column(sa.String(50), nullable=False)
+	middlename = sa.Column(sa.String(50), nullable=False)
 
-	position = sa.Column(sa.String)
+	position = sa.Column(sa.String(200), nullable=False)
 
-	email = sa.Column(sa.String)
+	email = sa.Column(sa.String(100))
+
+	date_of_creation = sa.Column(sa.DateTime(), default=datetime.utcnow)
+	#date_of_creation = sa.Column(sa.DateTime(), default=datetime.utcnow)
+	date_of_last_visit = sa.Column(sa.DateTime(), default=datetime.utcnow)#, onupdate=datetime.utcnow)
 	#date_of_birth = sa.Column(sa.String)
 
 	#----------------------------------------------------------------------
@@ -81,6 +93,7 @@ class User(Base):
 	def __repr__(self):
 		return "<User (id: %s, %s)>" % (self.id, self.username)
 
+
 	def toJson(self):
 		j = {}
 		j['id'] = self.id
@@ -92,7 +105,17 @@ class User(Base):
 		j['middlename'] = self.middlename
 		j['position'] = self.position
 		j['email'] = self.email
+		j['date_of_creation'] = utc2local(self.date_of_creation).strftime("%Y-%m-%d %H:%M:%S") #isoformat()
+		j['date_of_last_visit'] = utc2local(self.date_of_last_visit).strftime("%Y-%m-%d %H:%M:%S") #isoformat()
 		return j
+
+	def ping(self):
+		self.date_of_last_visit = datetime.utcnow
+		session = Session.object_session(self)
+		#session = Session()
+		session.add(self)
+		session.commit()
+
 
 ########################################################################
 class Patient(Base):
@@ -146,7 +169,11 @@ class Patient(Base):
 		j['department'] = self.department
 		j['diagnosis'] = self.diagnosis
 		return j
+	
+	#def getLastnameAndInitials(self):
+	#	retturn "{} {}.{}.".format(self.lastname, self.firstname, self.middlename)
 
+	
 
 
 # create tables
