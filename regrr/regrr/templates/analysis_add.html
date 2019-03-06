@@ -157,6 +157,16 @@
 						</div>
 
 						<script>
+
+		var data = {};
+
+		try {
+			((server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы');
+		}
+
 		function nbsp(s) {
 			return s.replace(/ /g, '&nbsp;');
 		}
@@ -235,6 +245,9 @@ competencies and usually transfer of the patient to a higher dependency care are
 				rows: rows,
 				isOk: false,
 				results: {
+					patient_id: data.patient_id,
+					analysis_type: data.analysis_type,
+					result: '',
 					points: 0,
 					isRed: false,
 					items: []
@@ -287,6 +300,11 @@ competencies and usually transfer of the patient to a higher dependency care are
 							result.push(message_7_points);
 					}
 
+					mes = points + ' points';
+					if (isRed)
+						mes += ' (red)';
+
+					this.results.result = mes;
 					this.results.points = points;
 					this.results.isRed = isRed;
 					this.results.items = items;
@@ -306,17 +324,17 @@ competencies and usually transfer of the patient to a higher dependency care are
 				sendResult: function () {
 
 					console.log('sendResult', JSON.stringify(this.results));
-					return;
-
-					axios.post('/api/v1.0/analysis', {
-						username: this.username
-					})
+//					return;
+					var me = this;
+					axios.post('/api/v1.0/analysis', this.results)
 					.then(function (response) {
-						console.log(response.data.result);
-						vm.username_icon = response.data.result ? icon_ok : icon_fail;
+						var url = "/patient/" + me.results.patient_id + "/analysis_type/" + me.results.analysis_type;
+						window.location.replace(url);
+//						console.log(response.data.result);
+//						vm.username_icon = response.data.result ? icon_ok : icon_fail;
 					})
 					.catch(function (error) {
-						vm.username_icon = icon_fail;
+//						vm.username_icon = icon_fail;
 						console.log('Error!');
 					});
 

@@ -39,7 +39,7 @@
 
 				<!-- Banner -->
 				<section id="banner">
-					<div class="content">
+					<div class="content" id="analizes">
 
 						(% if not server.isOk %)
 							<header class="major1">
@@ -65,22 +65,26 @@
 								</div>
 							</div>
 							<br>
-							<div class="table-wrapper">
+
+
+							<div v-if="analyzes.length" class="table-wrapper">
 								<table class="alt">
 									<thead>
 										<tr>
 											<th>№</th>
+											<th>id</th>
+											<th>user_id</th>
 											<th>Дата</th>
 											<th>Результат</th>
-											<th>Примечание</th>
 										</tr>
 									</thead>
 									<tbody>
-										<tr v-for="(patient, i) in patients" key="patient.id">
+										<tr v-for="(analysis, i) in analyzes" :key="analysis.id">
 											<td v-html="i + 1"></td>
-											<td v-html="getFullname(patient)"></td>
-											<td v-html="patient.department"></td>
-											<td v-html="patient.diagnosis"></td>
+											<td v-html="analysis.id"></td>
+											<td v-html="analysis.user"></td>
+											<td v-html="analysis.date_of_creation"></td>
+											<td v-html="analysis.result"></td>
 										</tr>
 									</tbody>
 									<tfoot>
@@ -91,6 +95,10 @@
 									</tfoot>
 								</table>
 							</div>
+
+							<p v-else>
+								Нет записей
+							</p>
 						(% endif %)
 					</div>
 				</section>
@@ -211,6 +219,11 @@
 
 		//data.editing = data.editing || true;
 		//data.saving = data.saving || false;
+
+		var app = new Vue({
+			el: '#analizes',
+			data: data
+		});
 
 		/*
 		var app = new Vue({

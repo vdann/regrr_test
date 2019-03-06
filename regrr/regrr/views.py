@@ -462,12 +462,12 @@ def patient_analysis_type_viewer(patient_id, analysis_type):
 	if user_role != db.UserRole.USER:
 		exceptions.abort(403)
 
-	server = {
-		'patient_id': patient_id,
-		'analysis_type': analysis_type,
-		'username': user_info.get('username'),
-		'menus': menus_user
-	}
+	server = {}
+	server['patient_id'] = patient_id
+	server['analysis_type'] = analysis_type
+	server['username'] = user_info.get('username')
+	server['menus'] = menus_user
+
 	data = {}
 
 	db_session = db.Session()
@@ -484,7 +484,23 @@ def patient_analysis_type_viewer(patient_id, analysis_type):
 		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
 		server['analysis_type_name'] = AnalysisType.get(analysis_type)
 		server['patient'] = db_patient
-		data = db_patient.toJson()
+
+		db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
+			db.Analysis.type.in_([analysis_type]),
+			db.Analysis.patient_id.in_([patient_id]),
+			db.Analysis.user_id == db.User.id
+		)
+
+		janalyzes = []
+		for db_item in db_query:
+			jAnalysis = db_item.Analysis.toJson()
+			jAnalysis['user'] = db.makeLastnameAndInitials(db_item.lastname, db_item.firstname, db_item.middlename)
+			janalyzes.append(jAnalysis)
+
+		#data = db_patient.toJson()
+		data['patient_id'] = patient_id
+		data['analysis_type'] = analysis_type
+		data['analyzes'] = janalyzes
 
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 	server['data'] = data
@@ -531,7 +547,9 @@ def patient_analysis_add(patient_id, analysis_type):
 		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
 		server['analysis_type_name'] = AnalysisType.get(analysis_type)
 		server['patient'] = db_patient
-		data = db_patient.toJson()
+
+		data['patient_id'] = patient_id
+		data['analysis_type'] = analysis_type
 
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 	server['data'] = data
@@ -564,20 +582,36 @@ def api_test_username():
 	result = query.first() == None
 	return jsonify({'result': result})
 
+import json
 @app.route('/api/v1.0/analysis', methods=['POST'])
 def api_analysis_add():
 	if not request.json:
 		abort(400)
 
-	patient_id = request.json.get('patient_id')
-	analysis_type = request.json.get('analysis_type')
+	patient_id = int(request.json.get('patient_id'))
+	analysis_type = int(request.json.get('analysis_type'))
+	result = request.json.get('result')
+
+	data = {}
+	data['analysis_type'] = analysis_type
+	data['points'] = request.json.get('points')
+	data['isRed'] = request.json.get('isRed')
+	data['items'] = request.json.get('items')
+	data = json.dumps(data)
 	
 	if not patient_id or patient_id == '':
 		abort(400)
 
+	user_info = session.get(SESSION_KEY_USER)
+
+	user_id = user_info.get('id')
+
 	db_session = db.Session()
-	#query = db_session.query(db.User).filter(
-	#	db.User.username.in_([username]))
+	
+	analysis = db.Analysis(user_id, patient_id, analysis_type, result, data)
+	db_session.add(analysis)
+	db_session.commit()
+
 	#result = query.first() == None
 	result = True
 	return jsonify({'result': result})

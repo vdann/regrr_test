@@ -22,7 +22,7 @@ db_file = 'sqlite:///' + db_file
 engine = sa.create_engine(db_file, echo=True)
 Base = sa.ext.declarative.declarative_base()
 
-db_version = 1
+db_version = 2
 
 ########################################################################
 from enum import IntEnum
@@ -53,6 +53,10 @@ def utc2local (utc):
 	epoch = time.mktime(utc.timetuple())
 	offset = datetime.fromtimestamp (epoch) - datetime.utcfromtimestamp (epoch)
 	return utc + offset
+
+def makeLastnameAndInitials(lastname, firstname, middlename):
+	str = "{} {}.{}.".format(lastname, firstname[0], middlename[0])
+	return str
 
 ########################################################################
 class User(Base):
@@ -236,7 +240,7 @@ class Analysis(Base):
 		j['user_id'] = self.user_id
 		j['patient_id'] = self.patient_id
 		j['type'] = self.type
-		j['date_of_creation'] = self.date_of_creation
+		j['date_of_creation'] = utc2local(self.date_of_creation).strftime("%Y-%m-%d %H:%M:%S") #isoformat()
 		j['result'] = self.result
 		j['data'] = self.data
 		return j
@@ -310,8 +314,6 @@ def initTestUsers():
 
 	resultUsers = session.query(User).all()
 	if len(resultUsers) == 1:
-		user = User("user", "user", UserRole.USER, 'Userov', 'User', 'Userovich', 'Врач', 'user@yan.ru')
-		session.add(user)
 
 		user = User("ivanov", "ivanov", UserRole.USER, 'Иванов', 'Иван', 'Иванович', 'Асистент', 'ivan@yan.ru')
 		session.add(user)
@@ -319,22 +321,26 @@ def initTestUsers():
 		user = User("petrov", "petrov", UserRole.USER, 'Петров', 'Петр', 'Петрович', 'Заведующий', 'petrov@yan.ru')
 		session.add(user)
 
+		user = User("user", "user", UserRole.USER, 'Сергеев', 'Сергей', 'Сергеевич', 'Врач', 'user@yan.ru')
+		session.add(user)
+
 
 	resultPatients = session.query(Patient).all()
 	if len(resultPatients) == 0:
-		patient = Patient('Петров', 'Петр', 'Петрович', '01.01.1980', '9. Отделение анестезиологии-реанимации', 'Диагноз 1')
+		patient = Patient('Набиев', 'Гасан', 'Набиевич', '01.01.1980', '9. Отделение анестезиологии-реанимации', 'Диагноз 1')
 		session.add(patient)
 		
-		patient = Patient('Иванов', 'Иван', 'Иванович', '02.02.1965', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 2')
+		patient = Patient('Воробъев', 'Илья', 'Игоревич', '02.02.1965', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 2')
 		session.add(patient)
 
-		patient = Patient('Сидоров', 'Сидор', 'Сидорович', '12.03.1970', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 3')
+		patient = Patient('Зырянов', 'Станислав', 'Александрович', '12.03.1970', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 3')
 		session.add(patient)
 
 	resultAnalyzes = session.query(Analysis).all()
 	if len(resultAnalyzes) == 0:
 
-		user = session.query(User).first()
+		user = session.query(User).filter(
+			User.role.in_([UserRole.USER])).first()
 		patient = session.query(Patient).first()
 
 		json_data = '''{"points":8,"isRed":true,"items":[{"name":"Respiratory Rate","label":"≤8","points":3},{"name":"Oxygen Saturations","label":"94-95%","points":1},{"name":"Any Supplemental Oxygen","label":"No","points":0},{"name":"Temperature","label":"38.1-39°C&nbsp;/&nbsp;100.5-102.2°F","points":1},{"name":"Systolic Blood Pressure","label":"111-219","points":0},{"name":"Heart Rate","label":"≥131","points":3},{"name":"AVPU Score (Alert, Voice, Pain, Unresponsive)","label":"A","points":0}]}'''
