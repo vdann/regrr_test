@@ -73,7 +73,7 @@
 						(% else %)
 							<header class="major1">
 								<!--Breadcrumbs-->
-								<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe )) &nbsp;&nbsp;/&nbsp;&nbsp; (( server.analysis_type_name )) </div>
+								<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe )) </div>
 
 								<h2>National Early Warning Score (NEWS)</h2>
 								<p>Determines the degree of illness of a patient and prompts critical care intervention.</p>
@@ -146,9 +146,10 @@
 								<ul class="actions">
 									<li>
 										<input type="submit"
-												value="Добавить"
-												class="primary"
-												:disabled="!isOk" />
+											value="Добавить"
+											class="primary"
+											:disabled="!isOk"
+											@click="sendResult"/>
 									</li>
 								</ul>
 
@@ -232,7 +233,12 @@ competencies and usually transfer of the patient to a higher dependency care are
 			el: '#test_news',
 			data: {
 				rows: rows,
-				isOk: false
+				isOk: false,
+				results: {
+					points: 0,
+					isRed: false,
+					items: []
+				}
 			},
 			computed: {
 				result: function () {
@@ -240,6 +246,7 @@ competencies and usually transfer of the patient to a higher dependency care are
 					var isOk = true;
 					var isRed = false;
 					var points = 0;
+					var items = [];
 
 					for (var i = 0, n = this.rows.length; i < n; ++i) {
 						var row = this.rows[i];
@@ -248,9 +255,12 @@ competencies and usually transfer of the patient to a higher dependency care are
 							continue;
 						}
 
-						var cur_points = row.variants[row.index].points;
+						var variant = row.variants[row.index];
+						var cur_points = variant.points;
 						if (cur_points == 3)
 							isRed = true;
+
+						items.push({ name: row.name, label: variant.name, points: cur_points });
 
 						points += cur_points;
 					}
@@ -277,6 +287,10 @@ competencies and usually transfer of the patient to a higher dependency care are
 							result.push(message_7_points);
 					}
 
+					this.results.points = points;
+					this.results.isRed = isRed;
+					this.results.items = items;
+
 					return result.join('<br><br>');
 				}
 			},
@@ -288,6 +302,24 @@ competencies and usually transfer of the patient to a higher dependency care are
 					if (points > 0)
 						return '+ ' + points;
 					return points;
+				},
+				sendResult: function () {
+
+					console.log('sendResult', JSON.stringify(this.results));
+					return;
+
+					axios.post('/api/v1.0/analysis', {
+						username: this.username
+					})
+					.then(function (response) {
+						console.log(response.data.result);
+						vm.username_icon = response.data.result ? icon_ok : icon_fail;
+					})
+					.catch(function (error) {
+						vm.username_icon = icon_fail;
+						console.log('Error!');
+					});
+
 				}
 			}
 		});

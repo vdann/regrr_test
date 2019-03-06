@@ -564,6 +564,24 @@ def api_test_username():
 	result = query.first() == None
 	return jsonify({'result': result})
 
+@app.route('/api/v1.0/analysis', methods=['POST'])
+def api_analysis_add():
+	if not request.json:
+		abort(400)
+
+	patient_id = request.json.get('patient_id')
+	analysis_type = request.json.get('analysis_type')
+	
+	if not patient_id or patient_id == '':
+		abort(400)
+
+	db_session = db.Session()
+	#query = db_session.query(db.User).filter(
+	#	db.User.username.in_([username]))
+	#result = query.first() == None
+	result = True
+	return jsonify({'result': result})
+
 ################################################################
 @app.route('/feedback', methods=['GET'])
 def feedback():

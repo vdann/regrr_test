@@ -116,6 +116,10 @@ class User(Base):
 		session.add(self)
 		session.commit()
 
+	def getLastnameAndInitials(self):
+		str = "{} {}.{}.".format(self.lastname, self.firstname[0], self.middlename[0])
+		return str
+
 
 ########################################################################
 class Patient(Base):
@@ -170,12 +174,74 @@ class Patient(Base):
 		j['diagnosis'] = self.diagnosis
 		return j
 	
-	#def getLastnameAndInitials(self):
-	#	retturn "{} {}.{}.".format(self.lastname, self.firstname, self.middlename)
+	def getLastnameAndInitials(self):
+		str = "{} {}.{}.".format(self.lastname, self.firstname[0], self.middlename[0])
+		return str
 
-	
+
+class AnalysisType(IntEnum):
+	Клинический_анализ_крови = 1
+	Биохимический_анализ_крови = 2
+	Коагулограмма = 3
+	Общий_анализ_мочи = 4
+	News = 5
+	Другие = 6
 
 
+AnalysisTypeStr = {
+	AnalysisType.Клинический_анализ_крови: 'Клинический анализ крови',
+	AnalysisType.Биохимический_анализ_крови: 'Биохимический анализ крови',
+	AnalysisType.Коагулограмма: 'Коагулограмма',
+	AnalysisType.Общий_анализ_мочи: 'Общий анализ мочи',
+	AnalysisType.News: 'News (тест по вопросам)',
+	AnalysisType.Другие: 'Другие',
+	}
+
+########################################################################
+class Analysis(Base):
+	"""Анализы"""
+	__tablename__ = "analyzes"
+
+	id = sa.Column(sa.Integer, primary_key=True)
+	user_id = sa.Column(sa.Integer) # кто добавил
+	patient_id = sa.Column(sa.Integer) # для какого пациента
+
+	type = sa.Column(sa.Integer) # тип анализа
+	date_of_creation = sa.Column(sa.DateTime(), default=datetime.utcnow) # когда зарегистрирован
+
+	result = sa.Column(sa.String) # результат
+	data = sa.Column(sa.String) # данные
+
+	#----------------------------------------------------------------------
+	def __init__(self,
+		user_id,
+		patient_id,
+		type,
+		result,
+		data):
+		""""""
+		self.user_id = user_id
+		self.patient_id = patient_id
+		self.type = type
+		self.result = result
+		self.data = data
+
+	def __repr__(self):
+		return "<Аnalysis (id: %s, user: %s, patient: %s, type: %s, result: %s)>" \
+			% (self.id, self.user_id, self.patient_id, self.type, self.result)
+
+	def toJson(self):
+		j = {}
+		j['id'] = self.id
+		j['user_id'] = self.user_id
+		j['patient_id'] = self.patient_id
+		j['type'] = self.type
+		j['date_of_creation'] = self.date_of_creation
+		j['result'] = self.result
+		j['data'] = self.data
+		return j
+
+########################################################################
 # create tables
 Base.metadata.create_all(engine)
 
@@ -209,6 +275,11 @@ def initAdmin():
 		if isOk:
 			query = session.query(Patient)
 			query = query.first()
+
+		if isOk:
+			query = session.query(Analysis)
+			query = query.first()
+			
 
 	except exc.SQLAlchemyError as err:
 		print ("models.init: except exc.SQLAlchemyError", err)
@@ -248,6 +319,7 @@ def initTestUsers():
 		user = User("petrov", "petrov", UserRole.USER, 'Петров', 'Петр', 'Петрович', 'Заведующий', 'petrov@yan.ru')
 		session.add(user)
 
+
 	resultPatients = session.query(Patient).all()
 	if len(resultPatients) == 0:
 		patient = Patient('Петров', 'Петр', 'Петрович', '01.01.1980', '9. Отделение анестезиологии-реанимации', 'Диагноз 1')
@@ -259,7 +331,21 @@ def initTestUsers():
 		patient = Patient('Сидоров', 'Сидор', 'Сидорович', '12.03.1970', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 3')
 		session.add(patient)
 
-		session.commit()
+	resultAnalyzes = session.query(Analysis).all()
+	if len(resultAnalyzes) == 0:
+
+		user = session.query(User).first()
+		patient = session.query(Patient).first()
+
+		json_data = '''{"points":8,"isRed":true,"items":[{"name":"Respiratory Rate","label":"≤8","points":3},{"name":"Oxygen Saturations","label":"94-95%","points":1},{"name":"Any Supplemental Oxygen","label":"No","points":0},{"name":"Temperature","label":"38.1-39°C&nbsp;/&nbsp;100.5-102.2°F","points":1},{"name":"Systolic Blood Pressure","label":"111-219","points":0},{"name":"Heart Rate","label":"≥131","points":3},{"name":"AVPU Score (Alert, Voice, Pain, Unresponsive)","label":"A","points":0}]}'''
+
+		analysis = Analysis(user.id, patient.id, AnalysisType.News, '8 points (red)', json_data)
+		session.add(analysis)
+
+		analysis = Analysis(user.id, patient.id, AnalysisType.News, '7 points (red)', json_data)
+		session.add(analysis)
+		
+	session.commit()
 
 initAdmin()
 
