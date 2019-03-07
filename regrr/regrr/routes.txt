@@ -1,0 +1,71 @@
+/
+/favicon.png
+
+/login
+/login POST
+/logout
+
+/profile
+
+/user/<username>
+/user_add
+/user_add POST
+
+/patient/<id>
+/patient_add
+/patient_add POST
+
+
+/patient/<id>/analysis_type/<analysis_type>/analysis
+/patient/<id>/analysis_type/<analysis_type>/analysis/<analysis>
+
+/patient/<id>/analysis_type/<analysis_type>/analysis_add
+
+/patient/<id>/analysis
+/patient/<id>/analysis/<analysis_id>
+
+/patient/<id>/analysis_add/<analysis_type>
+/patient/<id>/analysis_add/<analysis_type> POST:json
+
+
+
+/api/v1.0/test_username POST:json
+
+/feedback
+/feedback_result
+/feedback POST
+
+/contact
+/about
+
+static                                   GET, HEAD, OPTIONS        /static/<path:filename>
+favicon                                  GET, HEAD, OPTIONS        /favicon.png
+index                                    GET, HEAD, OPTIONS        /
+login                                    GET, HEAD, OPTIONS        /login
+login_post                               OPTIONS, POST             /login
+logout                                   GET, HEAD, OPTIONS        /logout
+profile                                  GET, HEAD, OPTIONS        /profile
+user_view                                GET, HEAD, OPTIONS        /user/<username>
+user_add                                 GET, HEAD, OPTIONS        /user_add
+user_add_post                            OPTIONS, POST             /user_add
+patient_view                             GET, HEAD, OPTIONS        /patient/<patient_id>
+patient_add                              GET, HEAD, OPTIONS        /patient_add
+patient_add_post                         OPTIONS, POST             /patient_add
+patient_analysis_type_analyzes_viewer    GET, HEAD, OPTIONS        /patient/<patient_id>/analysis_type/<analysis_type>/analysis
+patient_analysis_type_analysis_viewer    GET, HEAD, OPTIONS        /patient/<patient_id>/analysis_type/<analysis_type>/analysis/<analysis>
+patient_analysis_type_analysis_add       GET, HEAD, OPTIONS        /patient/<patient_id>/analysis_type/<analysis_type>/analysis_add
+patient_analysis_type_analysis_add_post  OPTIONS, POST             /patient/<patient_id>/analysis_type/<analysis_type>/analysis_add
+
+patient_analysis_viewer                  GET, HEAD, OPTIONS        /patient/<patient_id>/analysis/<analysis_id>
+patient_analysis_add                     GET, HEAD, OPTIONS        /patient/<patient_id>/analysis_add/<analysis_type>
+patient_analysis_add_post                OPTIONS, POST             /patient/<patient_id>/analysis_add/<analysis_type>
+test_system                              GET, HEAD, OPTIONS        /test_system
+routes                                   GET, HEAD, OPTIONS        /test_routes
+api_test_username                        OPTIONS, POST             /api/v1.0/test_username
+api_analysis_add                         OPTIONS, POST             /api/v1.0/analysis
+feedback                                 GET, HEAD, OPTIONS        /feedback
+feedback_result                          GET, HEAD, OPTIONS        /feedback_result
+feedback_post                            OPTIONS, POST             /feedback
+contact                                  GET, HEAD, OPTIONS        /contact
+about                                    GET, HEAD, OPTIONS        /about
+

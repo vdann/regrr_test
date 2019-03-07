@@ -18,11 +18,10 @@
     <PythonWsgiHandler>$(MSBuildProjectName).app</PythonWsgiHandler>
     <Name>regrr</Name>
     <RootNamespace>regrr</RootNamespace>
-    <InterpreterId>
-    </InterpreterId>
-    <InterpreterVersion>
-    </InterpreterVersion>
-    <WebBrowserPort>16091</WebBrowserPort>
+    <InterpreterId>{c87d6de4-d036-468b-9ab4-c48a735924a3}</InterpreterId>
+    <InterpreterVersion>3.5</InterpreterVersion>
+    <WebBrowserPort>16092</WebBrowserPort>
+    <PublishUrl>./dist</PublishUrl>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -77,6 +76,7 @@
     <Folder Include="regrr\templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="regrr\routes.txt" />
     <Content Include="regrr\static\favicon.png" />
     <Content Include="regrr\static\_design\assets\css\font-awesome.min.css" />
     <Content Include="regrr\static\_design\assets\css\main_ext.css" />
@@ -221,6 +221,7 @@
     <Content Include="regrr\static\_design\README.txt" />
     <Content Include="regrr\static\_design\tests_viewer.html" />
     <Content Include="regrr\templates\analysis_add.html" />
+    <Content Include="regrr\templates\analysis_type_analysis.html" />
     <Content Include="regrr\templates\feedback.html" />
     <Content Include="regrr\templates\feedback_result.html" />
     <Content Include="regrr\templates\analysis_type.html" />
@@ -258,6 +259,20 @@
     <Content Include="regrr\templates\_src_contact.html" />
     <Content Include="regrr\templates\index.html" />
     <Content Include="regrr\templates\_src_layout.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Interpreter Include="env36\">
+      <Id>{c87d6de4-d036-468b-9ab4-c48a735924a3}</Id>
+      <BaseInterpreter>{377e6200-8b84-4366-a408-a278a90d96df}</BaseInterpreter>
+      <Version>3.5</Version>
+      <Description>env36 (Py3.6)</Description>
+      <InterpreterPath>Scripts\python.exe</InterpreterPath>
+      <WindowsInterpreterPath>Scripts\python.exe</WindowsInterpreterPath>
+      <LibraryPath>Lib\</LibraryPath>
+      <PathEnvironmentVariable>
+      </PathEnvironmentVariable>
+      <Architecture>X86</Architecture>
+    </Interpreter>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

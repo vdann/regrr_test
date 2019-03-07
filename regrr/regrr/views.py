@@ -444,6 +444,7 @@ def patient_add_post():
 
 	return redirect('/')
 
+################################################################
 AnalysisType = {
 	'1': 'Клинический анализ крови',
 	'2': 'Биохимический анализ крови',
@@ -453,9 +454,9 @@ AnalysisType = {
 	'6': 'Другие'
 }
 
-@app.route('/patient/<patient_id>/analysis_type/<analysis_type>', methods=['GET'])
-def patient_analysis_type_viewer(patient_id, analysis_type):
-	"""Просмотр анализов по типам"""
+@app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis', methods=['GET'])
+def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
+	"""Просмотр анализов заданного типа"""
 
 	user_info = session.get(SESSION_KEY_USER)
 	user_role = user_info.get('role')
@@ -486,8 +487,10 @@ def patient_analysis_type_viewer(patient_id, analysis_type):
 		server['patient'] = db_patient
 
 		db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
-			db.Analysis.type.in_([analysis_type]),
-			db.Analysis.patient_id.in_([patient_id]),
+			#db.Analysis.type.in_([analysis_type]),
+			#db.Analysis.patient_id.in_([patient_id]),
+			db.Analysis.type == analysis_type,
+			db.Analysis.patient_id == patient_id,
 			db.Analysis.user_id == db.User.id
 		)
 
@@ -502,19 +505,80 @@ def patient_analysis_type_viewer(patient_id, analysis_type):
 		data['analysis_type'] = analysis_type
 		data['analyzes'] = janalyzes
 
+
+		db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
+			#db.Analysis.type.in_([analysis_type]),
+			#db.Analysis.patient_id.in_([patient_id]),
+			db.Analysis.type == analysis_type,
+			db.Analysis.patient_id == patient_id,
+			db.Analysis.user_id == db.User.id
+		)
+
+
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 	server['data'] = data
 
 	str = render_template('analysis_type.html', server = server)
 	return str
 
-@app.route('/patient/<patient_id>/analysis/<analysis_id>', methods=['GET'])
-def patient_analysis_viewer(patient_id, analysis_id):
-	"""Просмотр анализа по id"""
-	return 'Не реализовано'
 
-@app.route('/patient/<patient_id>/analysis_add/<analysis_type>', methods=['GET'])
-def patient_analysis_add(patient_id, analysis_type):
+@app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis/<analysis_id>', methods=['GET'])
+def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id):
+	"""Просмотр анализа с фильтрацией по типам"""
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+	if user_role != db.UserRole.USER:
+		exceptions.abort(403)
+
+	server = {}
+	server['patient_id'] = patient_id
+	server['analysis_type'] = analysis_type
+	server['analysis_id'] = analysis_id
+	server['username'] = user_info.get('username')
+	server['menus'] = menus_user
+
+	data = {}
+
+	db_session = db.Session()
+	db_patient = db_session.query(db.Patient).filter(
+		db.Patient.id.in_([patient_id])
+		)
+	db_patient = db_patient.first()
+	
+	if not db_patient:
+		server['isOk'] = False
+		server['title'] = "Пациент, #%s, не найден!" % id
+	else:
+		server['isOk'] = True
+		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
+		server['analysis_type_name'] = AnalysisType.get(analysis_type)
+		server['patient'] = db_patient
+
+		db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
+			#db.Analysis.type.in_([analysis_type]),
+			#db.Analysis.patient_id.in_([patient_id]),
+			db.Analysis.id == analysis_id,
+			db.Analysis.type == analysis_type,
+			db.Analysis.patient_id == patient_id,
+			db.Analysis.user_id == db.User.id
+		).first()
+
+		if db_query:
+			data = db_query.Analysis.toJson()
+			data['user'] = db.makeLastnameAndInitials(db_query.lastname, db_query.firstname, db_query.middlename)
+			data['analysis_type'] = analysis_type
+
+
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+	server['data'] = data
+
+	str = render_template('analysis_type_analysis.html', server = server)
+	return str
+
+
+@app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add', methods=['GET'])
+def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	"""Добавить анализ (форма)"""
 
 	user_info = session.get(SESSION_KEY_USER)
@@ -557,39 +621,15 @@ def patient_analysis_add(patient_id, analysis_type):
 	str = render_template('analysis_add.html', server = server)
 	return str
 
-@app.route('/patient/<patient_id>/analysis_add/<analysis_type>', methods=['POST'])
-def patient_analysis_add_post(patient_id, analysis_type):
+@app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add', methods=['POST'])
+def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 	"""Добавить анализ (данные)"""
-	if not request.json:
-		# abort(400)
-		pass
-	return 'Не реализовано'
-	return jsonify({'result': result})
 
-################################################################
-@app.route('/api/v1.0/test_username', methods=['POST'])
-def api_test_username():
 	if not request.json:
 		abort(400)
 
-	username = request.json.get('username')
-	if not username or username == '':
-		abort(400)
-
-	db_session = db.Session()
-	query = db_session.query(db.User).filter(
-		db.User.username.in_([username]))
-	result = query.first() == None
-	return jsonify({'result': result})
-
-import json
-@app.route('/api/v1.0/analysis', methods=['POST'])
-def api_analysis_add():
-	if not request.json:
-		abort(400)
-
-	patient_id = int(request.json.get('patient_id'))
-	analysis_type = int(request.json.get('analysis_type'))
+	# patient_id = int(request.json.get('patient_id'))
+	# analysis_type = int(request.json.get('analysis_type'))
 	result = request.json.get('result')
 
 	data = {}
@@ -614,6 +654,31 @@ def api_analysis_add():
 
 	#result = query.first() == None
 	result = True
+	return jsonify({'result': result})
+
+
+
+@app.route('/patient/<patient_id>/analysis/<analysis_id>', methods=['GET'])
+def patient_analysis_viewer(patient_id, analysis_id):
+	"""Просмотр анализа по id (Не реализовано)"""
+	return 'Не реализовано'
+
+import json
+
+################################################################
+@app.route('/api/v1.0/test_username', methods=['POST'])
+def api_test_username():
+	if not request.json:
+		abort(400)
+
+	username = request.json.get('username')
+	if not username or username == '':
+		abort(400)
+
+	db_session = db.Session()
+	query = db_session.query(db.User).filter(
+		db.User.username.in_([username]))
+	result = query.first() == None
 	return jsonify({'result': result})
 
 ################################################################
@@ -680,7 +745,6 @@ def feedback_result():
 	return render_template('feedback_result.html', server = server)
 
 
-
 from flask_mail import Message
 
 @app.route('/feedback', methods=['POST'])
@@ -704,20 +768,40 @@ def feedback_post():
 
 	return redirect('/feedback_result')
 
-
 ################################################################
-@app.route('/contact')
-def contact():
-	"""Renders the contact page."""
-	return render_template('contact.html',
-		title='Contact',
-		year=datetime.now().year,
-		message='Your contact page.')
+@app.route('/service_app_info')
+def test_system():
+	t = app
+	t = dir(app)
+	return jsonify(t)
 
-@app.route('/about')
-def about():
-	"""Renders the about page."""
-	return render_template('about.html',
-		title='About',
-		year=datetime.now().year,
-		message='Your application description page.')
+# import inspect
+from flask import escape
+
+@app.route('/service_app_routes')
+def routes():
+	'''Возвравщает список url-маршрутов'''
+	rules = []
+
+	# mm = inspect.getmembers(app.url_map, inspect.ismethod)
+	# rr = app.url_map.iter_rules()
+
+	for item in app.url_map._rules_by_endpoint.items():
+		rule = item[1][0].rule
+		methods = item[1][0].methods
+		methods = ', '.join(sorted(methods))
+		endpoint = item[0]
+
+		route = '{:40s} {:25s} {}'.format(endpoint, methods, escape(rule))
+		rules.append(route)
+
+	'''
+	list = []
+	sort_by_rule = operator.itemgetter(2)
+	for endpoint, methods, rule in sorted(rules, key=sort_by_rule):
+		route = '{:50s} {:25s} {}'.format(endpoint, methods, rule)
+		list.append(route)
+	'''
+
+	str = '<pre>' + '\n'.join(rules) + '</pre>'
+	return str
