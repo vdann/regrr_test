@@ -58,8 +58,11 @@ def make_menu_subitems (text, submenus):
 		}
 
 
-menus_all = [
-	make_menu_item('/feedback', 'Связь'),
+menus_all = []
+menus_all.append(make_menu_item('/feedback', 'Связь'))
+
+"""
+menus_all.append(
 	make_menu_subitems(
 		'Макеты', [
 				make_menu_item('/static/_design/index.html', 'Главная'),
@@ -73,7 +76,9 @@ menus_all = [
 				make_menu_item('/static/_design/test_national_early_warning_score.html', 'Test NEWS'),
 				make_menu_item('/static/_design/test_geneva_risk_score_for_vte.html', 'Test VTE'),
 			]
-		),
+		)
+	)
+menus_all.append(
 	make_menu_subitems(
 		'Исходный шаблон Editorial', [
 				make_menu_item('/static/_design/editorial/index.html', 'index'),
@@ -81,7 +86,9 @@ menus_all = [
 				make_menu_item('/static/_design/editorial/elements.html', 'elements'),
 			]
 		)
-	]
+	)
+"""
+
 
 
 menus_admin = [
@@ -350,6 +357,11 @@ def user_add_post():
 
 	return redirect('/')
 
+AnalysisTypes = [
+	db.AnalysisType.Тест_NEWS,
+	db.AnalysisType.Тест_VTE
+]
+
 ################################################################
 @app.route('/patient/<patient_id>', methods=['GET'])
 def patient_view(patient_id):
@@ -379,6 +391,15 @@ def patient_view(patient_id):
 		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
 		server['patient'] = db_patient
 		data = db_patient.toJson()
+
+		analysis_types = []
+		for item in AnalysisTypes:
+			analysis_types.append({
+					'id': int(item),
+					'text':  db.AnalysisTypeStr[item]
+				})
+
+		server['analysis_types'] = analysis_types
 
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 	server['data'] = data
@@ -445,14 +466,6 @@ def patient_add_post():
 	return redirect('/')
 
 ################################################################
-AnalysisType = {
-	'1': 'Клинический анализ крови',
-	'2': 'Биохимический анализ крови',
-	'3': 'Коагулограмма',
-	'4': 'Общий анализ мочи',
-	'5': 'News (тест по вопросам)',
-	'6': 'Другие'
-}
 
 @app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis', methods=['GET'])
 def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
@@ -462,6 +475,8 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	user_role = user_info.get('role')
 	if user_role != db.UserRole.USER:
 		exceptions.abort(403)
+
+	analysis_type = int(analysis_type)
 
 	server = {}
 	server['patient_id'] = patient_id
@@ -483,7 +498,7 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	else:
 		server['isOk'] = True
 		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
-		server['analysis_type_name'] = AnalysisType.get(analysis_type)
+		server['analysis_type_str'] = db.AnalysisTypeStr.get(analysis_type)
 		server['patient'] = db_patient
 
 		db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
@@ -492,7 +507,7 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 			db.Analysis.type == analysis_type,
 			db.Analysis.patient_id == patient_id,
 			db.Analysis.user_id == db.User.id
-		)
+		).order_by(db.Analysis.id.desc())
 
 		janalyzes = []
 		for db_item in db_query:
@@ -504,15 +519,6 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 		data['patient_id'] = patient_id
 		data['analysis_type'] = analysis_type
 		data['analyzes'] = janalyzes
-
-
-		db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
-			#db.Analysis.type.in_([analysis_type]),
-			#db.Analysis.patient_id.in_([patient_id]),
-			db.Analysis.type == analysis_type,
-			db.Analysis.patient_id == patient_id,
-			db.Analysis.user_id == db.User.id
-		)
 
 
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
@@ -530,6 +536,8 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 	user_role = user_info.get('role')
 	if user_role != db.UserRole.USER:
 		exceptions.abort(403)
+
+	analysis_type = int(analysis_type)
 
 	server = {}
 	server['patient_id'] = patient_id
@@ -552,7 +560,7 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 	else:
 		server['isOk'] = True
 		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
-		server['analysis_type_name'] = AnalysisType.get(analysis_type)
+		server['analysis_type_str'] = db.AnalysisTypeStr.get(analysis_type)
 		server['patient'] = db_patient
 
 		db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
@@ -586,6 +594,8 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	if user_role != db.UserRole.USER:
 		exceptions.abort(403)
 
+	analysis_type = int(analysis_type)
+
 	server = {
 		'patient_id': patient_id,
 		'analysis_type': analysis_type,
@@ -603,13 +613,13 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	if not db_patient:
 		server['isOk'] = False
 		server['title'] = "Пациент, #%s, не найден!" % id
-	elif analysis_type != '5':
+	elif analysis_type not in AnalysisTypes:
 		server['isOk'] = False
 		server['title'] = "Данный анализ не реализован"
 	else:
 		server['isOk'] = True
 		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
-		server['analysis_type_name'] = AnalysisType.get(analysis_type)
+		server['analysis_type_str'] = db.AnalysisTypeStr.get(analysis_type)
 		server['patient'] = db_patient
 
 		data['patient_id'] = patient_id
@@ -618,7 +628,12 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 	server['data'] = data
 
-	str = render_template('analysis_add.html', server = server)
+	str = ''
+	if analysis_type == db.AnalysisType.Тест_NEWS:
+		str = render_template('analysis_add.html', server = server)
+	elif analysis_type == db.AnalysisType.Тест_VTE:
+		str = render_template('analysis_add_6.html', server = server)
+	
 	return str
 
 @app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add', methods=['POST'])

@@ -18,8 +18,8 @@
     <PythonWsgiHandler>$(MSBuildProjectName).app</PythonWsgiHandler>
     <Name>regrr</Name>
     <RootNamespace>regrr</RootNamespace>
-    <InterpreterId>{c87d6de4-d036-468b-9ab4-c48a735924a3}</InterpreterId>
-    <InterpreterVersion>3.5</InterpreterVersion>
+    <InterpreterId>{d7958d04-ff6f-435b-9ffe-69063e06e789}</InterpreterId>
+    <InterpreterVersion>3.4</InterpreterVersion>
     <WebBrowserPort>16092</WebBrowserPort>
     <PublishUrl>./dist</PublishUrl>
   </PropertyGroup>
@@ -220,6 +220,7 @@
     <Content Include="regrr\static\_design\LICENSE.txt" />
     <Content Include="regrr\static\_design\README.txt" />
     <Content Include="regrr\static\_design\tests_viewer.html" />
+    <Content Include="regrr\templates\analysis_add_6.html" />
     <Content Include="regrr\templates\analysis_add.html" />
     <Content Include="regrr\templates\analysis_type_analysis.html" />
     <Content Include="regrr\templates\feedback.html" />
@@ -261,16 +262,15 @@
     <Content Include="regrr\templates\_src_layout.html" />
   </ItemGroup>
   <ItemGroup>
-    <Interpreter Include="env36\">
-      <Id>{c87d6de4-d036-468b-9ab4-c48a735924a3}</Id>
-      <BaseInterpreter>{377e6200-8b84-4366-a408-a278a90d96df}</BaseInterpreter>
-      <Version>3.5</Version>
-      <Description>env36 (Py3.6)</Description>
+    <Interpreter Include="env34\">
+      <Id>{d7958d04-ff6f-435b-9ffe-69063e06e789}</Id>
+      <BaseInterpreter>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</BaseInterpreter>
+      <Version>3.4</Version>
+      <Description>env34 (Python 3.4)</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
-      <WindowsInterpreterPath>Scripts\python.exe</WindowsInterpreterPath>
+      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
       <LibraryPath>Lib\</LibraryPath>
-      <PathEnvironmentVariable>
-      </PathEnvironmentVariable>
+      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
       <Architecture>X86</Architecture>
     </Interpreter>
   </ItemGroup>

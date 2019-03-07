@@ -53,13 +53,13 @@
 							<div class="breadcrumbs">
 								<a href="/">Пациенты</a>
 								&nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe ))
-								&nbsp;&nbsp;/&nbsp;&nbsp; (( server.analysis_type_name )) (('(#'))(( server.analysis_id )))
+								&nbsp;&nbsp;/&nbsp;&nbsp; (( server.analysis_type_str )) (('(#'))(( server.analysis_id )))
 							</div>
 
 						</header>
 							<br>
 
-							<div v-if="analysis_type == 5" class="table-wrapper">
+							<div v-if="analysis_type == 5 || analysis_type == 6" class="table-wrapper">
 
 								<ul class="alt">
 									<li><b>Исследование выполнил:</b> &nbsp;&nbsp;&nbsp; <span v-html="user"></span></li>

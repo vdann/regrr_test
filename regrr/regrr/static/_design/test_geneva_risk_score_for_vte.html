@@ -93,7 +93,7 @@
 																width="50%">
 															
 																<span class="f-left" v-html="variant.name"
-																	v-bind:class="{ fw-bold: test_row.index == index_var }">
+																	v-bind:class="{ fwBold: test_row.index == index_var }">
 																</span>
 																<span class="f-right">
 																	<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
@@ -110,7 +110,7 @@
 															v-on:click="select(index_row, index_var)">
 															<td>
 																<span class="f-left" v-html="variant.name"
-																	  v-bind:class="{ fw-bold: test_row.index == index_var }">
+																	  v-bind:class="{ fwBold: test_row.index == index_var }">
 																</span>
 																<span class="f-right">
 																	<span v-if="variant.points > 0">+</span><span v-html="variant.points"></span>
@@ -285,12 +285,21 @@
 			el: '#test_news',
 			data: {
 				rows: rows,
+				isOk: false,
+				results: {
+					result: '',
+					points: 0,
+					isRed: false,
+					items: []
+				}
 			},
 			computed: {
 				result: function () {
 
 					var isOk = true;
+					var isRed = false;
 					var points = 0;
+					var items = [];
 
 					for (var i = 0, n = this.rows.length; i < n; ++i) {
 						var row = this.rows[i];

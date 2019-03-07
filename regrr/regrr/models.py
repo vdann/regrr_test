@@ -188,8 +188,8 @@ class AnalysisType(IntEnum):
 	Биохимический_анализ_крови = 2
 	Коагулограмма = 3
 	Общий_анализ_мочи = 4
-	News = 5
-	Другие = 6
+	Тест_NEWS = 5
+	Тест_VTE = 6
 
 
 AnalysisTypeStr = {
@@ -197,8 +197,8 @@ AnalysisTypeStr = {
 	AnalysisType.Биохимический_анализ_крови: 'Биохимический анализ крови',
 	AnalysisType.Коагулограмма: 'Коагулограмма',
 	AnalysisType.Общий_анализ_мочи: 'Общий анализ мочи',
-	AnalysisType.News: 'News (тест по вопросам)',
-	AnalysisType.Другие: 'Другие',
+	AnalysisType.Тест_NEWS: 'Тест NEWS',
+	AnalysisType.Тест_VTE: 'Тест VTE',
 	}
 
 ########################################################################
