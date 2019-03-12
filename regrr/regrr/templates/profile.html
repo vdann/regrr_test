@@ -94,17 +94,17 @@
 
 								<div class="col-4 col-12-xsmall">
 									<input type="text"
-										value="Дата рождения"
+										value="Должность"
 										class="input-static input-static-bold"
 										disabled />
 								</div>
 								<div class="col-8 col-12-xsmall">
 									<input type="text"
-										name="date_of_birth" id="date_of_birth"
+										name="position" id="position"
 										:class="{'input-static': !inputing}"
 										:disabled="!inputing"
-										:value="date_of_birth"
-										placeholder="Дата рождения" />
+										:value="position"
+										placeholder="Должность" />
 								</div>
 
 
@@ -235,6 +235,7 @@
 			lastname: 'Иванов',
 			firstname: 'Иван',
 			middlename: 'Иванович',
+			position: '[Врач]',
 			date_of_birth: '01.01.1980',
 			email: 'ivanov@yan.ru',
 			editing: false,
@@ -248,6 +249,7 @@
 			data.lastname = data.lastname || ' ';
 			data.firstname = data.firstname || ' ';
 			data.middlename = data.middlename || ' ';
+			data.position = data.position || ' ';
 			data.date_of_birth = data.date_of_birth || ' ';
 			data.email = data.email || ' ';
 			data.editing = data.editing || false;

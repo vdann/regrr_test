@@ -250,6 +250,12 @@ def profile():
 	username = user_info.get('username')
 	user_role = user_info.get('role')
 
+	db_session = db.Session()
+	db_query = db_session.query(db.User).filter(
+		db.User.id == user_info.get('id')
+		)
+	db_query = db_query.first()
+
 	if user_role == db.UserRole.ADMIN:
 		isAdmin = True
 		menus = menus_admin
@@ -257,7 +263,8 @@ def profile():
 		menus = menus_user
 
 
-	data['username'] = username
+	# data['username'] = username
+	data = db_query.toJson()
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 	server = {
 		'title': title,
