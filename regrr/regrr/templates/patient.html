@@ -15,6 +15,7 @@
 		.form-profile {
 			max-width: 700px;
 		}
+
 	</style>
 
 	<script src="/static/_design/extern/es6-promise.js-v4.2.6/es6-promise.auto.js"></script>
@@ -41,43 +42,94 @@
 				<section id="banner">
 					<div class="content">
 
-						(% if not server.isOk %)
-							<header class="major1">
-								<!--Breadcrumbs-->
-								<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe )) </div>
-							</header>
-						
-						(% else %)
-							<header class="major1">
-								<!--Breadcrumbs-->
-								<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe )) </div>
+						<header class="major1 mb-2em">
 
-							</header>
-							<br>
+							(% if server.breadcrumbs %)
 
-							<ul class="alt">
-								<li><b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;(( server.patient.date_of_birth ))</li>
-								<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
-								<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
-							</ul>
+							<!--Breadcrumbs-->
+							<div class="breadcrumbs">
+								(% for item in server.breadcrumbs %)
 
-							<br>
+								(% if item.href %)
+								<a href="(( item.href ))">(( item.text | safe ))</a>
+								(% else %)
+								<span>(( item.text | safe ))</span>
+								(% endif %)
 
-							<div class="row">
-								<div class="col-10 col-12-small">
-									<div class="row">
+								(% if not loop.last %)
+								<span class="breadcrumbs-sep">»</span>
+								(% endif %)
 
-										(% for item in server.analysis_types %)
-										<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
-											<a href="/patient/(( server.patient.id ))/analysis_type/(( item.id ))/analysis" class="button fit primary">
-												(( item.text ))
-											</a>
-										</div>
-										(% endfor %)
+								(% endfor %)
+							</div>
 
+							(% endif %)
+
+							(% if server.prevnext %)
+
+							<!-- PrevNext -->
+							<div class="prevnext mt-1em">
+
+								(% if server.prevnext.prev: %)
+								<a href="((server.prevnext.prev.href))" 
+								(% if server.prevnext.prev.title: %)
+								title="((server.prevnext.prev.title))"
+								(% endif %)
+								>
+									<i class="fa fa-2x fa-caret-left"></i>
+								</a>
+								(% else %)
+								<i class="fa fa-2x fa-caret-left"></i>
+								(% endif %)
+
+								&nbsp;
+								&nbsp;
+
+								(% if server.prevnext.next: %)
+								<a href="((server.prevnext.next.href))"
+								(% if server.prevnext.next.title: %)
+								title="((server.prevnext.next.title))"
+								(% endif %)
+								>
+									<i class="fa fa-2x fa-caret-right"></i>
+								</a>
+								(% else %)
+								<i class="fa fa-2x fa-caret-right"></i>
+								(% endif %)
+
+							</div>
+
+							(% endif %)
+
+						</header>
+
+						(% if server.isOk %)
+
+						<br>
+
+						<ul class="alt">
+							<li><b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;(( server.patient.date_of_birth ))</li>
+							<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
+							<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
+						</ul>
+
+						<br>
+
+						<div class="row">
+							<div class="col-10 col-12-small">
+								<div class="row">
+
+									(% for item in server.analysis_types %)
+									<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
+										<a href="/patient/(( server.patient.id ))/analysis_type/(( item.id ))/analysis" class="button fit primary">
+											(( item.text ))
+										</a>
 									</div>
+									(% endfor %)
+
 								</div>
 							</div>
+						</div>
 
 						(% endif %)
 					</div>

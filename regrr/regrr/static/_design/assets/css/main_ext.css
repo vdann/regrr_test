@@ -34,13 +34,31 @@
 }
 
 /* margin */
-.mb-2em {
-	margin-bottom: 2em;
+.mt-1em {
+	margin-top: 1em;
+}
+
+.mt-1_5em {
+	margin-top: 1.5em;
+}
+
+.mt-2em {
+	margin-top: 2em;
+}
+
+
+.mb-1em {
+	margin-bottom: 1em;
 }
 
 .mb-1_5em {
 	margin-bottom: 1.5em;
 }
+
+.mb-2em {
+	margin-bottom: 2em;
+}
+
 
 .fw-bold {
 	font-weight: bold;
@@ -191,7 +209,11 @@ input[type="url"].input-static-bold {
 	font-family: "Roboto Slab", serif;
 	font-weight: 700;
 	line-height: 1.5;
-	margin: 0 0 1em 0;
+	/*margin: 0 0 1em 0;*/
+}
+
+.breadcrumbs .breadcrumbs-sep {
+	padding: 0 0.8em;
 }
 
 /* vue.js */

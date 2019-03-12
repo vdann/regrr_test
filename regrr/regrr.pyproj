@@ -226,6 +226,7 @@
     <Content Include="regrr\templates\feedback.html" />
     <Content Include="regrr\templates\feedback_result.html" />
     <Content Include="regrr\templates\analysis_type.html" />
+    <Content Include="regrr\templates\macros.html" />
     <Content Include="regrr\templates\patient.html" />
     <Content Include="regrr\templates\patient_add.html" />
     <Content Include="regrr\templates\_src_index.html" />

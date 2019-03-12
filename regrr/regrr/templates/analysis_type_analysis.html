@@ -41,22 +41,67 @@
 				<section id="banner">
 					<div class="content" id="analisis">
 
-						(% if not server.isOk %)
-							<header class="major1">
-								<!--Breadcrumbs-->
-								<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe )) </div>
-							</header>
-						
-						(% else %)
-						<header class="major1">
+						<header class="major1 mb-2em">
+
+							(% if server.breadcrumbs %)
+
 							<!--Breadcrumbs-->
 							<div class="breadcrumbs">
-								<a href="/">Пациенты</a>
-								&nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe ))
-								&nbsp;&nbsp;/&nbsp;&nbsp; (( server.analysis_type_str )) (('(#'))(( server.analysis_id )))
+								(% for item in server.breadcrumbs %)
+
+								(% if item.href %)
+								<a href="(( item.href ))">(( item.text | safe ))</a>
+								(% else %)
+								<span>(( item.text | safe ))</span>
+								(% endif %)
+
+								(% if not loop.last %)
+								<span class="breadcrumbs-sep">»</span>
+								(% endif %)
+
+								(% endfor %)
 							</div>
 
+							(% endif %)
+
+							(% if server.prevnext %)
+
+							<!-- PrevNext -->
+							<div class="prevnext mt-1em">
+
+								(% if server.prevnext.prev: %)
+								<a href="((server.prevnext.prev.href))"
+								   (% if server.prevnext.prev.title %)
+								   title="((server.prevnext.prev.title))"
+								   (% endif %)>
+									<i class="fa fa-2x fa-caret-left"></i>
+								</a>
+								(% else %)
+								<i class="fa fa-2x fa-caret-left"></i>
+								(% endif %)
+
+								&nbsp;
+								&nbsp;
+
+								(% if server.prevnext.next: %)
+								<a href="((server.prevnext.next.href))"
+								   (% if server.prevnext.next.title %)
+								   title="((server.prevnext.next.title))"
+								   (% endif %)>
+									<i class="fa fa-2x fa-caret-right"></i>
+								</a>
+								(% else %)
+								<i class="fa fa-2x fa-caret-right"></i>
+								(% endif %)
+
+							</div>
+
+							(% endif %)
+
 						</header>
+
+						(% if server.isOk %)
+
 							<br>
 
 							<div v-if="analysis_type == 5 || analysis_type == 6" class="table-wrapper">

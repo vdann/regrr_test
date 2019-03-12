@@ -25,6 +25,8 @@
 </head>
 <body class="is-preload">
 
+	(% import "macros.html" as macros %)
+
 	<!-- Wrapper -->
 	<div id="wrapper">
 
@@ -37,68 +39,116 @@
 					<a href="/" class="logo"><h2>Реестр результатов анализов и&nbsp;тестирования</h2></a>
 				</header>
 
+
 				<!-- Banner -->
 				<section id="banner">
+
 					<div class="content" id="analizes">
 
-						(% if not server.isOk %)
-							<header class="major1">
-								<!--Breadcrumbs-->
-								<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe )) </div>
-							</header>
-						
-						(% else %)
-							<header class="major1">
-								<!--Breadcrumbs-->
-								<div class="breadcrumbs"><a href="/">Пациенты</a> &nbsp;&nbsp;/&nbsp;&nbsp; (( server.title | safe )) &nbsp;&nbsp;/&nbsp;&nbsp; (( server.analysis_type_str )) </div>
+						<header class="major1 mb-2em">
 
-							</header>
-							<br>
+							(% if server.breadcrumbs %)
 
+							<!--Breadcrumbs-->
+							<div class="breadcrumbs">
+								(% for item in server.breadcrumbs %)
 
-							<div class="row">
-								<div class="col-12">
-									<a class="button primary"
-										href="/patient/((server.patient_id))/analysis_type/((server.analysis_type))/analysis_add"
-										title="Добавить новый анализ"
-										>Добавить</a>
-								</div>
-							</div>
-							<br>
+								(% if item.href %)
+								<a href="(( item.href ))">(( item.text | safe ))</a>
+								(% else %)
+								<span>(( item.text | safe ))</span>
+								(% endif %)
 
+								(% if not loop.last %)
+								<span class="breadcrumbs-sep">»</span>
+								(% endif %)
 
-							<div v-if="analyzes.length" class="table-wrapper">
-								<table class="alt">
-									<thead>
-										<tr>
-											<th>№</th>
-											<th>#</th>
-											<th>Результат</th>
-											<th>Исследование выполнил</th>
-											<th>Дата выполнения</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr v-for="(analysis, i) in analyzes" :key="analysis.id">
-											<td v-html="i + 1"></td>
-											<td v-html="makeLinkAnalysis(analysis, analysis.id)"></td>
-											<td v-html="makeLinkAnalysis(analysis, analysis.result)"></td>
-											<td v-html="analysis.user"></td>
-											<td v-html="analysis.date_of_creation"></td>
-										</tr>
-									</tbody>
-									<tfoot>
-										<tr>
-											<!--										<td v-html="patients.length"></td>
-						-->
-										</tr>
-									</tfoot>
-								</table>
+								(% endfor %)
 							</div>
 
-							<p v-else>
-								Нет записей
-							</p>
+							(% endif %)
+
+							(% if server.prevnext %)
+
+							<!-- PrevNext -->
+							<div class="prevnext mt-1em">
+
+								(% if server.prevnext.prev: %)
+								<a href="((server.prevnext.prev.href))"
+								   (% if server.prevnext.prev.title %)
+								   title="((server.prevnext.prev.title))"
+								   (% endif %)>
+									<i class="fa fa-2x fa-caret-left"></i>
+								</a>
+								(% else %)
+								<i class="fa fa-2x fa-caret-left"></i>
+								(% endif %)
+
+								&nbsp;
+								&nbsp;
+
+								(% if server.prevnext.next: %)
+								<a href="((server.prevnext.next.href))"
+								   (% if server.prevnext.next.title %)
+								   title="((server.prevnext.next.title))"
+								   (% endif %)>
+									<i class="fa fa-2x fa-caret-right"></i>
+								</a>
+								(% else %)
+								<i class="fa fa-2x fa-caret-right"></i>
+								(% endif %)
+
+							</div>
+
+							(% endif %)
+
+						</header>
+
+						(% if server.isOk %)
+						<br>
+
+						<div class="row">
+							<div class="col-12">
+								<a class="button primary"
+								   href="/patient/((server.patient_id))/analysis_type/((server.analysis_type))/analysis_add"
+								   title="Добавить новый анализ">Добавить</a>
+							</div>
+						</div>
+						<br>
+
+
+						<div v-if="analyzes.length" class="table-wrapper">
+							<table class="alt">
+								<thead>
+									<tr>
+										<th>№</th>
+										<th>#</th>
+										<th>Результат</th>
+										<th>Исследование выполнил</th>
+										<th>Дата выполнения</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(analysis, i) in analyzes" key="analysis.id">
+										<td v-html="i + 1"></td>
+										<td v-html="makeLinkAnalysis(analysis, analysis.id)"></td>
+										<td v-html="makeLinkAnalysis(analysis, analysis.result)"></td>
+										<td v-html="analysis.user"></td>
+										<td v-html="analysis.date_of_creation"></td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<!--										<td v-html="patients.length"></td>
+							-->
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+
+						<p v-else>
+							Нет записей
+						</p>
 						(% endif %)
 					</div>
 				</section>
@@ -106,83 +156,7 @@
 			</div>
 		</div>
 
-		<!-- Sidebar -->
-		<div id="sidebar">
-			<div class="inner">
-
-				<!-- Search -->
-				<section id="search" class="alt">
-					<form method="post" action="/#" style="margin-bottom: 1.2em;">
-						<a class="button fit1 primary" href="/logout" title="Выйти" style="padding: 0 1.2em;">
-							<i class="fa fa-sign-out fa-flip-horizontal fa-2x" style="vertical-align: middle;"></i>
-						</a>
-
-						<b class="f-right" style="font-size: 1.4em; vertical-align: baseline;">
-							<a href="/profile" title="Профиль">
-								(( server.username ))
-							</a>
-						</b>
-					</form>
-
-					<form id="search_form" method="post" action="#">
-						<input type="text" name="query" id="query" placeholder="Поиск" />
-					</form>
-				</section>
-
-
-
-				<!-- Menu -->
-				<nav id="menu">
-					<header class="major">
-						<h2>Меню</h2>
-					</header>
-					<ul>
-						(% for menu in server.menus %)
-						(% if not menu.submenus %)
-						<li><a href="(( menu.href ))">(( menu.text ))</a></li>
-						(% else %)
-						<li>
-							<span class="opener">(( menu.text ))</span>
-							<ul>
-								(% for submenu in menu.submenus %)
-								<li><a href="(( submenu.href ))">(( submenu.text ))</a></li>
-								(% endfor %)
-							</ul>
-						</li>
-						(% endif %)
-						(% endfor %)
-					</ul>
-				</nav>
-
-				<!-- Section -->
-				<!--
-				<section>
-					<header class="major">
-						<h2>Связь</h2>
-					</header>
-					<ul class="contact">
-						<li class="fa-envelope-o"><a href="#">mail@ya.ru</a></li>
-						<li style="padding-left: 0em;" class="gtr-uniform">
-							<div class="row gtr-uniform">
-								<div class="col-12">
-									<textarea name="link-message" id="link-message" placeholder="Или напишете сообщение сюда" rows="6"></textarea>
-								</div>
-								<div class="col-12">
-									<input type="submit" value="Отправить сообщение" class="primary" />
-								</div>
-							</div>
-						</li>
-					</ul>
-
-
-				</section>-->
-				<!-- Footer -->
-				<!--<footer id="footer">
-					<p class="copyright">&copy; 2019. regrr.ru. Все права защищены.<br> Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-				</footer>-->
-
-			</div>
-		</div>
+		(( macros.sidebar(server) ))
 
 	</div>
 

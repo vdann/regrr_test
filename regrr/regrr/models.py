@@ -182,6 +182,10 @@ class Patient(Base):
 		str = "{} {}.{}.".format(self.lastname, self.firstname[0], self.middlename[0])
 		return str
 
+	def getFullname(self):
+		str = "{} {} {}".format(self.lastname, self.firstname, self.middlename)
+		return str
+
 
 class AnalysisType(IntEnum):
 	Клинический_анализ_крови = 1
@@ -345,10 +349,10 @@ def initTestUsers():
 
 		json_data = '''{"points":8,"isRed":true,"items":[{"name":"Respiratory Rate","label":"≤8","points":3},{"name":"Oxygen Saturations","label":"94-95%","points":1},{"name":"Any Supplemental Oxygen","label":"No","points":0},{"name":"Temperature","label":"38.1-39°C&nbsp;/&nbsp;100.5-102.2°F","points":1},{"name":"Systolic Blood Pressure","label":"111-219","points":0},{"name":"Heart Rate","label":"≥131","points":3},{"name":"AVPU Score (Alert, Voice, Pain, Unresponsive)","label":"A","points":0}]}'''
 
-		analysis = Analysis(user.id, patient.id, AnalysisType.News, '8 points (red)', json_data)
+		analysis = Analysis(user.id, patient.id, AnalysisType.Тест_NEWS, '8 points (red)', json_data)
 		session.add(analysis)
 
-		analysis = Analysis(user.id, patient.id, AnalysisType.News, '7 points (red)', json_data)
+		analysis = Analysis(user.id, patient.id, AnalysisType.Тест_NEWS, '7 points (red)', json_data)
 		session.add(analysis)
 		
 	session.commit()

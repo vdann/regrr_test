@@ -362,6 +362,29 @@ AnalysisTypes = [
 	db.AnalysisType.Тест_VTE
 ]
 
+def make_nbsp(text):
+	return text.replace(' ', '&nbsp;')
+
+def make_breadcrumb(text, href = None):
+	return { 'text': text, 'href': href }
+
+def make_prevnext(prev_href = None, prev_title = None, next_href = None, next_title = None):
+	prevnext = {}
+
+	if prev_href:
+		prev = {}
+		prev['href'] = prev_href
+		prev['title'] = prev_title
+		prevnext['prev'] = prev
+
+	if next_href:
+		next = {}
+		next['href'] = next_href
+		next['title'] = next_title
+		prevnext['next'] = next
+
+	return prevnext
+
 ################################################################
 @app.route('/patient/<patient_id>', methods=['GET'])
 def patient_view(patient_id):
@@ -377,19 +400,29 @@ def patient_view(patient_id):
 	}
 	data = {}
 
+	prevnext = None
+	breadcrumbs = []
+	breadcrumbs.append(make_breadcrumb('Пациенты', url_for('index')))
+
 	db_session = db.Session()
 	db_patient = db_session.query(db.Patient).filter(
-		db.Patient.id.in_([patient_id])
+		db.Patient.id == patient_id
 		)
 	db_patient = db_patient.first()
 	
 	if not db_patient:
+		title = "Пациент, #%s, не найден!" % patient_id
 		server['isOk'] = False
-		server['title'] = "Пациент, #%s, не найден!" % id
+		server['title'] = title
+		breadcrumbs.append(make_breadcrumb(title))
+		server['prevnext'] = make_prevnext()
 	else:
+		title = "%s (#%s)" % (db_patient.getFullname(), patient_id)
 		server['isOk'] = True
-		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
-		server['patient'] = db_patient
+		server['title'] = title
+		breadcrumbs.append(make_breadcrumb(make_nbsp(title)))
+
+		server['patient'] = db_patient.toJson()
 		data = db_patient.toJson()
 
 		analysis_types = []
@@ -401,8 +434,32 @@ def patient_view(patient_id):
 
 		server['analysis_types'] = analysis_types
 
+		db_query = db_session.query(db.Patient).filter(
+			db.Patient.id < patient_id
+			).order_by(db.Patient.id.desc()).first()
+
+		prev_href = None
+		prev_title = None
+		if db_query:
+			prev_href = url_for('patient_view', patient_id=db_query.id)
+			prev_title = db_query.getFullname()
+
+
+		db_query = db_session.query(db.Patient).filter(
+			db.Patient.id > patient_id
+			).order_by(db.Patient.id.asc()).first()
+
+		next_href = None
+		next_title = None
+		if db_query:
+			next_href = url_for('patient_view', patient_id=db_query.id)
+			next_title = db_query.getFullname()
+
+		server['prevnext'] = make_prevnext(prev_href, prev_title, next_href, next_title)
+
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 	server['data'] = data
+	server['breadcrumbs'] = breadcrumbs
 
 	str = render_template('patient.html', server = server)
 	return str
@@ -484,6 +541,9 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	server['username'] = user_info.get('username')
 	server['menus'] = menus_user
 
+	breadcrumbs = []
+	breadcrumbs.append(make_breadcrumb('Пациенты', url_for('index')))
+
 	data = {}
 
 	db_session = db.Session()
@@ -493,13 +553,19 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	db_patient = db_patient.first()
 	
 	if not db_patient:
+		title = "Пациент, #%s, не найден!" % patient_id
 		server['isOk'] = False
-		server['title'] = "Пациент, #%s, не найден!" % id
+		server['title'] = title
+		breadcrumbs.append(make_breadcrumb(make_nbsp(title)))
 	else:
+		title = "%s (#%s)" % (db_patient.getFullname(), patient_id)
 		server['isOk'] = True
-		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
+		server['title'] = title
 		server['analysis_type_str'] = db.AnalysisTypeStr.get(analysis_type)
 		server['patient'] = db_patient
+
+		breadcrumbs.append(make_breadcrumb(make_nbsp(title), url_for('patient_view', patient_id=patient_id)))
+		breadcrumbs.append(make_breadcrumb(make_nbsp(db.AnalysisTypeStr.get(analysis_type))))
 
 		db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
 			#db.Analysis.type.in_([analysis_type]),
@@ -523,6 +589,7 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 	server['data'] = data
+	server['breadcrumbs'] = breadcrumbs
 
 	str = render_template('analysis_type.html', server = server)
 	return str
@@ -546,6 +613,9 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 	server['username'] = user_info.get('username')
 	server['menus'] = menus_user
 
+	breadcrumbs = []
+	breadcrumbs.append(make_breadcrumb('Пациенты', url_for('index')))
+
 	data = {}
 
 	db_session = db.Session()
@@ -555,11 +625,14 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 	db_patient = db_patient.first()
 	
 	if not db_patient:
+		title = "Пациент, #%s, не найден!" % patient_id
 		server['isOk'] = False
-		server['title'] = "Пациент, #%s, не найден!" % id
+		server['title'] = title
+		breadcrumbs.append(make_breadcrumb(make_nbsp(title)))
 	else:
+		title = "%s (#%s)" % (db_patient.getFullname(), patient_id)
 		server['isOk'] = True
-		server['title'] = "%s %s %s (#%s)" % (db_patient.lastname, db_patient.firstname, db_patient.middlename, patient_id)
+		server['title'] = title
 		server['analysis_type_str'] = db.AnalysisTypeStr.get(analysis_type)
 		server['patient'] = db_patient
 
@@ -578,8 +651,15 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 			data['analysis_type'] = analysis_type
 
 
+		breadcrumbs.append(make_breadcrumb(make_nbsp(title), url_for('patient_view', patient_id=patient_id)))
+		breadcrumbs.append(make_breadcrumb(make_nbsp(db.AnalysisTypeStr.get(analysis_type)),
+			url_for('patient_analysis_type_analyzes_viewer', patient_id=patient_id, analysis_type=analysis_type)))
+		breadcrumbs.append(make_breadcrumb(make_nbsp('#%s' % analysis_id)))
+
+
 	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 	server['data'] = data
+	server['breadcrumbs'] = breadcrumbs
 
 	str = render_template('analysis_type_analysis.html', server = server)
 	return str
