@@ -320,7 +320,22 @@
 		var icon_fail = 'fa fa-2x fa-exclamation-triangle clr-red';
 		var icon_wait = 'fa fa-2x fa-refresh fa-spin clr-blue';
 
+		var feilds = [
+			'username',
+			'lastname',
+			'firstname',
+			'middlename',
+			'position',
+			'email',
+		]
 
+		for (var i = 0, n = feilds.length; i < n; ++i) {
+			var feild = feilds[i];
+			data[feild] = data[feild] || '';
+			data[feild + '_icon'] = null;
+		}
+
+		/*
 		data.username = data.username || '';
 		data.username_icon = null;
 		data.lastname = data.lastname || '';
@@ -333,7 +348,7 @@
 		data.position_icon = null;
 		data.email = data.email || '';
 		data.email_icon = null;
-
+		*/
 		//data.editing = data.editing || true;
 		//data.saving = data.saving || false;
 

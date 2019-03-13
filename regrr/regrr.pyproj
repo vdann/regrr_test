@@ -45,6 +45,7 @@
     <Folder Include="regrr\static\" />
     <Folder Include="regrr\static\content\" />
     <Folder Include="regrr\static\fonts\" />
+    <Folder Include="regrr\static\js\" />
     <Folder Include="regrr\static\_design\" />
     <Folder Include="regrr\static\scripts\" />
     <Folder Include="regrr\static\_design\assets\" />
@@ -78,6 +79,7 @@
   <ItemGroup>
     <Content Include="regrr\routes.txt" />
     <Content Include="regrr\static\favicon.png" />
+    <Content Include="regrr\static\js\utils.js" />
     <Content Include="regrr\static\_design\assets\css\font-awesome.min.css" />
     <Content Include="regrr\static\_design\assets\css\main_ext.css" />
     <Content Include="regrr\static\_design\assets\css\main_red.css" />

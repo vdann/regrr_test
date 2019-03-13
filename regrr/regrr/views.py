@@ -237,7 +237,7 @@ def logout():
 	session.modified = True
 	return redirect('/')
 
-@app.route("/profile")
+@app.route("/profile", methods=['GET'])
 def profile():
 
 	user_info = session.get(SESSION_KEY_USER)
@@ -275,6 +275,29 @@ def profile():
 	}
 
 	return render_template('profile.html', server = server)
+
+@app.route("/profile", methods=['POST'])
+def profile_post():
+
+	if not request.json:
+		# abort(400)
+		return jsonify({'result': False, 'errors': ['invalid json']})
+
+	user_info = session.get(SESSION_KEY_USER)
+
+	db_session = db.Session()
+	db_query = db_session.query(db.User).get(user_info.get('id'))
+
+	db_query.lastname = request.json.get('lastname', '-')
+	db_query.firstname = request.json.get('firstname', '-')
+	db_query.middlename = request.json.get('middlename', '-')
+
+	db_query.position = request.json.get('position', '-')
+	db_query.email = request.json.get('email', '-')
+	
+	db_session.commit()
+
+	return jsonify({'result': True})
 
 ################################################################
 @app.route('/user/<username>', methods=['GET'])

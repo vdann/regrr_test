@@ -25,7 +25,7 @@
 	<script src="/static/_design/extern/axios.js-v0.18.0/axios.js"></script>
 	<script src="/static/_design/extern/lodash.js-v4.17.11/lodash.js"></script>
 	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
-
+	<script src="/static/js/utils.js"></script>
 </head>
 <body class="is-preload">
 
@@ -54,32 +54,61 @@
 
 						<br>
 
-						<form method="post" action="#" class="form-profile">
+						<form  v-cloak method="post" action="#" class="form-profile">
 							<div class="row gtr-uniform">
 
+								<!-- username -->
 								<div class="col-4 col-12-xsmall">
 									<input class="input-static input-static-bold" type="text" value="Логин" disabled />
 								</div>
 								<div class="col-8 col-12-xsmall">
-									<input class="input-static" type="text" :value="username" disabled />
+									<input class="input-static" type="text"
+										:value="user.username"
+										@input="user.username = $event.target.value"
+										disabled />
 								</div>
 
 
-								<div class="col-4 col-12-xsmall">
+								<!-- lastname -->
+								<div class="col-4 col-12-xsmall"><!-- <div class="col-4 col-10-xsmall"> -->
 									<input class="input-static input-static-bold" type="text" value="Фамилия" disabled />
 								</div>
-								<div class="col-8 col-12-xsmall">
-									<input type="text" name="lastname" id="lastname" :class="{'input-static': !inputing}"
-										:disabled="!inputing" :value="lastname" placeholder="Фамилия" />
+								<!--
+								<div class="col-0 col-2-xsmall align-right">
+									<div v-if="lastname_icon" class="icon-va-center">
+										<i :class="[lastname_icon]"></i>
+									</div>
 								</div>
+								-->
+
+								<div class="col-8 col-12-xsmall"><!-- <div class="col-7 col-12-xsmall"> -->
+									<input type="text"
+										:class="{'input-static': !inputing}"
+										:disabled="!inputing"
+										:value="user.lastname"
+										@input="changeUserParam('lastname', $event.target.value)"
+										placeholder="Фамилия"
+										required />
+								</div>
+								<!--
+								<div class="col-1 col-0-xsmall">
+									<div v-if="lastname_icon" class="icon-va-center">
+										<i :class="[lastname_icon]"></i>
+									</div>
+								</div>
+								-->
 
 
+								<!-- firstname -->
 								<div class="col-4 col-12-xsmall">
 									<input class="input-static input-static-bold" type="text" value="Имя" disabled />
 								</div>
 								<div class="col-8 col-12-xsmall">
 									<input type="text" name="firstname" id="firstname" :class="{'input-static': !inputing}"
-										:disabled="!inputing" :value="firstname" placeholder="Имя" />
+										:disabled="!inputing"
+										:value="user.firstname"
+										@input="user.firstname = $event.target.value"
+										placeholder="Имя" />
 								</div>
 
 
@@ -88,7 +117,10 @@
 								</div>
 								<div class="col-8 col-12-xsmall">
 									<input type="text" name="middlename" id="middlename" :class="{'input-static': !inputing}"
-										:disabled="!inputing" :value="middlename" placeholder="Отчество" />
+										:disabled="!inputing"
+										:value="user.middlename"
+										@input="user.middlename = $event.target.value"
+										placeholder="Отчество" />
 								</div>
 
 
@@ -103,7 +135,8 @@
 										name="position" id="position"
 										:class="{'input-static': !inputing}"
 										:disabled="!inputing"
-										:value="position"
+										:value="user.position"
+										@input="user.position = $event.target.value"
 										placeholder="Должность" />
 								</div>
 
@@ -115,7 +148,8 @@
 									<input type="email" name="email" id="email"
 										:class="{'input-static': !inputing}"
 										:disabled="!inputing"
-										:value="email"
+										:value="user.email"
+										@input="user.email = $event.target.value"
 										placeholder="email@ya.ru" />
 								</div>
 
@@ -125,13 +159,14 @@
 											<input type="button"
 												:value="!editing ? 'Изменить' : 'Отменить'"
 												:class="{primary: !editing}"
-												@click="editing = !editing"
+												@click="toggleEditing()"
 												:disabled="saving" />
 										</li>
+
 										<li v-if="editing">
 											<input type="button" value="Сохранить" class="primary"
 												@click="save"
-												:disabled="saving" />
+												:disabled="!isEnabledSave" />
 											<template v-if="saving">
 												&nbsp;&nbsp;
 												<i class="va-m fa fa-refresh fa-spin fa-2x fa-fw"> </i>
@@ -231,13 +266,15 @@
 	<script>
 
 		var data = {
-			username: 'ivanov',
-			lastname: 'Иванов',
-			firstname: 'Иван',
-			middlename: 'Иванович',
-			position: '[Врач]',
-			date_of_birth: '01.01.1980',
-			email: 'ivanov@yan.ru',
+			user: {
+				username: 'ivanov',
+				lastname: 'Иванов',
+				firstname: 'Иван',
+				middlename: 'Иванович',
+				position: '[Врач]',
+				//date_of_birth: '01.01.1980',
+				email: 'ivanov@yan.ru',
+			},
 			editing: false,
 			saving: false,
 		};
@@ -245,13 +282,24 @@
 		try {
 			((server.data | safe));
 
-			data.username = data.username || '';
-			data.lastname = data.lastname || ' ';
-			data.firstname = data.firstname || ' ';
-			data.middlename = data.middlename || ' ';
-			data.position = data.position || ' ';
-			data.date_of_birth = data.date_of_birth || ' ';
-			data.email = data.email || ' ';
+			data = data || {};
+			data = { user: data };
+			var user = data.user;
+
+			user.username = user.username || '';
+			user.lastname = user.lastname || ' ';
+			user.firstname = user.firstname || ' ';
+			user.middlename = user.middlename || ' ';
+			user.position = user.position || ' ';
+			//date_of_birth = date_of_birth || ' ';
+			user.email = user.email || ' ';
+
+			data.user0 = _.cloneDeep(user);
+
+			for (var k in user) {
+				data[k + '_icon'] = null;
+			}
+
 			data.editing = data.editing || false;
 			data.saving = data.saving || false;
 		}
@@ -270,16 +318,65 @@
 				inputing: function () {
 					var v = this.editing && !this.saving;
 					return v;
+				},
+
+				isEnabledSave: function () {
+
+					if (this.saving) {
+						console.log('App.computed:isEnabledSave false (this.saving)');
+						return false;
+					}
+
+					if (_.isEqual(this.user0, this.user)) {
+						console.log('App.computed:isEnabledSave false (_.isEqual(this.user0, this.user))');
+						return false;
+					}
+
+					console.log('App.computed:isEnabledSave true');
+					return true;
 				}
 			},
 			methods: {
+				changeUserParam: function (param, val) {
+					console.log('App.methods:changeUserParam', param, val);
+					this.user[param] = val;
+				},
+
+				toggleEditing: function () {
+					if (this.editing)
+						this.endEditing(false);
+					else
+						this.editing = true;
+				},
+
+				endEditing: function (isOk) {
+
+					this.editing = false;
+					if (isOk)
+						this.user0 = _.cloneDeep(this.user);
+					else
+						this.user = _.cloneDeep(this.user0);
+				},
+
 				save: function () {
 					this.saving = true;
 
-					setTimeout(function () {
-						this.saving = false;
-						this.editing = false;
-					}.bind(this), 1000);
+					var me = this;
+					axios.post('/profile', this.user)
+					.then(function (response) {
+
+						console.log(response.data.result);
+
+						me.saving = false;
+						me.endEditing(response.data.result);
+					})
+					.catch(function (error) {
+						console.log('Error!');
+
+						me.saving = false;
+						me.endEditing(false);
+					});
+
 				}
 			}
 		});
