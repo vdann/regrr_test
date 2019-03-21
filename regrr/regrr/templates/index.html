@@ -1,4 +1,6 @@
-﻿<!DOCTYPE HTML>
+﻿(% import "macros.html" as macros %)
+
+<!DOCTYPE HTML>
 <html>
 <head>
 	<meta charset="utf-8" />
@@ -40,7 +42,9 @@
 					<div class="content">
 						<header class="major1">
 							<h2>(( server.title ))</h2>
+						<a onclick="javascript:history.back();">назад</a>
 						</header>
+
 
 						<br>
 
@@ -66,7 +70,7 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr v-for="(user, i) in users" :key="user.id">
+									<tr v-for="(user, i) in users" key="user.id">
 										<td v-html="i + 1"></td>
 										<td v-html="getUsername(user)"></td>
 										<td v-html="getFullname(user)"></td>
@@ -76,11 +80,14 @@
 								</tbody>
 								<tfoot>
 									<tr>
-<!--										<td v-html="users.length"></td>
--->									</tr>
+										<!--										<td v-html="users.length"></td>
+							-->
+									</tr>
 								</tfoot>
 							</table>
 						</div>
+
+						(( macros.pagination(server.pagination) ))
 
 						(% else %) <!-- !server.isAdmin -->
 
@@ -110,7 +117,7 @@
 								<tfoot>
 									<tr>
 										<!--										<td v-html="patients.length"></td>
-					-->
+							-->
 									</tr>
 								</tfoot>
 							</table>

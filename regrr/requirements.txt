@@ -1,10 +1,11 @@
-Flask==0.12.4
+blinker==1.4
 Click==7.0
+Flask==0.12.4
+Flask-Mail==0.9.1
 Flask-SQLAlchemy==2.3.2
 itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.0
 SQLAlchemy==1.2.17
+sqlalchemy-pagination==0.0.2
 Werkzeug==0.14.1
-blinker==1.4
-Flask-Mail==0.9.1

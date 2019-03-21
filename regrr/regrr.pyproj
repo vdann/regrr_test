@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="regrr\config.py" />
+    <Compile Include="regrr\helper_view.py" />
     <Compile Include="regrr\models.py">
       <SubType>Code</SubType>
     </Compile>

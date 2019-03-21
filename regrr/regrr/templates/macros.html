@@ -1,80 +1,36 @@
-﻿(% macro sidebar(server) %)
+﻿(% macro pagination(data) %)
 
-	<!-- Sidebar -->
-	<div id="sidebar">
-		<div class="inner">
+<ul class="pagination">
+	<li>
+		(% if data.prev %)
+		<a href="((data.prev))" class="page"><i class="fa fa-arrow-left"></i></a>
+		(% else %)
+		<span class="disabled"><i class="fa fa-arrow-left"></i></span>
+		(% endif %)
+	</li>
 
-			<!-- Search -->
-			<section id="search" class="alt">
-				<form method="post" action="/#" style="margin-bottom: 1.2em;">
-					<a class="button fit1 primary" href="/logout" title="Выйти" style="padding: 0 1.2em;">
-						<i class="fa fa-sign-out fa-flip-horizontal fa-2x" style="vertical-align: middle;"></i>
-					</a>
+	(% for item in data.list %)
+	<li>
 
-					<b class="f-right" style="font-size: 1.4em; vertical-align: baseline;">
-						<a href="/profile" title="Профиль">
-							(( server.username ))
-						</a>
-					</b>
-				</form>
+		(% if item %)
+			(% if item.href == data.cur %)
+			<a href="(( item.href ))" class="page active">(( item.text ))</a>
+			(% else %)
+			<a href="(( item.href ))" class="page">(( item.text ))</a>
+			(% endif %)
+		(% else %)
+			<span>&hellip;</span>
+		(% endif %)
+	</li>
+	(% endfor %)
 
-				<form id="search_form" method="post" action="#">
-					<input type="text" name="query" id="query" placeholder="Поиск" />
-				</form>
-			</section>
-
-
-			<!-- Menu -->
-			<nav id="menu">
-				<header class="major">
-					<h2>Меню</h2>
-				</header>
-				<ul>
-					(% for menu in server.menus %)
-					(% if not menu.submenus %)
-					<li><a href="(( menu.href ))">(( menu.text ))</a></li>
-					(% else %)
-					<li>
-						<span class="opener">(( menu.text ))</span>
-						<ul>
-							(% for submenu in menu.submenus %)
-							<li><a href="(( submenu.href ))">(( submenu.text ))</a></li>
-							(% endfor %)
-						</ul>
-					</li>
-					(% endif %)
-					(% endfor %)
-				</ul>
-			</nav>
-
-			<!-- Section -->
-			<!--
-			<section>
-				<header class="major">
-					<h2>Связь</h2>
-				</header>
-				<ul class="contact">
-					<li class="fa-envelope-o"><a href="#">mail@ya.ru</a></li>
-					<li style="padding-left: 0em;" class="gtr-uniform">
-						<div class="row gtr-uniform">
-							<div class="col-12">
-								<textarea name="link-message" id="link-message" placeholder="Или напишете сообщение сюда" rows="6"></textarea>
-							</div>
-							<div class="col-12">
-								<input type="submit" value="Отправить сообщение" class="primary" />
-							</div>
-						</div>
-					</li>
-				</ul>
-
-
-			</section>-->
-			<!-- Footer -->
-			<!--<footer id="footer">
-				<p class="copyright">&copy; 2019. regrr.ru. Все права защищены.<br> Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-			</footer>-->
-
-		</div>
-	</div>
+	<li>
+		(% if data.next %)
+		<a href="((data.next))" class="page"><i class="fa fa-arrow-right"></i></a>
+		(% else %)
+		<span class="disabled"><i class="fa fa-arrow-right"></i></span>
+		(% endif %)
+	</li>
+</ul>
 
 (% endmacro %)
