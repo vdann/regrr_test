@@ -1,0 +1,392 @@
+﻿(% extends "layout.html" %)
+(% import "macros.html" as macros %)
+
+(% block block_head %)
+<style>
+	#table_orgamizations {
+		font-size: 0.9em;
+	}
+
+		#table_orgamizations th,
+		#table_orgamizations td {
+			width: auto;
+		}
+</style>
+(% endblock %)
+
+
+(% block content %)
+
+<br>
+<div class="table-wrapper">
+	<table class="alt" id="table_orgamizations">
+		<thead>
+			<tr>
+				<th>№</th>
+				<th>Наименование медицинской организации</th>
+				<th>Субъект федерации</th>
+				<th>Город</th>
+				<th>Адрес</th>
+				<th>Номер свидетельства об аккредитации</th>
+				<th>Дата выдачи свидетельства об аккредитации</th>
+				<th>Дата окончания срока действия свидетельства</th>
+				<th>Свидетельство</th>
+				<th>Приказ о принятии решения по аккредитации</th>
+			</tr>
+		</thead>
+		<tbody>
+			(% for organization in server.organizations.list %)
+
+			<tr>
+				<td><a href="/organizations/((organization.id))">(( organization.id ))</a></td>
+				<td><a href="/organizations/((organization.id))">(( organization.name ))</a></td>
+				<td>(( organization.subject_of_federation ))</td>
+				<td>(( organization.city ))</td>
+				<td>(( organization.address ))</td>
+				<td>(( organization.certificate_accreditation_number ))</td>
+				<td>(( organization.date_of_accreditation ))</td>
+				<td>(( organization.date_of_accreditation_end ))</td>
+				<td>(( organization.certificate ))</td>
+				<td>(( organization.order_of_accreditation ))</td>
+			</tr>
+			(% endfor %)
+
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="10"> (# len(server.organizations.list) #)  </td>
+			</tr>
+		</tfoot>
+	</table>
+</div>
+<br>
+(( macros.pagination(server.organizations.pagination) ))
+
+(% endblock %)
+
+
+(% import "macros.html" as macros %)
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+
+	<title>(( server.title )) - Реестр результатов анализов и тестирования</title>
+
+	<link rel="shortcut icon" type="image/png" href="/favicon.png">
+
+	(% if server.isAdmin %)
+	<link rel="stylesheet" href="/static/_design/assets/css/main_red.css" />
+	(% else %)
+	<link rel="stylesheet" href="/static/_design/assets/css/main.css" />
+	(% endif %)
+	<link rel="stylesheet" href="/static/_design/assets/css/main_ext.css" />
+
+	<style>
+	</style>
+
+	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
+
+</head>
+<body class="is-preload">
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Main -->
+		<div id="main">
+			<div class="inner">
+
+				<!-- Header -->
+				<header id="header">
+					<a href="/" class="logo"><h2>Реестр результатов анализов и&nbsp;тестирования</h2></a>
+				</header>
+
+				<!-- Banner -->
+				<section id="banner">
+					<div class="content">
+						<header class="major1">
+							<h2>(( server.title ))</h2>
+						<a onclick="javascript:history.back();">назад</a>
+						</header>
+
+
+						<br>
+
+						(% if server.isAdmin %)
+
+						<div class="row">
+							<div class="col-12">
+								<a class="button primary" href="/user_add" title="Добавить нового пользователя">Добавить</a>
+							</div>
+						</div>
+
+						<br>
+
+						<div class="table-wrapper">
+							<table class="alt">
+								<thead>
+									<tr>
+										<th>№</th>
+										<th>Логин</th>
+										<th>ФИО</th>
+										<th>Должность</th>
+										<th>email</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(user, i) in users" key="user.id">
+										<td v-html="i + 1"></td>
+										<td v-html="getUsername(user)"></td>
+										<td v-html="getFullname(user)"></td>
+										<td v-html="user.position"></td>
+										<td v-html="user.email"></td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<!--										<td v-html="users.length"></td>
+							-->
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+
+						(( macros.pagination(server.pagination) ))
+
+						(% else %) <!-- !server.isAdmin -->
+
+						<div class="row">
+							<div class="col-12">
+								<a class="button primary" href="/patient_add" title="Добавить нового пациента">Добавить</a>
+							</div>
+						</div>
+						<br>
+						<div class="table-wrapper">
+							<table class="alt">
+								<thead>
+									<tr>
+										<th>№</th>
+										<th>ФИО</th>
+										<th>Отеделение</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr v-for="(patient, i) in patients" key="patient.id">
+										<td v-html="i + 1"></td>
+										<td v-html="getFullname(patient)"></td>
+										<td v-html="patient.department"></td>
+										<td v-html="patient.diagnosis"></td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<!--										<td v-html="patients.length"></td>
+							-->
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+
+						(% endif %) <!-- !server.isAdmin -->
+					</div>
+				</section>
+
+			</div>
+		</div>
+
+		<!-- Sidebar -->
+		<div id="sidebar">
+			<div class="inner">
+
+				<!-- Search -->
+				<section id="search" class="alt">
+					<form method="post" action="/#" style="margin-bottom: 1.2em;">
+						<a class="button fit1 primary" href="/logout" title="Выйти" style="padding: 0 1.2em;">
+							<i class="fa fa-sign-out fa-flip-horizontal fa-2x" style="vertical-align: middle;"></i>
+						</a>
+
+						<b class="f-right" style="font-size: 1.4em; vertical-align: baseline;">
+							<a href="/profile" title="Профиль">
+								(( server.username ))
+							</a>
+						</b>
+					</form>
+
+					<form id="search_form" method="post" action="#">
+						<input type="text" name="query" id="query" placeholder="Поиск" />
+					</form>
+				</section>
+
+
+
+				<!-- Menu -->
+				<nav id="menu">
+					<header class="major">
+						<h2>Меню</h2>
+					</header>
+					<ul>
+						(% for menu in server.menus %)
+						(% if not menu.submenus %)
+						<li><a href="(( menu.href ))">(( menu.text ))</a></li>
+						(% else %)
+						<li>
+							<span class="opener">(( menu.text ))</span>
+							<ul>
+								(% for submenu in menu.submenus %)
+								<li><a href="(( submenu.href ))">(( submenu.text ))</a></li>
+								(% endfor %)
+							</ul>
+						</li>
+						(% endif %)
+						(% endfor %)
+					</ul>
+				</nav>
+
+				<!-- Section -->
+				<!--
+				<section>
+					<header class="major">
+						<h2>Связь</h2>
+					</header>
+					<ul class="contact">
+						<li class="fa-envelope-o"><a href="#">mail@ya.ru</a></li>
+						<li style="padding-left: 0em;" class="gtr-uniform">
+							<div class="row gtr-uniform">
+								<div class="col-12">
+									<textarea name="link-message" id="link-message" placeholder="Или напишете сообщение сюда" rows="6"></textarea>
+								</div>
+								<div class="col-12">
+									<input type="submit" value="Отправить сообщение" class="primary" />
+								</div>
+							</div>
+						</li>
+					</ul>
+
+
+				</section>-->
+				<!-- Footer -->
+				<!--<footer id="footer">
+					<p class="copyright">&copy; 2019. regrr.ru. Все права защищены.<br> Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+				</footer>-->
+
+			</div>
+		</div>
+
+	</div>
+
+	(% if server.isAdmin %)
+
+	<script>
+
+		var data = {
+			username: 'ivanov',
+			users: [],
+			url_user: '/user'
+		};
+
+		try {
+			(( server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы (users)');
+		}
+
+		data.url_user = data.url_user || '/user';
+		data.users = data.users || [];
+
+
+		var appUsers = new Vue({
+			el: '#wrapper',
+			data: data,/*,
+			mounted: function () {
+				$('<script src="//static//_design//assets//js//main.js"><//script>')
+					.appendTo('body');
+			}*/
+			methods: {
+				_makeA: function (href, text) {
+					return '<a href="' + href + '">' + text + '</a>';
+				},
+				getUsername: function (user) {
+					return this._makeA(this.url_user + '/' + user.username, user.username);
+				},
+				getFullname: function (user) {
+					var fullname = user.lastname + ' ' + user.firstname + ' ' + user.middlename;
+					return this._makeA(this.url_user + '/' + user.username, fullname);
+				}
+			}
+		});
+	</script>
+
+	(% else %)
+
+	<script>
+
+		function make_patient(fullname, department, date_of_birth) {
+			return {
+				fullname: fullname,
+				department: department,
+				date_of_birth: date_of_birth,
+			};
+		}
+
+		var patients = [
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+			make_patient('Сидоров Сидор Сидорович', '4. Хирургическое отделение абдоминальной онкологии', '12.02.1970'),
+			make_patient('Петров Петр Петрович', '9. Отделение анестезиологии-реанимации', '01.01.1980'),
+			make_patient('Иванов Иван Иванович', '4. Хирургическое отделение абдоминальной онкологии', '02.02.1960'),
+		];
+
+		var data = {
+			username: 'ivanov',
+			patients: patients,
+			url_user: '/user'
+		};
+
+		try {
+			(( server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы (patients)');
+		}
+
+		data.url_patient = data.url_patient || '/patient';
+		data.users = data.users || [];
+
+
+		var appPatients = new Vue({
+			el: '#wrapper',
+			data: data,/*,
+			mounted: function () {
+				$('<script src="//static//_design//assets//js//main.js"><//script>')
+					.appendTo('body');
+			}*/
+			methods: {
+				_makeA: function (href, text) {
+					return '<a href="' + href + '">' + text + '</a>';
+				},
+				getFullname: function (patient) {
+					var fullname = patient.lastname + ' ' + patient.firstname + ' ' + patient.middlename;
+					return this._makeA(this.url_patient + '/' + patient.id, fullname);
+				}
+			}
+		});
+	</script>
+
+	(% endif %)
+
+	<!-- Scripts -->
+	<script src="/static/_design/assets/js/jquery.min.js"></script>
+	<script src="/static/_design/assets/js/browser.min.js"></script>
+	<script src="/static/_design/assets/js/breakpoints.min.js"></script>
+	<script src="/static/_design/assets/js/util.js"></script>
+	<script src="/static/_design/assets/js/main.js"></script>
+
+</body>
+</html>

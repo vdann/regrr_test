@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<title>(( server.title )) - (( server.app_name ))</title>
+	
+	<link rel="shortcut icon" type="image/png" href="/favicon.png">
+
+	<link rel="stylesheet" href="/static/_design/assets/css/main(( server.style_ext )).css" />
+	<link rel="stylesheet" href="/static/_design/assets/css/main_ext.css" />
+
+<!--
+	<link rel="stylesheet" type="text/css" href="/static/content/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="/static/content/site.css" />
+-->
+
+	<script src="/static/scripts/modernizr-2.6.2.js"></script>
+
+	<script src="/static/_design/extern/axios.js-v0.18.0/axios.js"></script>
+	<script src="/static/_design/extern/lodash.js-v4.17.11/lodash.js"></script>
+	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
+
+
+	(% block block_head %)
+	(% endblock %)
+	
+
+</head>
+
+<body class="is-preload">
+	<!--
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a href="/" class="navbar-brand">Application name</a>
+			</div>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="container body-content">
+		<footer>
+		</footer>
+	</div>
+
+	<script src="/static/scripts/jquery-1.10.2.js"></script>
+	<script src="/static/scripts/bootstrap.js"></script>
+	<script src="/static/scripts/respond.js"></script>
+-->
+
+	<!-- Wrapper -->
+	<div id="wrapper">
+
+		<!-- Main -->
+		<div id="main">
+		
+			<div class="inner">
+		
+				<!-- Header -->
+				<header id="header">
+					<a href="/" class="logo">
+						<h2>(( server.app_name ))</h2>
+					</a>
+				</header>
+
+				<!-- Banner -->
+				
+				<section id="banner">
+
+					<div class="content">
+
+						<header class="major1 mb-2em">
+							(% if server.breadcrumbs %)
+
+							<!--Breadcrumbs-->
+							<div class="breadcrumbs">
+								(% for item in server.breadcrumbs %)
+
+								(% if item.href %)
+								<a href="(( item.href ))">(( item.text | safe ))</a>
+								(% else %)
+								<span>(( item.text | safe ))</span>
+								(% endif %)
+
+								(% if not loop.last %)
+								<span class="breadcrumbs-sep">»</span>
+								(% endif %)
+
+								(% endfor %)
+							</div>
+							(% endif %)
+
+							(% if server.prevnext %)
+
+							<!-- PrevNext -->
+							<div class="prevnext mt-1em">
+								(% if server.prevnext.prev: %)
+								<a href="((server.prevnext.prev.href))"
+									(% if server.prevnext.prev.title %)
+									title="((server.prevnext.prev.title))"
+									(% endif %)>
+									<i class="fa fa-2x fa-caret-left"></i>
+								</a>
+								(% else %)
+								<i class="fa fa-2x fa-caret-left"></i>
+								(% endif %)
+
+								&nbsp;
+								&nbsp;
+
+								(% if server.prevnext.next: %)
+								<a href="((server.prevnext.next.href))"
+									(% if server.prevnext.next.title %)
+									title="((server.prevnext.next.title))"
+									(% endif %)>
+									<i class="fa fa-2x fa-caret-right"></i>
+								</a>
+								(% else %)
+								<i class="fa fa-2x fa-caret-right"></i>
+								(% endif %)
+
+							</div>
+							(% endif %)
+
+						</header>
+
+						(% block content %)
+							[Блок content не задан]
+						(% endblock %)
+
+					</div>
+
+				</section>
+			</div>
+
+		</div>
+
+		<!-- Sidebar -->
+		<div id="sidebar">
+			<div class="inner">
+				<!-- Search -->
+				<section id="search" class="alt">
+					<form method="post" action="/#" style="margin-bottom: 1.2em;">
+
+						(% if server.username %)
+
+						<a class="button fit1 primary" href="/logout" title="Выйти" style="padding: 0 1.2em;">
+							<i class="fa fa-sign-out fa-flip-horizontal fa-2x" style="vertical-align: middle;"></i>
+						</a>
+
+						<b class="f-right" style="font-size: 1.4em; vertical-align: baseline;">
+							<a href="/profile" title="Профиль">
+								(( server.username ))
+							</a>
+						</b>
+
+						(% else %)
+
+						<a class="button fit1 primary" href="/login" title="Войти" style="padding: 0 1.2em;">
+							<i class="fa fa-sign-in fa-2x" style="vertical-align: middle;"></i>
+						</a>
+
+						<b class="f-right" style="font-size: 1.4em; vertical-align: baseline;">
+							<span>Гость</span>
+						</b>
+
+						(% endif %)
+
+					</form>
+					<form id="search_form" method="post" action="#">
+						<input type="text" name="query" id="query" placeholder="Поиск" />
+					</form>
+				</section>
+
+				<!-- Menu -->
+				<nav id="menu">
+					<header class="major">
+						<h2>Меню</h2>
+					</header>
+					<ul>
+						(% for menu in server.menus %)
+						(% if not menu.submenus %)
+						<li
+							(% if menu.href and (menu.href == server.menucur) %)
+							class="active"
+							(% endif %)
+							>
+							<a href="(( menu.href ))">
+								(( menu.text ))
+							</a>
+						</li>
+						(% else %)
+						<li>
+							<span class="opener">(( menu.text ))</span>
+							<ul>
+								(% for submenu in menu.submenus %)
+								<li><a href="(( submenu.href ))">(( submenu.text ))</a></li>
+								(% endfor %)
+							</ul>
+						</li>
+						(% endif %)
+						(% endfor %)
+					</ul>
+				</nav>
+
+
+				<!-- Section -->
+				<section>
+					<header class="major">
+						<h2>Связь</h2>
+					</header>
+					<ul class="contact">
+						<li class="fa-envelope-o"><a href="#">mail@ya.ru</a></li>
+						<li style="padding-left: 0em;" class="gtr-uniform">
+							<div class="row gtr-uniform">
+								<div class="col-12">
+									<textarea name="link-message" id="link-message" placeholder="Или напишете сообщение сюда" rows="6"></textarea>
+								</div>
+								<div class="col-12">
+									<input type="submit" value="Отправить сообщение" class="primary" />
+								</div>
+							</div>
+						</li>
+					</ul>
+				</section>
+
+
+				<!-- Footer -->
+				<footer id="footer">
+					<p class="copyright">
+						&copy; (( server.year )) - clinstudy.ru. Все права защищены<br>
+						Developer: <a href="mailto:vdann@ya.ru">vdann@ya.ru</a><br>
+						Design: <a href="https://html5up.net">HTML5 UP</a>
+					</p>
+				</footer>
+			</div>
+		</div>
+	</div>
+
+	<!-- Scripts -->
+	<script src="/static/_design/assets/js/jquery.min.js"></script>
+	<script src="/static/_design/assets/js/browser.min.js"></script>
+	<script src="/static/_design/assets/js/breakpoints.min.js"></script>
+	<script src="/static/_design/assets/js/util.js"></script>
+	<script src="/static/_design/assets/js/main.js"></script>
+
+</body>
+</html>

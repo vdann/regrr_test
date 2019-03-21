@@ -112,8 +112,10 @@ class PageData:
 		}
 
 
-	def __init__(self, title, username, menus, **kwargs):
+	def __init__(self, app_name, title, username, menus, **kwargs):
 		"""Constructor"""
+
+		self.app_name = app_name
 		self.title = title
 		self.username = username
 

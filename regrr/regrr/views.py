@@ -21,6 +21,7 @@ from regrr import mail
 import regrr.models as db
 import regrr.helper_view as helper_view
 
+APP_NAME = 'Реестр результатов анализов и&nbsp;тестирования'
 
 #############################################################
 import json
@@ -196,6 +197,79 @@ def index():
 
 	str = render_template('index.html', server = server)
 	return str
+
+#############################################################
+@app.route('/2')
+def index2():
+
+	user_info = session.get(SESSION_KEY_USER)
+
+	page_num = request.args.get('page', 1, type=int)
+	page_size = 10
+
+APP_NAME
+
+	title = ''
+	menus = []
+	data = {}
+	isAdmin = False
+
+	username = user_info.get('username')
+	user_role = user_info.get('role')
+
+	user_role = user_info.get('role')
+	if user_role == db.UserRole.ADMIN:
+
+		isAdmin = True
+		title = 'Пользователи'
+		menus = menus_admin
+
+		users = []
+
+		db_session = db.Session()
+		#db_users = db_session.query(db.User).all()
+		db_users = db_session.query(db.User)
+		pagination = paginate(db_users, page_num, page_size)
+
+		for db_user in pagination.items:
+			users.append(db_user.toJson())
+		
+		data['users'] = users
+		jpagination = helper_view.pagination_ext(pagination, page_num, page_size, 'index')
+		data['pagination'] = jpagination
+
+
+	elif user_role == db.UserRole.USER:
+		title = 'Пациенты'
+		menus = menus_user
+
+		patients = []
+
+		db_session = db.Session()
+		db_patients = db_session.query(db.Patient).all()
+		for db_patient in db_patients:
+			patients.append(db_patient.toJson())
+
+		data['patients'] = patients
+
+	else:
+		abort(500)
+
+	data['username'] = username
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+	server = {
+		'title': title,
+		'username': username,
+		'isAdmin': isAdmin,
+		'data': data,
+		'menus': menus,
+		'pagination': jpagination
+	}
+
+	str = render_template('index.html', server = server)
+	return str
+
+
 
 #############################################################
 @app.route('/login', methods=['GET'])
