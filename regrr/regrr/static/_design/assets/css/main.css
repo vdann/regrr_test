@@ -2,8 +2,9 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,400italic,600italic|Roboto+Slab:400,700");
 
 /*
-    main color - #75aad4 {1:# f56a6a}
-
+    main        color - #75aad4 {1:# f56a6a}
+    main:hover  color - rgba(106, 106, 245, 0.05) {1: rgba(245, 106, 106, 0.05)}
+    main:active color - rgba(106, 106, 245, 0.15) {1: rgba(245, 106, 106, 0.15)}
 */
 
 /*
@@ -2350,6 +2351,10 @@ input, select, textarea {
 				text-align: center;
 			}
 
+				ul.pagination li > .page:hover {
+					background-color: rgba(106, 106, 245, 0.15);
+				}
+
 				ul.pagination li > .page.active {
 					background-color: #75aad4;
 					color: #ffffff !important;
@@ -2371,6 +2376,7 @@ input, select, textarea {
 				padding-left: 0.75em;
 			}
 
+/*
 		@media screen and (max-width: 480px) {
 
 			ul.pagination li:nth-child(n+2):nth-last-child(n+2) {
@@ -2382,7 +2388,7 @@ input, select, textarea {
 			}
 
 		}
-
+*/
 /* Table */
 
 	.table-wrapper {
@@ -2491,7 +2497,7 @@ input, select, textarea {
 		input[type="button"]:hover,
 		button:hover,
 		.button:hover {
-			background-color: rgba(245, 106, 106, 0.05);
+			background-color: rgba(106, 106, 245, 0.05);
 		}
 
 		input[type="submit"]:active,
@@ -2499,7 +2505,7 @@ input, select, textarea {
 		input[type="button"]:active,
 		button:active,
 		.button:active {
-			background-color: rgba(245, 106, 106, 0.15);
+			background-color: rgba(106, 106, 245, 0.15);
 		}
 
 		input[type="submit"].icon:before,
@@ -3551,6 +3557,21 @@ input, select, textarea {
 		margin: 0.5em 0 0 0;
 		padding: 0.5em 0 0 0;
 	}
+
+		#menu > ul > li.active {
+			font-weight: bolder;
+		}
+
+		#menu > ul > li.active a:before {
+			font-family: FontAwesome;
+			font-style: normal;
+			font-weight: normal;
+			text-transform: none !important;
+			content: '\f0da';
+			position: absolute;
+			left: 2px;
+			transform: scale(2);
+		}
 
 		#menu > ul > li > ul {
 			color: #9fa3a6;

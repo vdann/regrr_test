@@ -340,6 +340,15 @@ def initTestUsers():
 		patient = Patient('Зырянов', 'Станислав', 'Александрович', '12.03.1970', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 3')
 		session.add(patient)
 
+	"""
+	resultPatients = session.query(Patient).count()
+	if resultPatients < 10:
+		for i in range(1, 80):
+			patient = Patient('Набиев' + str(i), 'Гасан', 'Набиевич', '01.01.1980', '9. Отделение анестезиологии-реанимации', 'Диагноз 1')
+			session.add(patient)
+	"""
+
+
 	resultAnalyzes = session.query(Analysis).all()
 	if len(resultAnalyzes) == 0:
 

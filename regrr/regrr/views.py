@@ -25,13 +25,6 @@ APP_NAME = 'Реестр результатов анализов и&nbsp;тес�
 
 #############################################################
 import json
-def make_patient(fullname, department, date_of_birth):
-	return {
-		'fullname': fullname,
-		'department': department,
-		'date_of_birth': date_of_birth,
-	}
-
 
 #############################################################
 import os
@@ -108,6 +101,20 @@ menus_user = [
 menus_user.extend(menus_all)
 
 
+pageDataRoles = {
+	db.UserRole.ADMIN: {
+		'menus': menus_admin,
+		'style_ext': '_red'
+	},
+	db.UserRole.USER: {
+		'menus': menus_user,
+		'style_ext': ''
+	}
+}
+
+#pageDataRoles[user_role]
+
+
 
 @app.before_request
 def before_request():
@@ -129,6 +136,7 @@ def before_request():
 
 	# print('before_request ok:' + path)
 
+
 #############################################################
 @app.route('/')
 def index():
@@ -139,27 +147,27 @@ def index():
 	page_size = 10
 
 	title = ''
-	menus = []
 	data = {}
 	isAdmin = False
 
 	username = user_info.get('username')
-	user_role = user_info.get('role')
 
 	user_role = user_info.get('role')
 	if user_role == db.UserRole.ADMIN:
 
 		isAdmin = True
 		title = 'Пользователи'
-		menus = menus_admin
 
-		users = []
+		pageData = helper_view.PageData(APP_NAME, title, username, menus_admin, menucur='/', style_ext='_red')
+		pageData.add_breadcrumb(title)
+
+		server = pageData.to_dict()
 
 		db_session = db.Session()
-		#db_users = db_session.query(db.User).all()
 		db_users = db_session.query(db.User)
 		pagination = paginate(db_users, page_num, page_size)
 
+		users = []
 		for db_user in pagination.items:
 			users.append(db_user.toJson())
 		
@@ -167,90 +175,50 @@ def index():
 		jpagination = helper_view.pagination_ext(pagination, page_num, page_size, 'index')
 		data['pagination'] = jpagination
 
+		#data['username'] = username
+		data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+
+		server['isAdmin'] = isAdmin
+		server['data'] = data
+		server['pagination'] = jpagination
+
+		str = render_template('index_new.html', server = server)
+		str = helper_view.str_remove_bom(str)
+		return str
+
 
 	elif user_role == db.UserRole.USER:
+
 		title = 'Пациенты'
-		menus = menus_user
+
+		pageData = helper_view.PageData(APP_NAME, title, username, menus_user, menucur='/')
+		pageData.add_breadcrumb(title)
+
+		server = pageData.to_dict()
+
+
+		db_session = db.Session()
+		db_patients = db_session.query(db.Patient)
+		pagination = paginate(db_patients, page_num, page_size)
 
 		patients = []
-
-		db_session = db.Session()
-		db_patients = db_session.query(db.Patient).all()
-		for db_patient in db_patients:
+		for db_patient in pagination.items:
 			patients.append(db_patient.toJson())
-
-		data['patients'] = patients
-
-	else:
-		abort(500)
-
-	data['username'] = username
-	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
-	server = {
-		'title': title,
-		'username': username,
-		'isAdmin': isAdmin,
-		'data': data,
-		'menus': menus,
-		'pagination': jpagination
-	}
-
-	str = render_template('index.html', server = server)
-	return str
-
-#############################################################
-@app.route('/2')
-def index2():
-
-	user_info = session.get(SESSION_KEY_USER)
-
-	page_num = request.args.get('page', 1, type=int)
-	page_size = 10
-
-APP_NAME
-
-	title = ''
-	menus = []
-	data = {}
-	isAdmin = False
-
-	username = user_info.get('username')
-	user_role = user_info.get('role')
-
-	user_role = user_info.get('role')
-	if user_role == db.UserRole.ADMIN:
-
-		isAdmin = True
-		title = 'Пользователи'
-		menus = menus_admin
-
-		users = []
-
-		db_session = db.Session()
-		#db_users = db_session.query(db.User).all()
-		db_users = db_session.query(db.User)
-		pagination = paginate(db_users, page_num, page_size)
-
-		for db_user in pagination.items:
-			users.append(db_user.toJson())
 		
-		data['users'] = users
+		data['patients'] = patients
 		jpagination = helper_view.pagination_ext(pagination, page_num, page_size, 'index')
 		data['pagination'] = jpagination
 
+		#data['username'] = username
+		data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
 
-	elif user_role == db.UserRole.USER:
-		title = 'Пациенты'
-		menus = menus_user
+		server['isAdmin'] = isAdmin
+		server['data'] = data
+		server['pagination'] = jpagination
 
-		patients = []
-
-		db_session = db.Session()
-		db_patients = db_session.query(db.Patient).all()
-		for db_patient in db_patients:
-			patients.append(db_patient.toJson())
-
-		data['patients'] = patients
+		str = render_template('index_new.html', server = server)
+		str = helper_view.str_remove_bom(str)
+		return str
 
 	else:
 		abort(500)
@@ -897,65 +865,53 @@ def api_test_username():
 ################################################################
 @app.route('/feedback', methods=['GET'])
 def feedback():
-	user_info = session.get(SESSION_KEY_USER)
+	"""Связь"""
 
-	title = 'Связь'
-	menus = []
-	data = {}
-	isAdmin = False
+	user_info = session.get(SESSION_KEY_USER)
 
 	username = user_info.get('username')
 	user_role = user_info.get('role')
 
+	pageData = helper_view.PageData(APP_NAME, feedback.__doc__, username, None, menucur='/feedback')
+	pageData.add_breadcrumb(feedback.__doc__)
+
 	if user_role == db.UserRole.ADMIN:
-		isAdmin = True
-		menus = menus_admin
+		pageData.menus = menus_admin
+		pageData.style_ext = '_red'
 	else:
-		menus = menus_user
+		pageData.menus = menus_user
 
+	server = pageData.to_dict()
 
-	data['username'] = username
-	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
-	server = {
-		'title': title,
-		'username': username,
-		'isAdmin': isAdmin,
-		'data': data,
-		'menus': menus
-	}
-
-	return render_template('feedback.html', server = server)
+	str = render_template('feedback.html', server = server)
+	str = helper_view.str_remove_bom(str)
+	return str
 
 
 @app.route('/feedback_result', methods=['GET'])
 def feedback_result():
-	user_info = session.get(SESSION_KEY_USER)
+	"""Связь"""
 
-	title = 'Связь'
-	menus = []
-	data = {}
-	isAdmin = False
+	user_info = session.get(SESSION_KEY_USER)
 
 	username = user_info.get('username')
 	user_role = user_info.get('role')
 
+	pageData = helper_view.PageData(APP_NAME, feedback.__doc__, username, None, menucur='/feedback')
+	pageData.add_breadcrumb(feedback.__doc__)
+
 	if user_role == db.UserRole.ADMIN:
-		isAdmin = True
-		menus = menus_admin
+		pageData.menus = menus_admin
+		pageData.style_ext = '_red'
 	else:
-		menus = menus_user
+		pageData.menus = menus_user
 
-	data['username'] = username
-	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
-	server = {
-		'title': title,
-		'username': username,
-		'isAdmin': isAdmin,
-		'data': data,
-		'menus': menus
-	}
+	server = pageData.to_dict()
 
-	return render_template('feedback_result.html', server = server)
+	str = render_template('feedback_result.html', server = server)
+	str = helper_view.str_remove_bom(str)
+	return str
+
 
 
 from flask_mail import Message

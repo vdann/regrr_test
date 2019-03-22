@@ -4,7 +4,7 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<title>(( server.title )) - (( server.app_name ))</title>
+	<title>(( server.title )) - (( server.app_name | safe ))</title>
 	
 	<link rel="shortcut icon" type="image/png" href="/favicon.png">
 
@@ -69,7 +69,7 @@
 				<!-- Header -->
 				<header id="header">
 					<a href="/" class="logo">
-						<h2>(( server.app_name ))</h2>
+						<h2>(( server.app_name | safe ))</h2>
 					</a>
 				</header>
 
@@ -133,6 +133,8 @@
 							(% endif %)
 
 						</header>
+
+						<br>
 
 						(% block content %)
 							[Блок content не задан]
@@ -214,7 +216,7 @@
 				</nav>
 
 
-				<!-- Section -->
+				<!-- Section -- >
 				<section>
 					<header class="major">
 						<h2>Связь</h2>
@@ -235,7 +237,7 @@
 				</section>
 
 
-				<!-- Footer -->
+				<!-- Footer -- >
 				<footer id="footer">
 					<p class="copyright">
 						&copy; (( server.year )) - clinstudy.ru. Все права защищены<br>
@@ -243,6 +245,7 @@
 						Design: <a href="https://html5up.net">HTML5 UP</a>
 					</p>
 				</footer>
+					-->
 			</div>
 		</div>
 	</div>
