@@ -1,0 +1,335 @@
+﻿(% extends "layout.html" %)
+(% import "macros.html" as macros %)
+
+
+(% block block_head %)
+<style>
+	.form-profile {
+		max-width: 700px;
+	}
+
+	.table_variants {
+		margin: 0 0 0 0;
+	}
+
+	table.table_variants tbody tr {
+		background-color: #f5f1f1;
+	}
+
+	.table_variants tbody tr:hover {
+		background-color: #ffff99;
+	}
+
+	.table_variants tbody tr.selected {
+		color: #fff;
+		background-color: #1bb193;
+	}
+
+	.selected {
+		color: #fff;
+		background-color: #1bb193;
+	}
+
+	.selected-red {
+		color: #fff;
+		background-color: #e02222;
+	}
+</style>
+(% endblock %)
+
+
+(% block content %)
+
+	<h2>Geneva Risk Score for Venous Thromboembolism (VTE) Prophylaxis</h2>
+	<p>Predicts need for VTE prophylaxis in admitted patients.</p>
+
+	<br>
+
+
+	<div class="row aln-center1">
+		<div id="test_news" class="col-7 col-8-xlarge col-9-large col-10-medium col-12-small" v-cloak>
+			<ul class="alt">
+
+				<li v-for="test_row, index_row in rows">
+
+					<div class="row">
+
+						<div class="col-6 col-4-small col-12-xsmall" v-html="test_row.name">
+						</div>
+
+						<div class="col-6 col-8-small col-12-xsmall">
+							<template v-if="test_row.variants.length == 2">
+								<table class="table_variants alt">
+									<tr>
+										<td v-for="variant, index_var in test_row.variants"
+											v-bind:class="{ selected: test_row.index == index_var }"
+											v-on:click="select(index_row, index_var)"
+											width="50%">
+
+											<span class="f-left"
+												v-html="variant.name"
+												v-bind:class="{ fwBold: test_row.index == index_var }">
+											</span>
+											<span class="f-right"
+												v-html="format_points(variant.points)">
+											</span>
+										</td>
+									</tr>
+								</table>
+							</template>
+
+							<template v-else>
+								<table class="table_variants alt">
+									<tr v-for="variant, index_var in test_row.variants"
+										v-bind:class="{ selected: test_row.index == index_var }"
+										v-on:click="select(index_row, index_var)">
+										<td>
+											<span class="f-left"
+													v-html="variant.name"
+													v-bind:class="{ fwBold: test_row.index == index_var }">
+											</span>
+											<span class="f-right"
+													v-html="format_points(variant.points)">
+											</span>
+										</td>
+									</tr>
+								</table>
+							</template>
+						</div>
+
+					</div>
+
+				</li>
+
+			</ul>
+
+			<div class="box"
+				v-bind:class="[results.isRed ? 'selected-red' : 'selected']"
+				v-html="result">
+
+			</div>
+
+			<ul class="actions">
+				<li>
+					<input type="submit"
+						value="Добавить"
+						class="primary"
+						:disabled="!isOk"
+						@click="sendResult"/>
+				</li>
+			</ul>
+
+		</div>
+	</div>
+
+	<script>
+
+		var data = {};
+
+		try {
+			((server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы');
+		}
+
+		function nbsp(s) {
+			return s.replace(/ /g, '&nbsp;');
+		}
+
+		function b(s) {
+			return '<b>' + s + '</b>';
+		}
+
+
+
+		var rows = [
+			["Cardiac failure", 2],
+			["Respiratory failure", 2],
+			["Recent stroke (<3 months ago)", 2],
+			["Recent myocardial infarction (<4 weeks ago)", 2],
+			["Acute infectious disease (including sepsis)", 2],
+			["Acute rheumatic disease", 2],
+			["Active malignancy", 2],
+			["Myeloproliferative syndrome", 2],
+			["Nephrotic syndrome", 2],
+			["History of venous thromboembolism", 2],
+			["Known hypercoagulable state", 2],
+			["Immobilization (<30 min walking per day) for ≥3 days", 1],
+
+			["Recent travel for >6 hrs", 1],
+			["Age >60 years", 1],
+			["Obesity (BMI >30)", 1],
+			["Chronic venous insufficiency", 1],
+			["Pregnancy", 1],
+			["Hormonal therapy (contraceptive or replacement therapy)", 1],
+			["Dehydration", 1],
+		];
+
+		function convert(rows) {
+
+			function convert_row(row) {
+
+				var variants = [{
+					name: 'No',
+					points: 0
+				}, {
+					name: 'Yes',
+					points: row[1]
+				}];
+
+
+				return {
+					index: 0,
+					name: row[0],
+					variants: variants
+				};
+			}
+
+			var rows_new = [];
+
+			for (var i = 0, n = rows.length; i < n; ++i) {
+				rows_new.push(convert_row(rows[i]));
+			}
+
+			return rows_new;
+		}
+
+		rows = convert(rows);
+
+
+		function makeUrlFromRoute(route, params) {
+			for (key in params) {
+				var param = params[key];
+				var t = typeof param;
+				if (t === 'string' || t === 'number')
+					route = route.replace(new RegExp('<' + key + '>', 'gm'), param);
+			}
+
+			if (/<\w+(\:\w*)*>/gm.test(route))
+				console.warn('makeUrlFromRoute => Не все параметры маршрута заданы', route);
+
+			return route;
+		}
+
+		data.route_analysis_add = data.route_analysis_add
+			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add';
+
+		data.route_analysis_viewer = data.route_analysis_viewer
+			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis';
+
+		var icon_ok = 'fa fa-2x fa-check clr-green';
+		var icon_fail = 'fa fa-2x fa-exclamation-triangle clr-red';
+		var icon_wait = 'fa fa-2x fa-refresh fa-spin clr-blue';
+
+		var app = new Vue({
+			el: '#test_news',
+			data: {
+				rows: rows,
+				isOk: false,
+				results: {
+					result: '',
+					points: 0,
+					isRed: false,
+					items: []
+				}
+			},
+			computed: {
+				result: function () {
+
+					var isOk = true;
+					var isRed = false;
+					var points = 0;
+					var items = [];
+
+					for (var i = 0, n = this.rows.length; i < n; ++i) {
+						var row = this.rows[i];
+						if (row.index == -1) {
+							isOk = false;
+							continue;
+						}
+
+						var variant = row.variants[row.index];
+						var cur_points = variant.points;
+
+						items.push({ name: row.name, label: variant.name, points: cur_points });
+
+						points += cur_points;
+					}
+
+
+					var result = [];
+					result.push('<span class="fw-bold" style="font-size:2.5em;">' + points + '</span> points<br>');
+					result.push('Geneva Risk Score for VTE Prophylaxis<br>');
+					result.push('<hr>');
+
+					mes = points + ' points';
+
+					if (!isOk) {
+						result.push('Please fill out required fields.');
+					}
+					else {
+						if (points < 3) {
+							result.push('<span class="fw-bold" style="font-size:2.5em;">0.6</span> %<br>');
+							result.push('VTE risk (composite of symptomatic VTE or 90-day VTE mortality)<br>');
+							result.push('<hr>');
+							result.push('<span class="fw-bold" style="font-size:2.5em;">Low</span> risk<br>');
+							result.push('VTE prophylaxis NOT indicated');
+
+							mes += ', 0.6, VTE prophylaxis NOT indicated'
+						}
+						else {
+							result.push('<span class="fw-bold" style="font-size:2.5em;">3.2</span> %<br>');
+							result.push('VTE risk (composite of symptomatic VTE or 90-day VTE mortality)<br>');
+							result.push('<hr>');
+							result.push('<span class="fw-bold" style="font-size:2.5em;">High</span> risk<br>');
+							result.push('VTE prophylaxis indicated (presuming no contraindications)');
+
+							mes += ', 3.2, VTE prophylaxis indicated (presuming no contraindications)'
+						}
+					}
+
+					this.isOk = isOk;
+
+					this.results.result = mes;
+					this.results.points = points;
+					this.results.isRed = isRed;
+					this.results.items = items;
+
+					return result.join('<br><br>');
+				}
+			},
+			methods: {
+				select: function (index_row, index_val) {
+					this.rows[index_row].index = index_val;
+				},
+				format_points: function (points) {
+					if (points > 0)
+						return '+ ' + points;
+					return points;
+				},
+				sendResult: function () {
+
+					var me = this;
+					var url = makeUrlFromRoute(data.route_analysis_add, data);
+
+					axios.post(url, this.results)
+					.then(function (response) {
+
+						var url = makeUrlFromRoute(data.route_analysis_viewer, data);
+						window.location.replace(url);
+//						console.log(response.data.result);
+//						vm.username_icon = response.data.result ? icon_ok : icon_fail;
+					})
+					.catch(function (error) {
+//						vm.username_icon = icon_fail;
+						console.log('Error!');
+					});
+
+				}
+			}
+		});
+	</script>
+
+
+(% endblock %)

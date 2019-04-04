@@ -1,267 +1,141 @@
-﻿<!DOCTYPE HTML>
-<html>
-<head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-
-	<title>(( server.title )) - Реестр результатов анализов и тестирования</title>
-
-	<link rel="shortcut icon" type="image/png" href="/favicon.png">
-
-	(% if server.isAdmin %)
-	<link rel="stylesheet" href="/static/_design/assets/css/main_red.css" />
-	(% else %)
-	<link rel="stylesheet" href="/static/_design/assets/css/main.css" />
-	(% endif %)
-	<link rel="stylesheet" href="/static/_design/assets/css/main_ext.css" />
-
-	<style>
-		.form-profile {
-			max-width: 700px;
-		}
-	</style>
-
-	<script src="/static/_design/extern/es6-promise.js-v4.2.6/es6-promise.auto.js"></script>
-	<script src="/static/_design/extern/axios.js-v0.18.0/axios.js"></script>
-	<script src="/static/_design/extern/lodash.js-v4.17.11/lodash.js"></script>
-	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
-	<script src="/static/js/utils.js"></script>
-</head>
-<body class="is-preload">
-
-	<!-- Wrapper -->
-	<div id="wrapper">
-
-		<!-- Main -->
-		<div id="main">
-			<div class="inner">
-
-				<!-- Header -->
-				<header id="header">
-					<a href="/" class="logo"><h2>Реестр результатов анализов и&nbsp;тестирования</h2></a>
-				</header>
-
-				<!-- Banner -->
-				<section id="banner">
-					<div class="content">
-						<header class="major1">
-							<!--Breadcrumbs-->
-							<h2>(( server.title ))</h2>
-							<!--
-								<div class="breadcrumbs"><a href="/profile">(( server.title ))</a></div>
-							-->
-						</header>
-
-						<br>
-
-						<form  v-cloak method="post" action="#" class="form-profile">
-							<div class="row gtr-uniform">
-
-								<!-- username -->
-								<div class="col-4 col-12-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Логин" disabled />
-								</div>
-								<div class="col-8 col-12-xsmall">
-									<input class="input-static" type="text"
-										:value="user.username"
-										@input="user.username = $event.target.value"
-										disabled />
-								</div>
+﻿(% extends "layout.html" %)
+(% import "macros.html" as macros %)
 
 
-								<!-- lastname -->
-								<div class="col-4 col-12-xsmall"><!-- <div class="col-4 col-10-xsmall"> -->
-									<input class="input-static input-static-bold" type="text" value="Фамилия" disabled />
-								</div>
-								<!--
-								<div class="col-0 col-2-xsmall align-right">
-									<div v-if="lastname_icon" class="icon-va-center">
-										<i :class="[lastname_icon]"></i>
-									</div>
-								</div>
-								-->
-
-								<div class="col-8 col-12-xsmall"><!-- <div class="col-7 col-12-xsmall"> -->
-									<input type="text"
-										:class="{'input-static': !inputing}"
-										:disabled="!inputing"
-										:value="user.lastname"
-										@input="changeUserParam('lastname', $event.target.value)"
-										placeholder="Фамилия"
-										required />
-								</div>
-								<!--
-								<div class="col-1 col-0-xsmall">
-									<div v-if="lastname_icon" class="icon-va-center">
-										<i :class="[lastname_icon]"></i>
-									</div>
-								</div>
-								-->
+(% block block_head %)
+<style>
+	#form_profile {
+		max-width: 700px;
+	}
+</style>
+(% endblock %)
 
 
-								<!-- firstname -->
-								<div class="col-4 col-12-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Имя" disabled />
-								</div>
-								<div class="col-8 col-12-xsmall">
-									<input type="text" name="firstname" id="firstname" :class="{'input-static': !inputing}"
-										:disabled="!inputing"
-										:value="user.firstname"
-										@input="user.firstname = $event.target.value"
-										placeholder="Имя" />
-								</div>
+
+(% block content %)
+
+	<form v-cloak method="post" action="#" id="form_profile">
+		<div class="row gtr-uniform">
+
+			<!-- username -->
+			<div class="col-4 col-12-xsmall">
+				<input class="input-static input-static-bold" type="text" value="Логин" disabled />
+			</div>
+			<div class="col-8 col-12-xsmall">
+				<input class="input-static" type="text"
+					:value="user.username"
+					@input="user.username = $event.target.value"
+					disabled />
+			</div>
 
 
-								<div class="col-4 col-12-xsmall">
-									<input type="text" class="input-static input-static-bold" value="Отчество" disabled />
-								</div>
-								<div class="col-8 col-12-xsmall">
-									<input type="text" name="middlename" id="middlename" :class="{'input-static': !inputing}"
-										:disabled="!inputing"
-										:value="user.middlename"
-										@input="user.middlename = $event.target.value"
-										placeholder="Отчество" />
-								</div>
+			<!-- lastname -->
+			<div class="col-4 col-12-xsmall"><!-- <div class="col-4 col-10-xsmall"> -->
+				<input class="input-static input-static-bold" type="text" value="Фамилия" disabled />
+			</div>
+			<!--
+			<div class="col-0 col-2-xsmall align-right">
+				<div v-if="lastname_icon" class="icon-va-center">
+					<i :class="[lastname_icon]"></i>
+				</div>
+			</div>
+			-->
+
+			<div class="col-8 col-12-xsmall"><!-- <div class="col-7 col-12-xsmall"> -->
+				<input type="text"
+					:class="{'input-static': !inputing}"
+					:disabled="!inputing"
+					:value="user.lastname"
+					@input="changeUserParam('lastname', $event.target.value)"
+					placeholder="Фамилия"
+					required />
+			</div>
+			<!--
+			<div class="col-1 col-0-xsmall">
+				<div v-if="lastname_icon" class="icon-va-center">
+					<i :class="[lastname_icon]"></i>
+				</div>
+			</div>
+			-->
 
 
-								<div class="col-4 col-12-xsmall">
-									<input type="text"
-										value="Должность"
-										class="input-static input-static-bold"
-										disabled />
-								</div>
-								<div class="col-8 col-12-xsmall">
-									<input type="text"
-										name="position" id="position"
-										:class="{'input-static': !inputing}"
-										:disabled="!inputing"
-										:value="user.position"
-										@input="user.position = $event.target.value"
-										placeholder="Должность" />
-								</div>
+			<!-- firstname -->
+			<div class="col-4 col-12-xsmall">
+				<input class="input-static input-static-bold" type="text" value="Имя" disabled />
+			</div>
+			<div class="col-8 col-12-xsmall">
+				<input type="text" name="firstname" id="firstname" :class="{'input-static': !inputing}"
+					:disabled="!inputing"
+					:value="user.firstname"
+					@input="user.firstname = $event.target.value"
+					placeholder="Имя" />
+			</div>
 
 
-								<div class="col-4 col-12-xsmall">
-									<input class="input-static input-static-bold" type="text" value="Почта" disabled />
-								</div>
-								<div class="col-8 col-12-xsmall">
-									<input type="email" name="email" id="email"
-										:class="{'input-static': !inputing}"
-										:disabled="!inputing"
-										:value="user.email"
-										@input="user.email = $event.target.value"
-										placeholder="email@ya.ru" />
-								</div>
+			<div class="col-4 col-12-xsmall">
+				<input type="text" class="input-static input-static-bold" value="Отчество" disabled />
+			</div>
+			<div class="col-8 col-12-xsmall">
+				<input type="text" name="middlename" id="middlename" :class="{'input-static': !inputing}"
+					:disabled="!inputing"
+					:value="user.middlename"
+					@input="user.middlename = $event.target.value"
+					placeholder="Отчество" />
+			</div>
 
-								<div class="col-12">
-									<ul class="actions">
-										<li>
-											<input type="button"
-												:value="!editing ? 'Изменить' : 'Отменить'"
-												:class="{primary: !editing}"
-												@click="toggleEditing()"
-												:disabled="saving" />
-										</li>
 
-										<li v-if="editing">
-											<input type="button" value="Сохранить" class="primary"
-												@click="save"
-												:disabled="!isEnabledSave" />
-											<template v-if="saving">
-												&nbsp;&nbsp;
-												<i class="va-m fa fa-refresh fa-spin fa-2x fa-fw"> </i>
-											</template>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</form>
+			<div class="col-4 col-12-xsmall">
+				<input type="text"
+					value="Должность"
+					class="input-static input-static-bold"
+					disabled />
+			</div>
+			<div class="col-8 col-12-xsmall">
+				<input type="text"
+					name="position" id="position"
+					:class="{'input-static': !inputing}"
+					:disabled="!inputing"
+					:value="user.position"
+					@input="user.position = $event.target.value"
+					placeholder="Должность" />
+			</div>
 
-					</div>
-				</section>
 
+			<div class="col-4 col-12-xsmall">
+				<input class="input-static input-static-bold" type="text" value="Почта" disabled />
+			</div>
+			<div class="col-8 col-12-xsmall">
+				<input type="email" name="email" id="email"
+					:class="{'input-static': !inputing}"
+					:disabled="!inputing"
+					:value="user.email"
+					@input="user.email = $event.target.value"
+					placeholder="email@ya.ru" />
+			</div>
+
+			<div class="col-12">
+				<ul class="actions">
+					<li>
+						<input type="button"
+							:value="!editing ? 'Изменить' : 'Отменить'"
+							:class="{primary: !editing}"
+							@click="toggleEditing()"
+							:disabled="saving" />
+					</li>
+
+					<li v-if="editing">
+						<input type="button" value="Сохранить" class="primary"
+							@click="save"
+							:disabled="!isEnabledSave" />
+						<template v-if="saving">
+							&nbsp;&nbsp;
+							<i class="va-m fa fa-refresh fa-spin fa-2x fa-fw"> </i>
+						</template>
+					</li>
+				</ul>
 			</div>
 		</div>
-
-		<!-- Sidebar -->
-		<div id="sidebar">
-			<div class="inner">
-
-				<!-- Search -->
-				<section id="search" class="alt">
-					<form method="post" action="/#" style="margin-bottom: 1.2em;">
-						<a class="button fit1 primary" href="/logout" title="Выйти" style="padding: 0 1.2em;">
-							<i class="fa fa-sign-out fa-flip-horizontal fa-2x" style="vertical-align: middle;"></i>
-						</a>
-
-						<b class="f-right" style="font-size: 1.4em; vertical-align: baseline;">
-							<a href="/profile" title="Профиль">
-								(( server.username ))
-							</a>
-						</b>
-					</form>
-
-					<form id="search_form" method="post" action="#">
-						<input type="text" name="query" id="query" placeholder="Поиск" />
-					</form>
-				</section>
-
-
-
-				<!-- Menu -->
-				<nav id="menu">
-					<header class="major">
-						<h2>Меню</h2>
-					</header>
-					<ul>
-						(% for menu in server.menus %)
-						(% if not menu.submenus %)
-						<li><a href="(( menu.href ))">(( menu.text ))</a></li>
-						(% else %)
-						<li>
-							<span class="opener">(( menu.text ))</span>
-							<ul>
-								(% for submenu in menu.submenus %)
-								<li><a href="(( submenu.href ))">(( submenu.text ))</a></li>
-								(% endfor %)
-							</ul>
-						</li>
-						(% endif %)
-						(% endfor %)
-					</ul>
-				</nav>
-
-				<!-- Section -->
-				<!--
-				<section>
-					<header class="major">
-						<h2>Связь</h2>
-					</header>
-					<ul class="contact">
-						<li class="fa-envelope-o"><a href="#">mail@ya.ru</a></li>
-						<li style="padding-left: 0em;" class="gtr-uniform">
-							<div class="row gtr-uniform">
-								<div class="col-12">
-									<textarea name="link-message" id="link-message" placeholder="Или напишете сообщение сюда" rows="6"></textarea>
-								</div>
-								<div class="col-12">
-									<input type="submit" value="Отправить сообщение" class="primary" />
-								</div>
-							</div>
-						</li>
-					</ul>
-
-
-				</section>-->
-				<!-- Footer -->
-				<!--<footer id="footer">
-					<p class="copyright">&copy; 2019. regrr.ru. Все права защищены.<br> Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-				</footer>-->
-
-			</div>
-		</div>
-
-	</div>
+	</form>
 
 	<script>
 
@@ -308,7 +182,7 @@
 		}
 
 		var app = new Vue({
-			el: '#wrapper',
+			el: '#form_profile',
 			data: data/*,
 			mounted: function () {
 				$('<script src="//static//_design//assets//js//main.js"><//script>')
@@ -382,12 +256,4 @@
 		});
 	</script>
 
-	<!-- Scripts -->
-	<script src="/static/_design/assets/js/jquery.min.js"></script>
-	<script src="/static/_design/assets/js/browser.min.js"></script>
-	<script src="/static/_design/assets/js/breakpoints.min.js"></script>
-	<script src="/static/_design/assets/js/util.js"></script>
-	<script src="/static/_design/assets/js/main.js"></script>
-
-</body>
-</html>
+(% endblock %)

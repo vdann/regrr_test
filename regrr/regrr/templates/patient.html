@@ -1,339 +1,43 @@
-﻿<!DOCTYPE HTML>
+﻿(% extends "layout.html" %)
+(% import "macros.html" as macros %)
 
-<html>
-<head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 
-	<title>(( server.title )) - Реестр результатов анализов и тестирования</title>
+(% block block_head %)
+(% endblock %)
 
-	<link rel="shortcut icon" type="image/png" href="/favicon.png">
-	<link rel="stylesheet" href="/static/_design/assets/css/main.css" />
-	<link rel="stylesheet" href="/static/_design/assets/css/main_ext.css" />
 
-	<style>
-		.form-profile {
-			max-width: 700px;
-		}
 
-	</style>
+(% block content %)
 
-	<script src="/static/_design/extern/es6-promise.js-v4.2.6/es6-promise.auto.js"></script>
-	<script src="/static/_design/extern/axios.js-v0.18.0/axios.js"></script>
-	<script src="/static/_design/extern/lodash.js-v4.17.11/lodash.js"></script>
-	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
+	(% if not server.isOk %)
+		<h2>Пациент, <b>"#(( server.title ))"</b>, не найден!</h2>
+	(% else %)
 
-</head>
-<body class="is-preload">
+		<ul class="alt">
+			<li><b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;(( server.patient.date_of_birth ))</li>
+			<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
+			<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
+		</ul>
 
-	<!-- Wrapper -->
-	<div id="wrapper">
+		<br>
 
-		<!-- Main -->
-		<div id="main">
-			<div class="inner">
+		<div class="row">
+			<div class="col-10 col-12-small">
+				<div class="row">
 
-				<!-- Header -->
-				<header id="header">
-					<a href="/" class="logo"><h2>Реестр результатов анализов и&nbsp;тестирования</h2></a>
-				</header>
-
-				<!-- Banner -->
-				<section id="banner">
-					<div class="content">
-
-						<a onclick="javascript:history.back();">назад</a>
-
-						<header class="major1 mb-2em">
-
-							(% if server.breadcrumbs %)
-
-							<!--Breadcrumbs-->
-							<div class="breadcrumbs">
-								(% for item in server.breadcrumbs %)
-
-								(% if item.href %)
-								<a href="(( item.href ))">(( item.text | safe ))</a>
-								(% else %)
-								<span>(( item.text | safe ))</span>
-								(% endif %)
-
-								(% if not loop.last %)
-								<span class="breadcrumbs-sep">»</span>
-								(% endif %)
-
-								(% endfor %)
-							</div>
-
-							(% endif %)
-
-							(% if server.prevnext %)
-
-							<!-- PrevNext -->
-							<div class="prevnext mt-1em">
-
-								(% if server.prevnext.prev: %)
-								<a href="((server.prevnext.prev.href))" 
-								(% if server.prevnext.prev.title: %)
-								title="((server.prevnext.prev.title))"
-								(% endif %)
-								>
-									<i class="fa fa-2x fa-caret-left"></i>
-								</a>
-								(% else %)
-								<i class="fa fa-2x fa-caret-left"></i>
-								(% endif %)
-
-								&nbsp;
-								&nbsp;
-
-								(% if server.prevnext.next: %)
-								<a href="((server.prevnext.next.href))"
-								(% if server.prevnext.next.title: %)
-								title="((server.prevnext.next.title))"
-								(% endif %)
-								>
-									<i class="fa fa-2x fa-caret-right"></i>
-								</a>
-								(% else %)
-								<i class="fa fa-2x fa-caret-right"></i>
-								(% endif %)
-
-							</div>
-
-							(% endif %)
-
-						</header>
-
-						(% if server.isOk %)
-
-						<br>
-
-						<ul class="alt">
-							<li><b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;(( server.patient.date_of_birth ))</li>
-							<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
-							<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
-						</ul>
-
-						<br>
-
-						<div class="row">
-							<div class="col-10 col-12-small">
-								<div class="row">
-
-									(% for item in server.analysis_types %)
-									<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
-										<a href="/patient/(( server.patient.id ))/analysis_type/(( item.id ))/analysis" class="button fit primary">
-											(( item.text ))
-										</a>
-									</div>
-									(% endfor %)
-
-								</div>
-							</div>
-						</div>
-
-						(% endif %)
-					</div>
-				</section>
-
-			</div>
-		</div>
-
-		<!-- Sidebar -->
-		<div id="sidebar">
-			<div class="inner">
-
-				<!-- Search -->
-				<section id="search" class="alt">
-					<form method="post" action="/#" style="margin-bottom: 1.2em;">
-						<a class="button fit1 primary" href="/logout" title="Выйти" style="padding: 0 1.2em;">
-							<i class="fa fa-sign-out fa-flip-horizontal fa-2x" style="vertical-align: middle;"></i>
+					(% for item in server.analysis_types %)
+					<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
+						<a href="/patient/(( server.patient.id ))/analysis_type/(( item.id ))/analysis" class="button fit primary">
+							(( item.text ))
 						</a>
+					</div>
+					(% endfor %)
 
-						<b class="f-right" style="font-size: 1.4em; vertical-align: baseline;">
-							<a href="/profile" title="Профиль">
-								(( server.username ))
-							</a>
-						</b>
-					</form>
-
-					<form id="search_form" method="post" action="#">
-						<input type="text" name="query" id="query" placeholder="Поиск" />
-					</form>
-				</section>
-
-
-
-				<!-- Menu -->
-				<nav id="menu">
-					<header class="major">
-						<h2>Меню</h2>
-					</header>
-					<ul>
-						(% for menu in server.menus %)
-						(% if not menu.submenus %)
-						<li><a href="(( menu.href ))">(( menu.text ))</a></li>
-						(% else %)
-						<li>
-							<span class="opener">(( menu.text ))</span>
-							<ul>
-								(% for submenu in menu.submenus %)
-								<li><a href="(( submenu.href ))">(( submenu.text ))</a></li>
-								(% endfor %)
-							</ul>
-						</li>
-						(% endif %)
-						(% endfor %)
-					</ul>
-				</nav>
-
-				<!-- Section -->
-				<!--
-				<section>
-					<header class="major">
-						<h2>Связь</h2>
-					</header>
-					<ul class="contact">
-						<li class="fa-envelope-o"><a href="#">mail@ya.ru</a></li>
-						<li style="padding-left: 0em;" class="gtr-uniform">
-							<div class="row gtr-uniform">
-								<div class="col-12">
-									<textarea name="link-message" id="link-message" placeholder="Или напишете сообщение сюда" rows="6"></textarea>
-								</div>
-								<div class="col-12">
-									<input type="submit" value="Отправить сообщение" class="primary" />
-								</div>
-							</div>
-						</li>
-					</ul>
-
-
-				</section>-->
-				<!-- Footer -->
-				<!--<footer id="footer">
-					<p class="copyright">&copy; 2019. regrr.ru. Все права защищены.<br> Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
-				</footer>-->
-
+				</div>
 			</div>
 		</div>
 
-	</div>
-
-	<script>
-		var rx_email = /^(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/gm;
-		var data = {};
-
-		try {
-			((server.data | safe));
-		}
-		catch (e) {
-			console.log('Серверные данные не были проинициализированы');
-		}
-
-		var icon_ok = 'fa fa-2x fa-check clr-green';
-		var icon_fail = 'fa fa-2x fa-exclamation-triangle clr-red';
-		var icon_wait = 'fa fa-2x fa-refresh fa-spin clr-blue';
+	(% endif %)
 
 
-		data.id = data.id || '';
-		data.id_icon = null;
-		data.lastname = data.lastname || '';
-		data.lastname_icon = null;
-		data.firstname = data.firstname || '';
-		data.firstname_icon = null;
-		data.middlename = data.middlename || '';
-		data.middlename_icon = null;
-		data.date_of_birth = data.date_of_birth || '';
-		data.date_of_birth_icon = null;
-		data.department = data.department || '';
-		data.department_icon = null;
-		data.diagnosis = data.diagnosis || '';
-		data.diagnosis_icon = null;
-
-		//data.editing = data.editing || true;
-		//data.saving = data.saving || false;
-
-		var app = new Vue({
-			el: '#wrapper',
-			data: data,
-
-			created: function () {
-				this.debouncedTestUsername = _.debounce(this.testUsername, 500)
-			},
-
-			computed: {
-				isEnableAdd: function () {
-					if (
-						this.username_icon == icon_ok
-						&& this.lastname_icon == icon_ok
-						&& this.firstname_icon == icon_ok
-						&& this.middlename_icon == icon_ok
-						&& this.position_icon == icon_ok
-						&& this.email_icon == icon_ok
-						)
-						return true;
-
-					return false;
-				}
-			},
-			watch: {
-				username: function (val, valOld) {
-					console.log('App.watch:username', val);
-					this.username_icon = icon_wait;
-					this.debouncedTestUsername();
-				},
-				lastname: function (val, valOld) {
-					this.lastname_icon = val != '' ?  icon_ok : icon_fail;
-				},
-				firstname: function (val, valOld) {
-					this.firstname_icon = val != '' ? icon_ok : icon_fail;
-				},
-				middlename: function (val, valOld) {
-					this.middlename_icon = val != '' ? icon_ok : icon_fail;
-				},
-				position: function (val, valOld) {
-					this.position_icon = val != '' ? icon_ok : icon_fail;
-				},
-				email: function (val, valOld) {
-					// var isOk = rx_email.test(val);
-					var isOk = val.search(rx_email) != -1;
-					this.email_icon = isOk ? icon_ok : icon_fail;
-				},
-			},
-			methods: {
-				testUsername: function () {
-					if (this.username == '') {
-						this.username_icon = icon_fail;
-						return;
-					}
-
-					this.username_icon = icon_wait;
-
-					var vm = this;
-					axios.post('/api/v1.0/test_username', {
-						username: this.username
-					})
-					.then(function (response) {
-						console.log(response.data.result);
-						vm.username_icon = response.data.result ? icon_ok : icon_fail;
-					})
-					.catch(function (error) {
-						vm.username_icon = icon_fail;
-						console.log('Error!');
-					});
-				}
-			}
-		});
-
-	</script>
-
-	<!-- Scripts -->
-	<script src="/static/_design/assets/js/jquery.min.js"></script>
-	<script src="/static/_design/assets/js/browser.min.js"></script>
-	<script src="/static/_design/assets/js/breakpoints.min.js"></script>
-	<script src="/static/_design/assets/js/util.js"></script>
-	<script src="/static/_design/assets/js/main.js"></script>
-
-</body>
-</html>
+(% endblock %)

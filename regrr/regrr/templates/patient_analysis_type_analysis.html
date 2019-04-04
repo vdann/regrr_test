@@ -1,0 +1,77 @@
+﻿(% extends "layout.html" %)
+(% import "macros.html" as macros %)
+
+
+(% block block_head %)
+<style>
+</style>
+(% endblock %)
+
+
+(% block content %)
+
+	<div id="analisis">
+		<div v-if="analysis_type == 5 || analysis_type == 6">
+
+			<ul class="alt">
+				<li><b>Исследование выполнил:</b> &nbsp;&nbsp;&nbsp; <span v-html="user"></span></li>
+				<li><b>Дата выполнения:</b> &nbsp;&nbsp;&nbsp; <span v-html="date_of_creation"></span></li>
+				<li><b>Результат:</b> &nbsp;&nbsp;&nbsp; <span v-html="result"></span></li>
+			</ul>
+
+			<br>
+
+			<div class="table-wrapper">
+				<table class="alt">
+					<thead>
+						<tr>
+							<th>№</th>
+							<th>Параметр</th>
+							<th>Значение</th>
+							<th>Очки</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(item, i) in data.items" :key="i">
+							<td v-html="i + 1"></td>
+							<td v-html="item.name"></td>
+							<td v-html="item.label"></td>
+							<td v-html="item.points"></td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="3" align="right">Всего очков</td>
+							<td v-html="data.points"></td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+		</div>
+
+		<p v-else>
+			Нет записей
+		</p>
+	</div>
+
+	<script>
+		var data = {};
+		try {
+			((server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы');
+		}
+
+		if (typeof data.data === 'string')
+			data.data = JSON.parse(data.data);
+
+		var app = new Vue({
+			el: '#analisis',
+			data: data
+		});
+
+	</script>
+
+
+(% endblock %)

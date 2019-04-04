@@ -1,0 +1,335 @@
+﻿(% extends "layout.html" %)
+(% import "macros.html" as macros %)
+
+
+(% block block_head %)
+<style>
+	.form-profile {
+		max-width: 700px;
+	}
+
+	.table_variants {
+		margin: 0 0 0 0;
+	}
+
+	table.table_variants tbody tr {
+		background-color: #f5f1f1;
+	}
+
+	.table_variants tbody tr:hover {
+		background-color: #ffff99;
+	}
+
+	.table_variants tbody tr.selected {
+		color: #fff;
+		background-color: #1bb193;
+	}
+
+	.selected {
+		color: #fff;
+		background-color: #1bb193;
+	}
+
+	.selected-red {
+		color: #fff;
+		background-color: #e02222;
+	}
+</style>
+(% endblock %)
+
+
+(% block content %)
+
+	<h2>National Early Warning Score (NEWS)</h2>
+	<p>Determines the degree of illness of a patient and prompts critical care intervention.</p>
+
+
+	<div class="row aln-center1">
+		<div id="test_news" class="col-7 col-8-xlarge col-9-large col-10-medium col-12-small">
+			<ul class="alt" v-cloak>
+
+				<li v-for="test_row, index_row in rows">
+
+					<div class="row">
+
+						<div class="col-6 col-4-small col-12-xsmall" v-html="test_row.name">
+						</div>
+
+						<div class="col-6 col-8-small col-12-xsmall">
+							<template v-if="test_row.variants.length == 2">
+								<table class="table_variants alt">
+									<tr>
+										<td v-for="variant, index_var in test_row.variants"
+											v-bind:class="{ selected: test_row.index == index_var }"
+											v-on:click="select(index_row, index_var)"
+											width="50%">
+
+											<span class="f-left"
+												v-html="variant.name"
+												v-bind:class="{ fwBold: test_row.index == index_var }">
+											</span>
+											<span class="f-right"
+												v-html="format_points(variant.points)">
+											</span>
+										</td>
+									</tr>
+								</table>
+							</template>
+
+							<template v-else>
+								<table class="table_variants alt">
+									<tr v-for="variant, index_var in test_row.variants"
+										v-bind:class="{ selected: test_row.index == index_var }"
+										v-on:click="select(index_row, index_var)">
+										<td>
+											<span class="f-left"
+													v-html="variant.name"
+													v-bind:class="{ fwBold: test_row.index == index_var }">
+											</span>
+											<span class="f-right"
+													v-html="format_points(variant.points)">
+											</span>
+										</td>
+									</tr>
+								</table>
+							</template>
+						</div>
+
+					</div>
+
+				</li>
+
+			</ul>
+
+			<div class="box"
+				v-bind:class="[results.isRed ? 'selected-red' : 'selected']"
+				v-html="result">
+
+			</div>
+
+			<ul class="actions">
+				<li>
+					<input type="submit"
+						value="Добавить"
+						class="primary"
+						:disabled="!isOk"
+						@click="sendResult"/>
+				</li>
+			</ul>
+
+		</div>
+	</div>
+
+
+	<script>
+
+		var data = {};
+
+		try {
+			((server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы');
+		}
+
+		function nbsp(s) {
+			return s.replace(/ /g, '&nbsp;');
+		}
+
+		function b(s) {
+			return '<b>' + s + '</b>';
+		}
+
+
+
+		var rows = [
+			["Respiratory Rate",   [["≤8", 3], ["9-11", 1], ["12-20", 0], ["21-24", 2], ["≥25", 3]] ],
+			["Oxygen Saturations", [["≤91%", 3], ["92-93%", 2], ["94-95%", 1], ["≥96%", 0]] ],
+			["Any Supplemental Oxygen", [["No", 0], ["Yes", 2]] ],
+			["Temperature", [
+				["≤35°C / 95°F", 3],
+				["35.1-36°C / 95.1-96.8°F", 1],
+				["36.1-38°C / 96.9-100.4°F", 0],
+				["38.1-39°C / 100.5-102.2°F", 1],
+				["≥39.1 °C / 102.3°F", 2]] ],
+			["Systolic Blood Pressure", [["<90", 3], ["91-100", 2], ["101-110", 1], ["111-219", 0], ["≥220", 3]] ],
+			["Heart Rate", [["<40", 3], ["41-50", 1], ["51-90", 0], ["91-110", 1], ["110-130", 2], ["≥131", 3]] ],
+			["AVPU Score (Alert, Voice, Pain, Unresponsive)", [["A", 0], ["V, P or U", 3]]],
+		];
+
+		var message_not_all = 'Please fill out required fields.';
+
+		var message_RED_score =
+'Assigned when an extreme variation in a single physiological parameter is present \
+(i.e., a score of 3 in any one physiological parameter).';
+
+		var message_0_4_points =
+'Low score: Assessment by a competent registered nurse who should decide if a change \
+to frequency of clinical monitoring or an escalation of clinical care is required.';
+
+		var message_5_6_points =
+'Medium score: Urgent review by a clinician skilled with competencies in the assessment of acute illness.';
+
+		var message_7_points =
+'High score: Emergency assessment by a clinical/critical care outreach team with critical-care \
+competencies and usually transfer of the patient to a higher dependency care area.';
+
+		function convert (rows) {
+
+			function convert_row (row) {
+				var variants = [];
+
+				for (var i = 0, n = row[1].length; i < n; ++i) {
+					variants.push({
+						name: nbsp(row[1][i][0]),
+						points: row[1][i][1],
+					});
+				}
+
+				return {
+					index: -1,
+					name: row[0],
+					variants: variants
+				};
+			}
+
+			var rows_new = [];
+
+			for (var i = 0, n = rows.length; i < n; ++i) {
+				rows_new.push(convert_row(rows[i]));
+			}
+
+			return rows_new;
+		}
+
+		rows = convert(rows);
+
+		function makeUrlFromRoute(route, params) {
+			for (key in params) {
+				var param = params[key];
+				var t = typeof param;
+				if (t === 'string' || t === 'number')
+					route = route.replace(new RegExp('<' + key + '>', 'gm'), param);
+			}
+
+			if (/<\w+(\:\w*)*>/gm.test(route))
+				console.warn('makeUrlFromRoute => Не все параметры маршрута заданы', route);
+
+			return route;
+		}
+
+		data.route_analysis_add = data.route_analysis_add
+			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add';
+
+		data.route_analysis_viewer = data.route_analysis_viewer
+			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis';
+
+		var icon_ok = 'fa fa-2x fa-check clr-green';
+		var icon_fail = 'fa fa-2x fa-exclamation-triangle clr-red';
+		var icon_wait = 'fa fa-2x fa-refresh fa-spin clr-blue';
+
+		var app = new Vue({
+			el: '#test_news',
+			data: {
+				rows: rows,
+				isOk: false,
+				results: {
+					result: '',
+					points: 0,
+					isRed: false,
+					items: []
+				}
+			},
+			computed: {
+				result: function () {
+
+					var isOk = true;
+					var isRed = false;
+					var points = 0;
+					var items = [];
+
+					for (var i = 0, n = this.rows.length; i < n; ++i) {
+						var row = this.rows[i];
+						if (row.index == -1) {
+							isOk = false;
+							continue;
+						}
+
+						var variant = row.variants[row.index];
+						var cur_points = variant.points;
+						if (cur_points == 3)
+							isRed = true;
+
+						items.push({ name: row.name, label: variant.name, points: cur_points });
+
+						points += cur_points;
+					}
+
+					var result = [];
+					result.push('<span class="fw-bold" style="font-size:1.75em;">' + points + ' points</span>');
+
+					this.isOk = isOk;
+					if (!isOk) {
+						result.push(message_not_all);
+					}
+					else {
+
+						if (isRed) {
+							result.push('RED score');
+							result.push(message_RED_score);
+						}
+
+						if (points <= 4)
+							result.push(message_0_4_points);
+						else if (points <= 6)
+							result.push(message_5_6_points);
+						else
+							result.push(message_7_points);
+					}
+
+					mes = points + ' points';
+					if (isRed)
+						mes += ' (red)';
+
+					this.results.result = mes;
+					this.results.points = points;
+					this.results.isRed = isRed;
+					this.results.items = items;
+
+					return result.join('<br><br>');
+				}
+			},
+			methods: {
+				select: function (index_row, index_val) {
+					this.rows[index_row].index = index_val;
+				},
+				format_points: function (points) {
+					if (points > 0)
+						return '+ ' + points;
+					return points;
+				},
+				sendResult: function () {
+
+					var me = this;
+					var url = makeUrlFromRoute(data.route_analysis_add, data);
+
+					axios.post(url, this.results)
+					.then(function (response) {
+
+						var url = makeUrlFromRoute(data.route_analysis_viewer, data);
+						window.location.replace(url);
+//						console.log(response.data.result);
+//						vm.username_icon = response.data.result ? icon_ok : icon_fail;
+					})
+					.catch(function (error) {
+//						vm.username_icon = icon_fail;
+						console.log('Error!');
+					});
+
+				}
+			}
+		});
+	</script>
+
+
+(% endblock %)

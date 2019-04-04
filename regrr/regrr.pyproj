@@ -18,8 +18,8 @@
     <PythonWsgiHandler>$(MSBuildProjectName).app</PythonWsgiHandler>
     <Name>regrr</Name>
     <RootNamespace>regrr</RootNamespace>
-    <InterpreterId>{d7958d04-ff6f-435b-9ffe-69063e06e789}</InterpreterId>
-    <InterpreterVersion>3.4</InterpreterVersion>
+    <InterpreterId>{5129b740-f950-4692-aa65-ca0863380e15}</InterpreterId>
+    <InterpreterVersion>3.5</InterpreterVersion>
     <WebBrowserPort>16092</WebBrowserPort>
     <PublishUrl>./dist</PublishUrl>
   </PropertyGroup>
@@ -223,13 +223,14 @@
     <Content Include="regrr\static\_design\LICENSE.txt" />
     <Content Include="regrr\static\_design\README.txt" />
     <Content Include="regrr\static\_design\tests_viewer.html" />
-    <Content Include="regrr\templates\analysis_add_6.html" />
-    <Content Include="regrr\templates\analysis_add.html" />
-    <Content Include="regrr\templates\analysis_type_analysis.html" />
+    <Content Include="regrr\templates\patient_analysis_add_6.html" />
+    <Content Include="regrr\templates\patient_analysis_add_5.html" />
+    <Content Include="regrr\templates\page_message.html" />
+    <Content Include="regrr\templates\patient_analysis_type_analysis.html" />
     <Content Include="regrr\templates\feedback.html" />
     <Content Include="regrr\templates\feedback_result.html" />
-    <Content Include="regrr\templates\analysis_type.html" />
-    <Content Include="regrr\templates\index_new.html" />
+    <Content Include="regrr\templates\patient_analysis_type.html" />
+    <Content Include="regrr\templates\index.html" />
     <Content Include="regrr\templates\layout.html" />
     <Content Include="regrr\templates\macros.html" />
     <Content Include="regrr\templates\patient.html" />
@@ -264,19 +265,19 @@
     <Content Include="regrr\static\scripts\_references.js" />
     <Content Include="regrr\templates\_src_about.html" />
     <Content Include="regrr\templates\_src_contact.html" />
-    <Content Include="regrr\templates\index.html" />
     <Content Include="regrr\templates\_src_layout.html" />
   </ItemGroup>
   <ItemGroup>
-    <Interpreter Include="env34\">
-      <Id>{d7958d04-ff6f-435b-9ffe-69063e06e789}</Id>
-      <BaseInterpreter>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</BaseInterpreter>
-      <Version>3.4</Version>
-      <Description>env34 (Python 3.4)</Description>
+    <Interpreter Include="env\">
+      <Id>{5129b740-f950-4692-aa65-ca0863380e15}</Id>
+      <BaseInterpreter>{377e6200-8b84-4366-a408-a278a90d96df}</BaseInterpreter>
+      <Version>3.5</Version>
+      <Description>env (Py3.6)</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
-      <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
+      <WindowsInterpreterPath>Scripts\python.exe</WindowsInterpreterPath>
       <LibraryPath>Lib\</LibraryPath>
-      <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
+      <PathEnvironmentVariable>
+      </PathEnvironmentVariable>
       <Architecture>X86</Architecture>
     </Interpreter>
   </ItemGroup>
