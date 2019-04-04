@@ -4,6 +4,7 @@
 
 from datetime import datetime
 from flask import url_for
+import json
 
 
 ############################################################
@@ -15,6 +16,9 @@ def str_remove_bom(str):
 		str = str[1:]
 
 	return str
+
+def str_nbsp(text):
+	return text.replace(' ', '&nbsp;')
 
 
 ############################################################
@@ -88,10 +92,16 @@ def pagination_ext(pagination, page_cur, page_size, endpoint, **values):
 
 	return jpagination
 
+############################################################
+def data_to_json(data):
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+	return data
 
 ############################################################
 class PageData:
 	"""Содержит данные для отрисовки базового шаблона"""
+
+	app_name = "[Не задано]"
 
 	@staticmethod
 	def make_menu_item (href, text, cls = None):
@@ -112,10 +122,10 @@ class PageData:
 		}
 
 
-	def __init__(self, app_name, title, username, menus, **kwargs):
+	def __init__(self, title, username = None, menus = None, **kwargs):
 		"""Constructor"""
 
-		self.app_name = app_name
+		self.app_name = PageData.app_name
 		self.title = title
 		self.username = username
 
@@ -150,7 +160,7 @@ class PageData:
 		self.prevnext['prev'] = prev
 
 
-	def setNext(self, href = None, title = None):
+	def set_next(self, href = None, title = None):
 		"""Устанавливает ссылку на следующий элемент для страниц детального просмотра списков"""
 		if self.prevnext == None:
 			self.prevnext = {}
@@ -165,25 +175,8 @@ class PageData:
 
 	def to_dict(self, dict_in = {}):
 
-		#dict_in.update(self.__dict__)
-		dict_in['title2'] = 444
-		dict_in['title'] = 333
 		dict_out = dict(dict_in, **self.__dict__)
-		#self.__dict__
 
-		"""
-		dict["title"] = self.title
-		dict["username"] = self.username
-		dict["menus"] = self.menus
-		dict["menucur"] = self.menucur
-
-		dict['breadcrumbs'] = self.breadcrumbs
-
-		if self.prevnext:
-			dict['prevnext'] = self.prevnext
-
-		dict['year'] = self.year
-		"""
 		return dict_out
 
 ############################################################
