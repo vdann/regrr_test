@@ -124,6 +124,10 @@ class User(Base):
 		str = "{} {}.{}.".format(self.lastname, self.firstname[0], self.middlename[0])
 		return str
 
+	def getFullname(self):
+		str = "{} {} {}".format(self.lastname, self.firstname, self.middlename)
+		return str
+
 
 ########################################################################
 class Patient(Base):
@@ -340,14 +344,6 @@ def initTestUsers():
 		patient = Patient('Зырянов', 'Станислав', 'Александрович', '12.03.1970', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 3')
 		session.add(patient)
 
-	"""
-	resultPatients = session.query(Patient).count()
-	if resultPatients < 10:
-		for i in range(1, 80):
-			patient = Patient('Набиев' + str(i), 'Гасан', 'Набиевич', '01.01.1980', '9. Отделение анестезиологии-реанимации', 'Диагноз 1')
-			session.add(patient)
-	"""
-
 
 	resultAnalyzes = session.query(Analysis).all()
 	if len(resultAnalyzes) == 0:
@@ -363,6 +359,29 @@ def initTestUsers():
 
 		analysis = Analysis(user.id, patient.id, AnalysisType.Тест_NEWS, '7 points (red)', json_data)
 		session.add(analysis)
+
+
+	# инициализация для проверки пагинации
+	resultPatients = session.query(Patient).count()
+	if resultPatients < 10:
+		for i in range(1, 80):
+			patient = Patient('Набиев' + str(i), 'Гасан', 'Набиевич', '01.01.1980', '9. Отделение анестезиологии-реанимации', 'Диагноз 1')
+			session.add(patient)
+
+
+	resultAnalyzes = session.query(Analysis).count()
+	if resultAnalyzes < 10:
+
+		user = session.query(User).filter(
+			User.role.in_([UserRole.USER])).first()
+		patient = session.query(Patient).first()
+
+		json_data = '''{"points":8,"isRed":true,"items":[{"name":"Respiratory Rate","label":"≤8","points":3},{"name":"Oxygen Saturations","label":"94-95%","points":1},{"name":"Any Supplemental Oxygen","label":"No","points":0},{"name":"Temperature","label":"38.1-39°C&nbsp;/&nbsp;100.5-102.2°F","points":1},{"name":"Systolic Blood Pressure","label":"111-219","points":0},{"name":"Heart Rate","label":"≥131","points":3},{"name":"AVPU Score (Alert, Voice, Pain, Unresponsive)","label":"A","points":0}]}'''
+
+		for i in range(1, 80):
+			analysis = Analysis(user.id, patient.id, AnalysisType.Тест_NEWS, '8 points (red)', json_data)
+			session.add(analysis)
+
 		
 	session.commit()
 
