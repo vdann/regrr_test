@@ -3,9 +3,10 @@
 """
 
 from datetime import datetime
-from flask import url_for
 import json
 
+from flask import url_for
+from flask import render_template
 
 ############################################################
 def str_remove_bom(str):
@@ -21,6 +22,13 @@ def str_nbsp(text):
 	return text.replace(' ', '&nbsp;')
 
 
+############################################################
+def render_template_ext(template_name_or_list, **context):
+	str = render_template(template_name_or_list, **context)
+	str = str_remove_bom(str)
+	return str
+
+	
 ############################################################
 def url_for_ext(endpoint, **values):
 	"""Удаляет page, при page == 1"""

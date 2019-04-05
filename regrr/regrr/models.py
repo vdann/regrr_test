@@ -1,12 +1,18 @@
+
 import os
+import time
+from datetime import datetime
+from contextlib import contextmanager
 
 import sqlalchemy as sa
 import sqlalchemy.ext.declarative
+import sqlalchemy.orm
 #from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy import exc
 
-from datetime import datetime
 
+########################################################################
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 db_file = '../data/tutorial.db'
@@ -22,7 +28,21 @@ db_file = 'sqlite:///' + db_file
 engine = sa.create_engine(db_file, echo=True)
 Base = sa.ext.declarative.declarative_base()
 
-db_version = 2
+DB_VERSION = 2
+
+########################################################################
+def utc_to_local(utc):
+	epoch = time.mktime(utc.timetuple())
+	offset = datetime.fromtimestamp (epoch) - datetime.utcfromtimestamp (epoch)
+	return utc + offset
+
+def datetime_to_str(utc):
+	return utc_to_local(utc).strftime("%Y-%m-%d %H:%M:%S")
+
+########################################################################
+def make_lastname_and_initials(lastname, firstname, middlename):
+	str = "{} {}.{}.".format(lastname, firstname[0], middlename[0])
+	return str
 
 ########################################################################
 from enum import IntEnum
@@ -47,16 +67,7 @@ class Metadata(Base):
 	def __repr__(self):
 		return "<Metadata (%s, %s)>" % (self.key, self.value)
 
-import time
 
-def utc2local (utc):
-	epoch = time.mktime(utc.timetuple())
-	offset = datetime.fromtimestamp (epoch) - datetime.utcfromtimestamp (epoch)
-	return utc + offset
-
-def makeLastnameAndInitials(lastname, firstname, middlename):
-	str = "{} {}.{}.".format(lastname, firstname[0], middlename[0])
-	return str
 
 ########################################################################
 class User(Base):
@@ -109,8 +120,8 @@ class User(Base):
 		j['middlename'] = self.middlename
 		j['position'] = self.position
 		j['email'] = self.email
-		j['date_of_creation'] = utc2local(self.date_of_creation).strftime("%Y-%m-%d %H:%M:%S") #isoformat()
-		j['date_of_last_visit'] = utc2local(self.date_of_last_visit).strftime("%Y-%m-%d %H:%M:%S") #isoformat()
+		j['date_of_creation'] = datetime_to_str(self.date_of_creation)
+		j['date_of_last_visit'] = datetime_to_str(self.date_of_last_visit)
 		return j
 
 	def ping(self):
@@ -248,7 +259,7 @@ class Analysis(Base):
 		j['user_id'] = self.user_id
 		j['patient_id'] = self.patient_id
 		j['type'] = self.type
-		j['date_of_creation'] = utc2local(self.date_of_creation).strftime("%Y-%m-%d %H:%M:%S") #isoformat()
+		j['date_of_creation'] = datetime_to_str(self.date_of_creation)
 		j['result'] = self.result
 		j['data'] = self.data
 		return j
@@ -257,15 +268,35 @@ class Analysis(Base):
 # create tables
 Base.metadata.create_all(engine)
 
-# import datetime
-
 ########################################################################
-import sqlalchemy.orm
-from sqlalchemy import exc
-
 Session = sa.orm.sessionmaker(bind=engine)
 
+########################################################################
+@contextmanager
+def session_scope(): 
+	"""
+		Пример использования
+
+		def run_my_program():
+		with session_scope() as session:
+			session.query(FooBar).update({"x": 5})
+			session.query(ThingTwo).update({"q": 18})
+	"""
+
+	session = Session()
+	try:
+		yield session
+		session.commit()
+	except:
+		session.rollback()
+		raise
+	finally:
+		session.close()
+
+
+########################################################################
 def initAdmin():
+	"""Инициализация БД"""
 
 	isOk = True
 
@@ -275,7 +306,7 @@ def initAdmin():
 		query = session.query(Metadata).filter(Metadata.key.in_(['version']))
 		version = query.first()
 		version = int(version.value)
-		if version != db_version:
+		if version != DB_VERSION:
 			isOk = False
 
 		if isOk:
@@ -309,7 +340,7 @@ def initAdmin():
 	Base.metadata.drop_all(engine)
 	Base.metadata.create_all(engine)
 
-	metadata_version = Metadata('version', str(db_version))
+	metadata_version = Metadata('version', str(DB_VERSION))
 	session.add(metadata_version)
 
 	user = User("admin", "admin", UserRole.ADMIN, '-', '-', '-', '-', 'admin@yan.ru')

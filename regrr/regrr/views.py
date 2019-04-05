@@ -5,7 +5,6 @@ Routes and views for the flask application.
 import json
 
 from datetime import datetime
-from flask import render_template
 from flask import redirect
 from flask import session
 from flask import request
@@ -166,8 +165,7 @@ def index():
 		server['data'] = helper_view.data_to_json(data)
 		server['pagination'] = jpagination
 
-		str = render_template('index.html', server = server)
-		str = helper_view.str_remove_bom(str)
+		str = helper_view.render_template_ext('index.html', server = server)
 		return str
 
 
@@ -196,8 +194,7 @@ def index():
 		server['data'] = helper_view.data_to_json(data)
 		server['pagination'] = jpagination
 
-		str = render_template('index.html', server = server)
-		str = helper_view.str_remove_bom(str)
+		str = helper_view.render_template_ext('index.html', server = server)
 		return str
 
 	abort(500)
@@ -207,8 +204,7 @@ def index():
 @app.route('/login', methods=['GET'])
 def login():
 	next = request.referrer or ''
-	str = render_template('login.html', next = next)
-	str = helper_view.str_remove_bom(str)
+	str = helper_view.render_template_ext('login.html', next = next)
 	return str
 
 ################################################################
@@ -227,7 +223,7 @@ def login_post():
 
 	result = query.first()
 	if not result:
-		return render_template('login.html',
+		return helper_view.render_template_ext('login.html',
 			display_error = True,
 			password = password,
 			username = username,
@@ -270,12 +266,6 @@ def profile():
 	username = user_info.get('username')
 	user_role = user_info.get('role')
 
-	db_session = db.Session()
-	db_query = db_session.query(db.User).filter(
-		db.User.id == user_info.get('id')
-		)
-	db_query = db_query.first()
-
 	pageData = helper_view.PageData('Профиль', username, menus_user)
 	pageData.add_breadcrumb(pageData.title)
 
@@ -286,12 +276,16 @@ def profile():
 		pageData.style_ext = '_red'
 
 	server = pageData.to_dict()
-
 	server['isAdmin'] = isAdmin
-	server['data'] = helper_view.data_to_json(db_query.toJson())
 
-	str = render_template('profile.html', server = server)
-	str = helper_view.str_remove_bom(str)
+	with db.session_scope() as db_session:
+		db_query = db_session.query(db.User).filter(
+			db.User.id == user_info.get('id')
+			)
+		db_query = db_query.first()
+		server['data'] = helper_view.data_to_json(db_query.toJson())
+
+	str = helper_view.render_template_ext('profile.html', server = server)
 	return str
 
 ################################################################
@@ -304,18 +298,15 @@ def profile_post():
 
 	user_info = session.get(SESSION_KEY_USER)
 
-	db_session = db.Session()
-	db_query = db_session.query(db.User).get(user_info.get('id'))
+	with db.session_scope() as db_session:
+		db_query = db_session.query(db.User).get(user_info.get('id'))
 
-	db_query.lastname = request.json.get('lastname', '-')
-	db_query.firstname = request.json.get('firstname', '-')
-	db_query.middlename = request.json.get('middlename', '-')
-
-	db_query.position = request.json.get('position', '-')
-	db_query.email = request.json.get('email', '-')
+		db_query.lastname = request.json.get('lastname', '-')
+		db_query.firstname = request.json.get('firstname', '-')
+		db_query.middlename = request.json.get('middlename', '-')
+		db_query.position = request.json.get('position', '-')
+		db_query.email = request.json.get('email', '-')
 	
-	db_session.commit()
-
 	return jsonify({'result': True})
 
 ################################################################
@@ -327,37 +318,37 @@ def user_view(username):
 	if user_role != db.UserRole.ADMIN:
 		exceptions.abort(403)
 
-	db_session = db.Session()
-	db_user = db_session.query(db.User).filter(
-		db.User.username == username
-		)
-	db_user = db_user.first()
-
 	pageData = helper_view.PageData(username, user_info.get('username'), menus_admin, menucur='/', style_ext='_red')
 	pageData.add_breadcrumb('Пользователи', '/')
 	pageData.add_breadcrumb(pageData.title)
 
-	if not db_user:
-		server = pageData.to_dict()
-	else:
-		db_query = db_session.query(db.User).filter(
-			db.User.id < db_user.id
-			).order_by(db.User.id.desc()).first()
-		if db_query:
-			pageData.set_prev(url_for('user_view', username=db_query.username), db_query.getFullname())
+	with db.session_scope() as db_session:
+		db_user = db_session.query(db.User).filter(
+			db.User.username == username
+			)
+		db_user = db_user.first()
 
-		db_query = db_session.query(db.User).filter(
-			db.User.id > db_user.id
-			).order_by(db.User.id.asc()).first()
-		if db_query:
-			pageData.set_next(url_for('user_view', username=db_query.username), db_query.getFullname())
+		if not db_user:
+			server = pageData.to_dict()
+		else:
+			db_query = db_session.query(db.User).filter(
+				db.User.id < db_user.id
+				).order_by(db.User.id.desc()).first()
+			if db_query:
+				pageData.set_prev(url_for('user_view', username=db_query.username), db_query.getFullname())
 
-		server = pageData.to_dict()
-		server['isOk'] = True
-		server['data'] = helper_view.data_to_json(db_user.toJson())
+			db_query = db_session.query(db.User).filter(
+				db.User.id > db_user.id
+				).order_by(db.User.id.asc()).first()
+			if db_query:
+				pageData.set_next(url_for('user_view', username=db_query.username), db_query.getFullname())
 
-	str = render_template('user.html', server = server)
-	str = helper_view.str_remove_bom(str)
+			server = pageData.to_dict()
+			server['isOk'] = True
+			server['data'] = helper_view.data_to_json(db_user.toJson())
+
+
+	str = helper_view.render_template_ext('user.html', server = server)
 	return str
 
 ################################################################
@@ -381,8 +372,8 @@ def user_add():
 	data['username'] = username
 	server['data'] = helper_view.data_to_json(data)
 
-	str = render_template('user_add.html', server = server)
-	return helper_view.str_remove_bom(str)
+	str = helper_view.render_template_ext('user_add.html', server = server)
+	return str
 
 
 @app.route('/user_add', methods=['POST'])
@@ -439,8 +430,8 @@ def patient_view(patient_id):
 		pageData.title = patient_id
 		pageData.add_breadcrumb(pageData.title)
 		server = pageData.to_dict()
-		str = render_template('patient.html', server = server)
-		return helper_view.str_remove_bom(str)
+		str = helper_view.render_template_ext('patient.html', server = server)
+		return str
 
 
 	pageData.title = "%s (#%s)" % (db_patient.getFullname(), patient_id)
@@ -476,8 +467,8 @@ def patient_view(patient_id):
 
 	server['analysis_types'] = analysis_types
 
-	str = render_template('patient.html', server = server)
-	return helper_view.str_remove_bom(str)
+	str = helper_view.render_template_ext('patient.html', server = server)
+	return str
 
 
 ################################################################
@@ -496,8 +487,8 @@ def patient_add():
 	pageData.add_breadcrumb(pageData.title)
 	server = pageData.to_dict()
 
-	str = render_template('patient_add.html', server = server)
-	return helper_view.str_remove_bom(str)
+	str = helper_view.render_template_ext('patient_add.html', server = server)
+	return str
 
 
 ################################################################
@@ -567,8 +558,8 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 		pageData.message = '<h2>Пациент, <b>"#%s"</b>, не найден!</h2>' % patient_id
 		server = pageData.to_dict()
 
-		str = render_template('page_message.html', server = server)
-		return helper_view.str_remove_bom(str)
+		str = helper_view.render_template_ext('page_message.html', server = server)
+		return str
 
 
 	patient_label = "%s (#%s)" % (db_patient.getFullname(), patient_id)
@@ -582,8 +573,8 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 		pageData.message = '<h2>Неизвестный анализ <b>"#%s"</b>!</h2>' % analysis_type
 		server = pageData.to_dict()
 
-		str = render_template('page_message.html', server = server)
-		return helper_view.str_remove_bom(str)
+		str = helper_view.render_template_ext('page_message.html', server = server)
+		return str
 
 
 	page_num = request.args.get('page', 1, type=int)
@@ -610,7 +601,7 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	janalyzes = []
 	for db_item in pagination.items:
 		jAnalysis = db_item.Analysis.toJson()
-		jAnalysis['user'] = db.makeLastnameAndInitials(db_item.lastname, db_item.firstname, db_item.middlename)
+		jAnalysis['user'] = db.make_lastname_and_initials(db_item.lastname, db_item.firstname, db_item.middlename)
 		janalyzes.append(jAnalysis)
 
 
@@ -627,8 +618,8 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	server['patient_id'] = patient_id
 	server['analysis_type'] = analysis_type
 
-	str = render_template('patient_analysis_type.html', server = server)
-	return helper_view.str_remove_bom(str)
+	str = helper_view.render_template_ext('patient_analysis_type.html', server = server)
+	return str
 
 
 #############################################################
@@ -673,8 +664,8 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 		server = pageData.to_dict()
 		server['message'] = '<h2>Пациент, <b>"#%s"</b>, не найден!</h2>' % patient_id
 
-		str = render_template('page_message.html', server = server)
-		return helper_view.str_remove_bom(str)
+		str = helper_view.render_template_ext('page_message.html', server = server)
+		return str
 
 
 	patient_label = "%s (#%s)" % (db_patient.getFullname(), patient_id)
@@ -689,8 +680,8 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 		server = pageData.to_dict()
 		server['message'] = '<h2>Неизвестный анализ <b>"#%s"</b>!</h2>' % analysis_type
 
-		str = render_template('page_message.html', server = server)
-		return helper_view.str_remove_bom(str)
+		str = helper_view.render_template_ext('page_message.html', server = server)
+		return str
 
 	page_num = request.args.get('page', 1, type=int)
 	page_size = 10
@@ -712,11 +703,11 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 	if not db_query:
 		server = pageData.to_dict()
 		server['message'] = '<h2>%s, <b>"#%s"</b>, не найден!</h2>' % (analysis_type_str, analysis_id)
-		str = render_template('page_message.html', server = server)
-		return helper_view.str_remove_bom(str)
+		str = helper_view.render_template_ext('page_message.html', server = server)
+		return str
 
 	data = db_query.Analysis.toJson()
-	data['user'] = db.makeLastnameAndInitials(db_query.lastname, db_query.firstname, db_query.middlename)
+	data['user'] = db.make_lastname_and_initials(db_query.lastname, db_query.firstname, db_query.middlename)
 	data['analysis_type'] = analysis_type
 
 
@@ -755,8 +746,8 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 	server['analysis_type'] = analysis_type
 	
 
-	str = render_template('patient_analysis_type_analysis.html', server = server)
-	return helper_view.str_remove_bom(str)
+	str = helper_view.render_template_ext('patient_analysis_type_analysis.html', server = server)
+	return str
 
 #############################################################
 @app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add', methods=['GET'])
@@ -799,8 +790,8 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 		pageData.message = '<h2>Пациент, <b>"#%s"</b>, не найден!</h2>' % patient_id
 		server = pageData.to_dict()
 
-		str = render_template('page_message.html', server = server)
-		return helper_view.str_remove_bom(str)
+		str = helper_view.render_template_ext('page_message.html', server = server)
+		return str
 
 
 	patient_label = "%s (#%s)" % (db_patient.getFullname(), patient_id)
@@ -815,8 +806,8 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 		pageData.message = '<h2>Неизвестный анализ <b>"#%s"</b>!</h2>' % analysis_type
 		server = pageData.to_dict()
 
-		str = render_template('page_message.html', server = server)
-		return helper_view.str_remove_bom(str)
+		str = helper_view.render_template_ext('page_message.html', server = server)
+		return str
 
 	analysis_type_url = url_for('patient_analysis_type_analyzes_viewer',
 		patient_id=patient_id, analysis_type=analysis_type)
@@ -839,11 +830,11 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 
 	str = ''
 	if analysis_type_int == db.AnalysisType.Тест_NEWS:
-		str = render_template('patient_analysis_add_5.html', server = server)
+		str = helper_view.render_template_ext('patient_analysis_add_5.html', server = server)
 	elif analysis_type_int == db.AnalysisType.Тест_VTE:
-		str = render_template('patient_analysis_add_6.html', server = server)
+		str = helper_view.render_template_ext('patient_analysis_add_6.html', server = server)
 	
-	return helper_view.str_remove_bom(str)
+	return str
 
 @app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add', methods=['POST'])
 def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
@@ -922,8 +913,8 @@ def feedback():
 		pageData.style_ext = '_red'
 
 	server = pageData.to_dict()
-	str = render_template('feedback.html', server = server)
-	return helper_view.str_remove_bom(str)
+	str = helper_view.render_template_ext('feedback.html', server = server)
+	return str
 
 
 @app.route('/feedback_result', methods=['GET'])
@@ -942,8 +933,8 @@ def feedback_result():
 		pageData.style_ext = '_red'
 
 	server = pageData.to_dict()
-	str = render_template('feedback_result.html', server = server)
-	return helper_view.str_remove_bom(str)
+	str = helper_view.render_template_ext('feedback_result.html', server = server)
+	return str
 
 
 
