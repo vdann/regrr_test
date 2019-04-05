@@ -142,58 +142,54 @@ def index():
 
 	if user_role == db.UserRole.ADMIN:
 
-		db_session = db.Session()
-		db_users = db_session.query(db.User)
-		pagination = paginate(db_users, page_num, page_size)
-
-		users = []
-		for db_user in pagination.items:
-			users.append(db_user.toJson())
-
-		jpagination = helper_view.pagination_ext(pagination, page_num, page_size, 'index')
-		
-		data = {}
-		data['users'] = users
-		data['users_offset'] = (page_num - 1) * page_size
-
 		pageData = helper_view.PageData('Пользователи', username, menus_admin, menucur='/', style_ext='_red')
 		pageData.add_breadcrumb(pageData.title)
 
 		server = pageData.to_dict()
-
 		server['isAdmin'] = True
-		server['data'] = helper_view.data_to_json(data)
-		server['pagination'] = jpagination
 
+		data = {}
+		data['users_offset'] = (page_num - 1) * page_size
+
+		with db.session_scope() as db_session:
+			db_users = db_session.query(db.User)
+			pagination = paginate(db_users, page_num, page_size)
+
+			users = []
+			for db_user in pagination.items:
+				users.append(db_user.toJson())
+
+			data['users'] = users
+			server['pagination'] = helper_view.pagination_ext(pagination, page_num, page_size, 'index')
+
+		server['data'] = helper_view.data_to_json(data)
 		str = helper_view.render_template_ext('index.html', server = server)
 		return str
 
 
 	elif user_role == db.UserRole.USER:
 
-		db_session = db.Session()
-		db_patients = db_session.query(db.Patient)
-		pagination = paginate(db_patients, page_num, page_size)
-
-		patients = []
-		for db_patient in pagination.items:
-			patients.append(db_patient.toJson())
-
-		jpagination = helper_view.pagination_ext(pagination, page_num, page_size, 'index')
-		
-		data = {}
-		data['patients'] = patients
-		data['patients_offset'] = (page_num - 1) * page_size
-
 		pageData = helper_view.PageData('Пациенты', username, menus_user, menucur='/')
 		pageData.add_breadcrumb(pageData.title)
 
 		server = pageData.to_dict()
-
 		server['isAdmin'] = False
-		server['data'] = helper_view.data_to_json(data)
-		server['pagination'] = jpagination
 
+		data = {}
+		data['patients_offset'] = (page_num - 1) * page_size
+
+		with db.session_scope() as db_session:
+			db_patients = db_session.query(db.Patient)
+			pagination = paginate(db_patients, page_num, page_size)
+
+			patients = []
+			for db_patient in pagination.items:
+				patients.append(db_patient.toJson())
+
+			data['patients'] = patients
+			server['pagination'] = helper_view.pagination_ext(pagination, page_num, page_size, 'index')
+		
+		server['data'] = helper_view.data_to_json(data)
 		str = helper_view.render_template_ext('index.html', server = server)
 		return str
 
@@ -215,30 +211,29 @@ def login_post():
 	remember = bool(request.form.get('remember'))
 	next = request.form['next']
 
-	db_session = db.Session()
-	query = db_session.query(db.User).filter(
-		db.User.username.in_([username]),
-		db.User.password.in_([password])
-		)
+	user_lite = None
 
-	result = query.first()
-	if not result:
+	with db.session_scope() as db_session:
+		query = db_session.query(db.User).filter(
+			db.User.username.in_([username]),
+			db.User.password.in_([password])
+			)
+		result = query.first()
+		if result:
+			result.date_of_last_visit = datetime.utcnow()
+			user_lite = {
+				'id': result.id,
+				'username': result.username,
+				'role': result.role
+			}
+	
+	if not user_lite:
 		return helper_view.render_template_ext('login.html',
 			display_error = True,
 			password = password,
 			username = username,
 			remember = 'checked' if remember else '',
 			next = next)
-
-	user_lite = {
-		'id': result.id,
-		'username': result.username,
-		'role': result.role
-	}
-
-	result.date_of_last_visit = datetime.utcnow()
-	db_session.commit()
-
 
 	session[SESSION_KEY_USER] = user_lite
 	session.permanent = remember
@@ -277,14 +272,16 @@ def profile():
 
 	server = pageData.to_dict()
 	server['isAdmin'] = isAdmin
+	data = {}
 
 	with db.session_scope() as db_session:
 		db_query = db_session.query(db.User).filter(
 			db.User.id == user_info.get('id')
 			)
 		db_query = db_query.first()
-		server['data'] = helper_view.data_to_json(db_query.toJson())
+		data = db_query.toJson()
 
+	server['data'] = helper_view.data_to_json(data)
 	str = helper_view.render_template_ext('profile.html', server = server)
 	return str
 
@@ -322,15 +319,19 @@ def user_view(username):
 	pageData.add_breadcrumb('Пользователи', '/')
 	pageData.add_breadcrumb(pageData.title)
 
+	isOk = False
+	data = {}
+
 	with db.session_scope() as db_session:
 		db_user = db_session.query(db.User).filter(
 			db.User.username == username
 			)
 		db_user = db_user.first()
 
-		if not db_user:
-			server = pageData.to_dict()
-		else:
+		if db_user:
+			isOk = True
+			data = db_user.toJson()
+
 			db_query = db_session.query(db.User).filter(
 				db.User.id < db_user.id
 				).order_by(db.User.id.desc()).first()
@@ -343,10 +344,9 @@ def user_view(username):
 			if db_query:
 				pageData.set_next(url_for('user_view', username=db_query.username), db_query.getFullname())
 
-			server = pageData.to_dict()
-			server['isOk'] = True
-			server['data'] = helper_view.data_to_json(db_user.toJson())
-
+	server = pageData.to_dict()
+	server['isOk'] = isOk
+	server['data'] = helper_view.data_to_json(data)
 
 	str = helper_view.render_template_ext('user.html', server = server)
 	return str
@@ -395,9 +395,8 @@ def user_add_post():
 
 	user = db.User(username, password, db.UserRole.USER, lastname, firstname, middlename, position, email)
 
-	db_session = db.Session()
-	db_session.add(user)
-	db_session.commit()
+	with db.session_scope() as db_session:
+		db_session.add(user)
 
 	return redirect('/')
 
@@ -416,17 +415,39 @@ def patient_view(patient_id):
 	if user_role != db.UserRole.USER:
 		exceptions.abort(403)
 
-	db_session = db.Session()
-	db_patient = db_session.query(db.Patient).filter(
-		db.Patient.id == patient_id
-		)
-	db_patient = db_patient.first()
-
 	pageData = helper_view.PageData(None, user_info.get('username'), menus_user, menucur='/')
 	pageData.add_breadcrumb('Пациенты', '/')
 
+	j_patient = None
+	patient_fullname = None
 
-	if not db_patient:
+	with db.session_scope() as db_session:
+		db_patient = db_session.query(db.Patient).filter(
+			db.Patient.id == patient_id
+			)
+		db_patient = db_patient.first()
+		if db_patient:
+			j_patient = db_patient.toJson()
+			patient_fullname = db_patient.getFullname()
+
+			db_query = db_session.query(db.Patient).filter(
+				db.Patient.id < patient_id
+				).order_by(db.Patient.id.desc()).first()
+			if db_query:
+				pageData.set_prev(url_for('patient_view', patient_id=db_query.id), db_query.getFullname())
+			else:
+				pageData.set_prev()
+
+			db_query = db_session.query(db.Patient).filter(
+				db.Patient.id > patient_id
+				).order_by(db.Patient.id.asc()).first()
+			if db_query:
+				pageData.set_next(url_for('patient_view', patient_id=db_query.id), db_query.getFullname())
+			else:
+				pageData.set_next()
+
+
+	if not j_patient:
 		pageData.title = patient_id
 		pageData.add_breadcrumb(pageData.title)
 		server = pageData.to_dict()
@@ -434,29 +455,12 @@ def patient_view(patient_id):
 		return str
 
 
-	pageData.title = "%s (#%s)" % (db_patient.getFullname(), patient_id)
+	pageData.title = "%s (#%s)" % (patient_fullname, patient_id)
 	pageData.add_breadcrumb(pageData.title)
-
-	db_query = db_session.query(db.Patient).filter(
-		db.Patient.id < patient_id
-		).order_by(db.Patient.id.desc()).first()
-	if db_query:
-		pageData.set_prev(url_for('patient_view', patient_id=db_query.id), db_query.getFullname())
-	else:
-		pageData.set_prev()
-
-	db_query = db_session.query(db.Patient).filter(
-		db.Patient.id > patient_id
-		).order_by(db.Patient.id.asc()).first()
-	if db_query:
-		pageData.set_next(url_for('patient_view', patient_id=db_query.id), db_query.getFullname())
-	else:
-		pageData.set_next()
-
 	server = pageData.to_dict()
 
 	server['isOk'] = True
-	server['patient'] = db_patient.toJson()
+	server['patient'] = j_patient
 
 	analysis_types = []
 	for item in AnalysisTypes:
@@ -515,9 +519,8 @@ def patient_add_post():
 
 	patient = db.Patient(lastname, firstname, middlename, date_of_birth, department, diagnosis)
 
-	db_session = db.Session()
-	db_session.add(patient)
-	db_session.commit()
+	with db.session_scope() as db_session:
+		db_session.add(patient)
 
 	return redirect('/')
 
@@ -531,54 +534,70 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	if user_role != db.UserRole.USER:
 		exceptions.abort(403)
 
+	page_num = request.args.get('page', 1, type=int)
+	page_size = 10
 
 	analysis_type_str = db.AnalysisTypeStr.get(int_no_exc(analysis_type))
+
+	patient_fullname = None
+	janalyzes = None
+	jpagination = None
 	
-	db_session = db.Session()
-	db_patient = db_session.query(db.Patient).filter(
-		db.Patient.id == patient_id
-		)
-	db_patient = db_patient.first()
+	with db.session_scope() as db_session:
+		db_patient = db_session.query(db.Patient).filter(
+			db.Patient.id == patient_id
+			)
+		db_patient = db_patient.first()
+		if db_patient:
+			patient_fullname = db_patient.getFullname()
+
+			if analysis_type_str:
+				db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
+					db.Analysis.type == analysis_type,
+					db.Analysis.patient_id == patient_id,
+					db.Analysis.user_id == db.User.id
+				).order_by(db.Analysis.id.desc())
+
+				pagination = paginate(db_query, page_num, page_size)
+
+				janalyzes = []
+				for db_item in pagination.items:
+					jAnalysis = db_item.Analysis.toJson()
+					jAnalysis['user'] = db.make_lastname_and_initials(db_item.lastname, db_item.firstname, db_item.middlename)
+					janalyzes.append(jAnalysis)
+
+				jpagination = helper_view.pagination_ext(pagination, page_num, page_size,
+					'patient_analysis_type_analyzes_viewer', patient_id=patient_id, analysis_type=analysis_type)
 
 
 	username = user_info.get('username')
 	pageData = helper_view.PageData(None, username, menus_user, menucur='/')
 	pageData.add_breadcrumb('Пациенты', '/')
 
-
-	if not db_patient:
+	if not patient_fullname:
 		pageData.title = "#%s" % patient_id
 		pageData.add_breadcrumb(pageData.title)
-
 		if analysis_type_str:
 			pageData.add_breadcrumb(analysis_type_str)
 		else:
 			pageData.add_breadcrumb('Неизвестный анализ #%s' % analysis_type)
 
 		pageData.message = '<h2>Пациент, <b>"#%s"</b>, не найден!</h2>' % patient_id
-		server = pageData.to_dict()
-
-		str = helper_view.render_template_ext('page_message.html', server = server)
+		str = helper_view.render_template_ext('page_message.html', server=pageData.to_dict())
 		return str
 
 
-	patient_label = "%s (#%s)" % (db_patient.getFullname(), patient_id)
+	patient_label = "%s (#%s)" % (patient_fullname, patient_id)
 	pageData.add_breadcrumb(helper_view.str_nbsp(patient_label), url_for('patient_view', patient_id=patient_id))
 
 
 	if not analysis_type_str:
 		pageData.title = 'Неизвестный анализ #%s' % analysis_type
 		pageData.add_breadcrumb(pageData.title)
-
 		pageData.message = '<h2>Неизвестный анализ <b>"#%s"</b>!</h2>' % analysis_type
-		server = pageData.to_dict()
-
-		str = helper_view.render_template_ext('page_message.html', server = server)
+		str = helper_view.render_template_ext('page_message.html', server=pageData.to_dict())
 		return str
 
-
-	page_num = request.args.get('page', 1, type=int)
-	page_size = 10
 
 	pageData.title = analysis_type_str
 	pageData.add_breadcrumb(helper_view.str_nbsp(pageData.title))
@@ -588,25 +607,8 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	#server['isOk'] = True
 	#server['analysis_type_str'] = analysis_type_str
 
-
-	db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
-		db.Analysis.type == analysis_type,
-		db.Analysis.patient_id == patient_id,
-		db.Analysis.user_id == db.User.id
-	).order_by(db.Analysis.id.desc())
-
-
-	pagination = paginate(db_query, page_num, page_size)
-
-	janalyzes = []
-	for db_item in pagination.items:
-		jAnalysis = db_item.Analysis.toJson()
-		jAnalysis['user'] = db.make_lastname_and_initials(db_item.lastname, db_item.firstname, db_item.middlename)
-		janalyzes.append(jAnalysis)
-
-
-	jpagination = helper_view.pagination_ext(pagination, page_num, page_size,
-		'patient_analysis_type_analyzes_viewer', patient_id=patient_id, analysis_type=analysis_type)
+	server['patient_id'] = patient_id
+	server['analysis_type'] = analysis_type
 	server['pagination'] = jpagination
 
 	data = {}
@@ -615,8 +617,6 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	data['analyzes'] = janalyzes
 	data['analyzes_offset'] = (page_num - 1) * page_size
 	server['data'] = helper_view.data_to_json(data)
-	server['patient_id'] = patient_id
-	server['analysis_type'] = analysis_type
 
 	str = helper_view.render_template_ext('patient_analysis_type.html', server = server)
 	return str
@@ -632,59 +632,93 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 	if user_role != db.UserRole.USER:
 		exceptions.abort(403)
 
+	page_num = request.args.get('page', 1, type=int)
+	page_size = 10
 
 	analysis_id_int = int_no_exc(analysis_id)
 	analysis_type_int = int_no_exc(analysis_type)
 	analysis_type_str = db.AnalysisTypeStr.get(analysis_type_int)
 
-
-	db_session = db.Session()
-	db_patient = db_session.query(db.Patient).filter(
-		db.Patient.id == patient_id
-		)
-	db_patient = db_patient.first()
-
+	patient_fullname = None
+	data = None
 
 	username = user_info.get('username')
 	pageData = helper_view.PageData(None, username, menus_user, menucur='/')
 	pageData.add_breadcrumb('Пациенты', '/')
 
+	with db.session_scope() as db_session:
+		db_patient = db_session.query(db.Patient).filter(
+			db.Patient.id == patient_id
+			)
+		db_patient = db_patient.first()
+		if db_patient:
+			patient_fullname = db_patient.getFullname()
 
-	if not db_patient:
+			if analysis_type_str:
+				db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
+					db.Analysis.id == analysis_id,
+					db.Analysis.type == analysis_type,
+					db.Analysis.patient_id == patient_id,
+					db.Analysis.user_id == db.User.id
+				).first()
+
+				if db_query:
+					data = db_query.Analysis.toJson()
+					data['user'] = db.make_lastname_and_initials(db_query.lastname, db_query.firstname, db_query.middlename)
+					data['analysis_type'] = analysis_type
+
+					db_query = db_session.query(db.Analysis).filter(
+						db.Analysis.id > analysis_id,
+						db.Analysis.type == analysis_type,
+						db.Analysis.patient_id == patient_id,
+						db.Analysis.user_id == db.User.id
+						).order_by(db.Analysis.id.asc()).first()
+					if db_query:
+						u = url_for('patient_analysis_type_analysis_viewer',
+							patient_id=patient_id, analysis_type=analysis_type, analysis_id=db_query.id)
+						pageData.set_prev(u)
+					else:
+						pageData.set_prev()
+
+
+					db_query = db_session.query(db.Analysis).filter(
+						db.Analysis.id < analysis_id,
+						db.Analysis.type == analysis_type,
+						db.Analysis.patient_id == patient_id,
+						db.Analysis.user_id == db.User.id
+						).order_by(db.Analysis.id.desc()).first()
+					if db_query:
+						u = url_for('patient_analysis_type_analysis_viewer',
+							patient_id=patient_id, analysis_type=analysis_type, analysis_id=db_query.id)
+						pageData.set_next(u)
+					else:
+						pageData.set_next()
+
+
+	if not patient_fullname:
 		pageData.title = "#%s" % patient_id
 		pageData.add_breadcrumb(pageData.title)
-
-		if analysis_type_str:
-			pageData.add_breadcrumb(analysis_type_str)
-		else:
-			pageData.add_breadcrumb('Неизвестный анализ #%s' % analysis_type)
-
+		pageData.add_breadcrumb(analysis_type_str if analysis_type_str else 'Неизвестный анализ #%s' % analysis_type)
 		pageData.add_breadcrumb('#%s' % analysis_id)
-
 		server = pageData.to_dict()
 		server['message'] = '<h2>Пациент, <b>"#%s"</b>, не найден!</h2>' % patient_id
-
 		str = helper_view.render_template_ext('page_message.html', server = server)
 		return str
 
 
-	patient_label = "%s (#%s)" % (db_patient.getFullname(), patient_id)
+	patient_label = "%s (#%s)" % (patient_fullname, patient_id)
 	pageData.add_breadcrumb(helper_view.str_nbsp(patient_label), url_for('patient_view', patient_id=patient_id))
 
 
 	if not analysis_type_str:
 		pageData.title = 'Неизвестный анализ #%s' % analysis_type
 		pageData.add_breadcrumb(pageData.title)
-
 		pageData.add_breadcrumb('#%s' % analysis_id)
 		server = pageData.to_dict()
 		server['message'] = '<h2>Неизвестный анализ <b>"#%s"</b>!</h2>' % analysis_type
-
 		str = helper_view.render_template_ext('page_message.html', server = server)
 		return str
 
-	page_num = request.args.get('page', 1, type=int)
-	page_size = 10
 
 	analysis_type_url = url_for('patient_analysis_type_analyzes_viewer',
 		patient_id=patient_id, analysis_type=analysis_type)
@@ -693,50 +727,12 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 	pageData.add_breadcrumb('#%s' % analysis_id)
 	pageData.title = '%s #%s' % (analysis_type_str, analysis_id)
 
-	db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
-		db.Analysis.id == analysis_id,
-		db.Analysis.type == analysis_type,
-		db.Analysis.patient_id == patient_id,
-		db.Analysis.user_id == db.User.id
-	).first()
 
-	if not db_query:
+	if not data:
 		server = pageData.to_dict()
 		server['message'] = '<h2>%s, <b>"#%s"</b>, не найден!</h2>' % (analysis_type_str, analysis_id)
 		str = helper_view.render_template_ext('page_message.html', server = server)
 		return str
-
-	data = db_query.Analysis.toJson()
-	data['user'] = db.make_lastname_and_initials(db_query.lastname, db_query.firstname, db_query.middlename)
-	data['analysis_type'] = analysis_type
-
-
-	db_query = db_session.query(db.Analysis).filter(
-		db.Analysis.id > analysis_id,
-		db.Analysis.type == analysis_type,
-		db.Analysis.patient_id == patient_id,
-		db.Analysis.user_id == db.User.id
-		).order_by(db.Analysis.id.asc()).first()
-	if db_query:
-		u = url_for('patient_analysis_type_analysis_viewer',
-			patient_id=patient_id, analysis_type=analysis_type, analysis_id=db_query.id)
-		pageData.set_prev(u)
-	else:
-		pageData.set_prev()
-
-
-	db_query = db_session.query(db.Analysis).filter(
-		db.Analysis.id < analysis_id,
-		db.Analysis.type == analysis_type,
-		db.Analysis.patient_id == patient_id,
-		db.Analysis.user_id == db.User.id
-		).order_by(db.Analysis.id.desc()).first()
-	if db_query:
-		u = url_for('patient_analysis_type_analysis_viewer',
-			patient_id=patient_id, analysis_type=analysis_type, analysis_id=db_query.id)
-		pageData.set_next(u)
-	else:
-		pageData.set_next()
 
 
 	server = pageData.to_dict()
@@ -744,7 +740,6 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 	server['data'] = helper_view.data_to_json(data)
 	server['patient_id'] = patient_id
 	server['analysis_type'] = analysis_type
-	
 
 	str = helper_view.render_template_ext('patient_analysis_type_analysis.html', server = server)
 	return str
@@ -763,50 +758,40 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	analysis_type_int = int_no_exc(analysis_type)
 	analysis_type_str = db.AnalysisTypeStr.get(analysis_type_int)
 
+	patient_fullname = None
 	
-	db_session = db.Session()
-	db_patient = db_session.query(db.Patient).filter(
-		db.Patient.id == patient_id
-		)
-	db_patient = db_patient.first()
+	with db.session_scope() as db_session:
+		db_patient = db_session.query(db.Patient).filter(
+			db.Patient.id == patient_id
+			)
+		db_patient = db_patient.first()
+		if db_patient:
+			patient_fullname = db_patient.getFullname()
+	
 
-	
 	username = user_info.get('username')
 	pageData = helper_view.PageData(None, username, menus_user, menucur='/')
 	pageData.add_breadcrumb('Пациенты', '/')
 
-
-	if not db_patient:
+	if not patient_fullname:
 		pageData.title = "#%s" % patient_id
 		pageData.add_breadcrumb(pageData.title)
-
-		if analysis_type_str:
-			pageData.add_breadcrumb(analysis_type_str)
-		else:
-			pageData.add_breadcrumb('Неизвестный анализ #%s' % analysis_type)
-
+		pageData.add_breadcrumb(analysis_type_str if analysis_type_str else 'Неизвестный анализ #%s' % analysis_type)
 		pageData.add_breadcrumb('Добавить')
-
 		pageData.message = '<h2>Пациент, <b>"#%s"</b>, не найден!</h2>' % patient_id
-		server = pageData.to_dict()
-
-		str = helper_view.render_template_ext('page_message.html', server = server)
+		str = helper_view.render_template_ext('page_message.html', server = pageData.to_dict())
 		return str
 
 
-	patient_label = "%s (#%s)" % (db_patient.getFullname(), patient_id)
+	patient_label = "%s (#%s)" % (patient_fullname, patient_id)
 	pageData.add_breadcrumb(helper_view.str_nbsp(patient_label), url_for('patient_view', patient_id=patient_id))
-
 
 	if not analysis_type_str:
 		pageData.title = 'Неизвестный анализ #%s' % analysis_type
 		pageData.add_breadcrumb(helper_view.str_nbsp(pageData.title))
 		pageData.add_breadcrumb('Добавить')
-
 		pageData.message = '<h2>Неизвестный анализ <b>"#%s"</b>!</h2>' % analysis_type
-		server = pageData.to_dict()
-
-		str = helper_view.render_template_ext('page_message.html', server = server)
+		str = helper_view.render_template_ext('page_message.html', server = pageData.to_dict())
 		return str
 
 	analysis_type_url = url_for('patient_analysis_type_analyzes_viewer',
@@ -815,17 +800,14 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	pageData.add_breadcrumb('Добавить')
 	pageData.title = "%s - Добавить" % analysis_type_str
 
-
 	server = pageData.to_dict()
 	server['patient_id'] = patient_id
 	server['analysis_type'] = analysis_type
 	server['analysis_type_str'] = analysis_type_str
 
-
 	data = {}
 	data['patient_id'] = patient_id
 	data['analysis_type'] = analysis_type
-
 	server['data'] = helper_view.data_to_json(data)
 
 	str = ''
@@ -858,14 +840,11 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 		abort(400)
 
 	user_info = session.get(SESSION_KEY_USER)
-
 	user_id = user_info.get('id')
 
-	db_session = db.Session()
-	
 	analysis = db.Analysis(user_id, patient_id, analysis_type, result, data)
-	db_session.add(analysis)
-	db_session.commit()
+	with db.session_scope() as db_session:
+		db_session.add(analysis)
 
 	#result = query.first() == None
 	result = True
@@ -890,10 +869,11 @@ def api_test_username():
 	if not username or username == '':
 		abort(400)
 
-	db_session = db.Session()
-	query = db_session.query(db.User).filter(
-		db.User.username.in_([username]))
-	result = query.first() == None
+	with db.session_scope() as db_session:
+		query = db_session.query(db.User).filter(
+			db.User.username.in_([username]))
+		result = query.first() == None
+
 	return jsonify({'result': result})
 
 ################################################################
