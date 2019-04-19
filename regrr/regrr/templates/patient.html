@@ -9,35 +9,29 @@
 
 (% block content %)
 
-	(% if not server.isOk %)
-		<h2>Пациент, <b>"#(( server.title ))"</b>, не найден!</h2>
-	(% else %)
+	<ul class="alt">
+		<li><b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;(( server.patient.date_of_birth ))</li>
+		<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
+		<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
+	</ul>
 
-		<ul class="alt">
-			<li><b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;(( server.patient.date_of_birth ))</li>
-			<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
-			<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
-		</ul>
+	<br>
 
-		<br>
+	<div class="row">
+		<div class="col-10 col-12-small">
+			<div class="row">
 
-		<div class="row">
-			<div class="col-10 col-12-small">
-				<div class="row">
-
-					(% for item in server.analysis_types %)
-					<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
-						<a href="/patient/(( server.patient.id ))/analysis_type/(( item.id ))/analysis" class="button fit primary">
-							(( item.text ))
-						</a>
-					</div>
-					(% endfor %)
-
+				(% for item in server.analysis_types %)
+				<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
+					<a href="/patient/(( server.patient.id ))/analysis_type/(( item.id ))/analysis" class="button fit primary">
+						(( item.text ))
+					</a>
 				</div>
+				(% endfor %)
+
 			</div>
 		</div>
-
-	(% endif %)
+	</div>
 
 
 (% endblock %)

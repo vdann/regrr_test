@@ -401,6 +401,7 @@ def user_add_post():
 	return redirect('/')
 
 AnalysisTypes = [
+	db.AnalysisType.Клинический_анализ_крови,
 	db.AnalysisType.Тест_NEWS,
 	db.AnalysisType.Тест_VTE
 ]
@@ -450,8 +451,8 @@ def patient_view(patient_id):
 	if not j_patient:
 		pageData.title = patient_id
 		pageData.add_breadcrumb(pageData.title)
-		server = pageData.to_dict()
-		str = helper_view.render_template_ext('patient.html', server = server)
+		pageData.message = '<h2>Пациент, <b>"#%s"</b>, не найден!</h2>' % patient_id
+		str = helper_view.render_template_ext('page_message.html', server=pageData.to_dict())
 		return str
 
 
@@ -711,12 +712,10 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 
 
 	if not analysis_type_str:
-		pageData.title = 'Неизвестный анализ #%s' % analysis_type
+		pageData.title = "#%s" % patient_id
 		pageData.add_breadcrumb(pageData.title)
-		pageData.add_breadcrumb('#%s' % analysis_id)
-		server = pageData.to_dict()
-		server['message'] = '<h2>Неизвестный анализ <b>"#%s"</b>!</h2>' % analysis_type
-		str = helper_view.render_template_ext('page_message.html', server = server)
+		pageData.message = '<h2>Пациент, <b>"#%s"</b>, не найден!</h2>' % patient_id
+		str = helper_view.render_template_ext('page_message.html', server = pageData.to_dict())
 		return str
 
 
@@ -811,7 +810,9 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	server['data'] = helper_view.data_to_json(data)
 
 	str = ''
-	if analysis_type_int == db.AnalysisType.Тест_NEWS:
+	if analysis_type_int == db.AnalysisType.Клинический_анализ_крови:
+		str = helper_view.render_template_ext('patient_analysis_add_1.html', server = server)
+	elif analysis_type_int == db.AnalysisType.Тест_NEWS:
 		str = helper_view.render_template_ext('patient_analysis_add_5.html', server = server)
 	elif analysis_type_int == db.AnalysisType.Тест_VTE:
 		str = helper_view.render_template_ext('patient_analysis_add_6.html', server = server)

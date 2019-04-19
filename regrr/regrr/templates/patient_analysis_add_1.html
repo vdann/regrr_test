@@ -1,0 +1,333 @@
+﻿(% extends "layout.html" %)
+(% import "macros.html" as macros %)
+
+
+(% block block_head %)
+<style>
+	#app {
+		max-width: 800px;
+	}
+
+	.form-profile {
+		max-width: 700px;
+	}
+
+	.table_variants {
+		margin: 0 0 0 0;
+	}
+
+	table.table_variants tbody tr {
+		background-color: #f5f1f1;
+	}
+
+	.table_variants tbody tr:hover {
+		background-color: #ffff99;
+	}
+
+	.table_variants tbody tr.selected {
+		color: #fff;
+		background-color: #1bb193;
+	}
+
+	.selected {
+		color: #fff;
+		background-color: #1bb193;
+	}
+
+	.selected-red {
+		color: #fff;
+		background-color: #e02222;
+	}
+
+	.w_50 {
+		width: 50%;
+	}
+
+	table tbody tr:nth-child(2n + 1) {
+		background-color: transparent;
+	}
+
+	.fs-small {
+		font-size: 0.85em;
+	}
+
+	.fs-large {
+		font-size: 1.2em;
+	}
+	
+</style>
+(% endblock %)
+
+
+(% block content %)
+
+	<div id="app" v-cloak>
+
+		<table class="w_100" v-if="false">
+			<tr>
+				<td class="w_50 va_top">
+					Пациент: <b v-html="data.patient"></b> Пол:&nbsp;<b>{{ data.gender }}</b> <br />
+					Возраст: <b>{{ data.age }} л.</b> <br />
+					Дата поступления образца: <b>{{ data.date_receipt_example }}</b>
+				</td>
+
+				<td class="w_50 va_top">
+					№ заявки: <b> {{ data.number_request }} </b> <br />
+					Заказчик: <b> {{ data.customer }} </b> <br />
+					Отделение: <b> {{ data.department }} </b>
+				</td>
+			</tr>
+		</table>
+
+		<h2>{{ data.analysis_str }}</h2>
+
+		<ul class="alt">
+			<li>
+			</li>
+		</ul>
+
+		<div class="table-wrapper">
+			<table class="alt1">
+				<thead>
+					<tr>
+						<th class="ta-l">Тест</th>
+						<th class="ta-c">Результат</th>
+						<th v-if="!isMobile" class="ta-c1" v-html="nbsp('Еденицы измерения')"></th>
+						<th v-if="!isMobile" class="ta-c1" v-html="nbsp('Референсные значения')"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="test in data.tests">
+						<td v-if="isMobile" v-html="tr2(test)" class="va-m"></td>
+						<td v-if="!isMobile" v-html="test.name" class="va-m"></td>
+						<td class="va-m">
+							<input type="text"
+								class="ta-r"
+								:value="test.result"
+								@input="test.result = $event.target.value"/>
+						</td>
+						<td v-if="!isMobile" v-html="nbsp(test.unit)" class="ta-c va-m"></td>
+						<td v-if="!isMobile" v-html="nbsp(test.refs)" class="ta-c va-m"></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<ul class="actions">
+			<li>
+				<input type="submit"
+					value="Добавить"
+					class="primary"
+					:disabled="!isOk"
+					@click="sendResult"/>
+			</li>
+		</ul>
+
+	</div>
+
+	<script>
+
+		window.onload = function () {
+/*			breakpoints.on('xlarge', function () {
+				console.log('ACTIVE xlarge');
+			});
+			breakpoints.on('large', function () {
+				console.log('ACTIVE large');
+			});
+			breakpoints.on('medium', function () {
+				console.log('ACTIVE medium');
+			});
+*/			breakpoints.on('min-to-small', function () {
+				app.isMobile = true;
+				console.log('ACTIVE min-to-small');
+			});
+			breakpoints.on('small-to-max', function () {
+				app.isMobile = false;
+				console.log('ACTIVE small-to-max');
+			});
+		};
+
+
+		function nbsp(s) {
+			return s.replace(/ /g, '&nbsp;');
+		}
+
+		function b(s) {
+			return '<b>' + s + '</b>';
+		}
+
+		var data = {};
+
+		try {
+			((server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы');
+		}
+
+		var tests = [
+			{
+				id: 1,
+				name: 'АЛТ',
+				result: '', // 24,00
+				unit: 'Ед/л',
+				refs: '0,00 - 55,00'
+			},
+			{
+				id: 2,
+				name: 'АСТ',
+				result: '', // 19,00
+				unit: 'Ед/л',
+				refs: '5,00 - 34,00'
+			},
+			{
+				id: 3,
+				name: 'Белок общий',
+				result: '', // 44,00
+				unit: 'г/л',
+				refs: '63,00 - 83,00'
+			},
+			{
+				id: 4,
+				name: 'Билирубин общий',
+				result: '', // 6,00
+				unit: 'мкмоль/л',
+				refs: '3,40 - 20,50'
+			},
+			{
+				id: 5,
+				name: 'Глюкоза',
+				result: '', // 6,19
+				unit: 'мкмоль/л',
+				refs: '3,89 - 5,83'
+			},
+			{
+				id: 6,
+				name: 'Креатинин',
+				result: '', // 52,20
+				unit: 'мкмоль/л',
+				refs: '63,60 - 110,50'
+			},
+			{
+				id: 7,
+				name: 'Клубочковая фильтрация CKD-EPI Креатинин',
+				result: '', // 111,56
+				unit: 'мл/мин.1.73м^2',
+				refs: '> 60,00'
+			},
+			{
+				id: 8,
+				name: 'Мочевина',
+				result: '', // 3,30
+				unit: 'мкмоль/л',
+				refs: '3,00 - 9,20'
+			},
+			{
+				id: 9,
+				name: 'С-реактивный белок',
+				result: '', // 61,90
+				unit: 'мг/л',
+				refs: '0,00 - 5,00'
+			},
+		];
+
+
+		var dataDef = {
+			analysis_str: 'Биохимические исследования', // 'Клинический анализ крови', 
+			patient: 'Иванов И.И.',
+			gender: 'м',
+			age: 40,
+			date_receipt_example: '18.04.2019',
+			number_request: 12345,
+			customer: '',
+			department: '',
+			tests: tests
+		};
+
+		data = _.extend({}, dataDef, data);
+
+
+
+
+		function makeUrlFromRoute(route, params) {
+			for (key in params) {
+				var param = params[key];
+				var t = typeof param;
+				if (t === 'string' || t === 'number')
+					route = route.replace(new RegExp('<' + key + '>', 'gm'), param);
+			}
+
+			if (/<\w+(\:\w*)*>/gm.test(route))
+				console.warn('makeUrlFromRoute => Не все параметры маршрута заданы', route);
+
+			return route;
+		}
+
+		data.route_analysis_add = data.route_analysis_add
+			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add';
+
+		data.route_analysis_viewer = data.route_analysis_viewer
+			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis';
+
+		var icon_ok = 'fa fa-2x fa-check clr-green';
+		var icon_fail = 'fa fa-2x fa-exclamation-triangle clr-red';
+		var icon_wait = 'fa fa-2x fa-refresh fa-spin clr-blue';
+
+		var app = new Vue({
+			el: '#app',
+			data: {
+				data: data,
+				isMobile: false,
+				//isOk: false
+			},
+			computed: {
+				isOk: function () {
+					var tests = this.data.tests;
+					for (var i = 0, n = tests.length; i < n; ++i) {
+						var test = tests[i];
+						if (test.result == '')
+							return false;
+					}
+					
+					return true;
+				}
+			},
+			methods: {
+				nbsp: nbsp,
+
+				tr2: function (item) {
+					var s = '';
+					s += '<div>' + b(item.name) + '</div>';
+					s += '<div class="fs-small">' + nbsp(item.unit) + '</div>';
+					s += '<div class="fs-small">' + nbsp(item.refs) + '</div>';
+					return s;
+				},
+
+				sendResult: function () {
+
+					var results = _.map(this.data.tests, 'result');
+
+					var me = this;
+					var url = makeUrlFromRoute(data.route_analysis_add, data);
+					results
+
+					axios.post(url, results)
+					.then(function (response) {
+
+						var url = makeUrlFromRoute(data.route_analysis_viewer, data);
+						window.location.replace(url);
+//						console.log(response.data.result);
+//						vm.username_icon = response.data.result ? icon_ok : icon_fail;
+					})
+					.catch(function (error) {
+//						vm.username_icon = icon_fail;
+						console.log('Error!');
+					});
+
+				}
+			}
+		});
+	</script>
+
+
+(% endblock %)

@@ -28,10 +28,32 @@
 	float: right;
 }
 
+/* выравнивание текста по горизонтали */
+.ta-c {
+	text-align: center;
+}
+
+.ta-l {
+	text-align: left;
+}
+.ta-r {
+	text-align: right;
+}
+
+
 /* выравнивание по горизонтали */
 .va-m {
 	vertical-align: middle;
 }
+
+.va_t {
+	vertical-align: top;
+}
+
+.va_b {
+	vertical-align: bottom;
+}
+
 
 /* margin */
 .mt-1em {

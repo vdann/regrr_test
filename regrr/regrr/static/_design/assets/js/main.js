@@ -19,7 +19,9 @@
 			xsmall:   [ '361px',   '480px'  ],
 			xxsmall:  [ null,      '360px'  ],
 			'xlarge-to-max':    '(min-width: 1681px)',
-			'small-to-xlarge':  '(min-width: 481px) and (max-width: 1680px)'
+			'small-to-xlarge':  '(min-width: 481px) and (max-width: 1680px)',
+			'min-to-small':     '(max-width: 480px)',
+			'small-to-max':     '(min-width: 481px)',
 		});
 
 	// Stops animations/transitions until the page has ...
