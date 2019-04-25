@@ -10,7 +10,7 @@
 (% block content %)
 
 	<ul class="alt">
-		<li><b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;(( server.patient.date_of_birth ))</li>
+		<li><b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;<spin id="date_of_birth">(( server.patient.date_of_birth ))</spin></li>
 		<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
 		<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
 	</ul>
@@ -33,5 +33,20 @@
 		</div>
 	</div>
 
+	<script>
+		window.onload = function () {
+
+			moment.locale('ru');
+
+			var $date_of_birth = $('#date_of_birth');
+			var date_of_birth = $date_of_birth.text();
+
+			var m = moment(date_of_birth, 'DD.MM.YYYY');
+			if (m.isValid()) {
+				var str = m.fromNow(true);
+				$date_of_birth.after(' (' + str + ')');
+			}
+		}
+	</script>
 
 (% endblock %)
