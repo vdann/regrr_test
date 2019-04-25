@@ -21,6 +21,9 @@ from regrr import mail
 import regrr.models as db
 import regrr.helper_view as helper_view
 
+import regrr.analisis as analisis_rules
+
+
 SESSION_KEY_USER = 'user'
 APP_NAME = 'Реестр результатов анализов и&nbsp;тестирования'
 
@@ -401,11 +404,13 @@ def user_add_post():
 	return redirect('/')
 
 AnalysisTypes = [
+	db.AnalysisType.Биохимические_исследования,
+	db.AnalysisType.Гемостаз,
 	db.AnalysisType.Клинический_анализ_крови,
+	db.AnalysisType.Общий_анализ_мочи,
 	db.AnalysisType.Тест_NEWS,
 	db.AnalysisType.Тест_VTE
 ]
-
 
 ################################################################
 @app.route('/patient/<patient_id>', methods=['GET'])
@@ -733,6 +738,14 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 		str = helper_view.render_template_ext('page_message.html', server = server)
 		return str
 
+	if analysis_type_int == db.AnalysisType.Биохимические_исследования:
+		data['tests'] = analisis_rules.tests_Биохимические_исследования
+	elif analysis_type_int == db.AnalysisType.Гемостаз:
+		data['tests'] = analisis_rules.tests_Гемостаз
+	elif analysis_type_int == db.AnalysisType.Клинический_анализ_крови:
+		data['tests'] = analisis_rules.tests_Клинический_анализ_крови
+	elif analysis_type_int == db.AnalysisType.Общий_анализ_мочи:
+		data['tests'] = analisis_rules.tests_Общий_анализ_мочи
 
 	server = pageData.to_dict()
 	server['isOk'] = True
@@ -753,7 +766,6 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	if user_role != db.UserRole.USER:
 		exceptions.abort(403)
 
-
 	analysis_type_int = int_no_exc(analysis_type)
 	analysis_type_str = db.AnalysisTypeStr.get(analysis_type_int)
 
@@ -765,7 +777,7 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 			)
 		db_patient = db_patient.first()
 		if db_patient:
-			patient_fullname = db_patient.getFullname()
+			patient_fullname = db_patient.getLastnameAndInitials()
 	
 
 	username = user_info.get('username')
@@ -776,7 +788,7 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 		pageData.title = "#%s" % patient_id
 		pageData.add_breadcrumb(pageData.title)
 		pageData.add_breadcrumb(analysis_type_str if analysis_type_str else 'Неизвестный анализ #%s' % analysis_type)
-		pageData.add_breadcrumb('Добавить')
+		pageData.add_breadcrumb('Новый')
 		pageData.message = '<h2>Пациент, <b>"#%s"</b>, не найден!</h2>' % patient_id
 		str = helper_view.render_template_ext('page_message.html', server = pageData.to_dict())
 		return str
@@ -788,7 +800,7 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	if not analysis_type_str:
 		pageData.title = 'Неизвестный анализ #%s' % analysis_type
 		pageData.add_breadcrumb(helper_view.str_nbsp(pageData.title))
-		pageData.add_breadcrumb('Добавить')
+		pageData.add_breadcrumb('Новый')
 		pageData.message = '<h2>Неизвестный анализ <b>"#%s"</b>!</h2>' % analysis_type
 		str = helper_view.render_template_ext('page_message.html', server = pageData.to_dict())
 		return str
@@ -796,8 +808,8 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	analysis_type_url = url_for('patient_analysis_type_analyzes_viewer',
 		patient_id=patient_id, analysis_type=analysis_type)
 	pageData.add_breadcrumb(analysis_type_str, analysis_type_url)
-	pageData.add_breadcrumb('Добавить')
-	pageData.title = "%s - Добавить" % analysis_type_str
+	pageData.add_breadcrumb('Новый')
+	pageData.title = "%s - Новый" % analysis_type_str
 
 	server = pageData.to_dict()
 	server['patient_id'] = patient_id
@@ -807,10 +819,28 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	data = {}
 	data['patient_id'] = patient_id
 	data['analysis_type'] = analysis_type
-	server['data'] = helper_view.data_to_json(data)
+	data['analysis_str'] = analysis_type_str
 
 	str = ''
-	if analysis_type_int == db.AnalysisType.Клинический_анализ_крови:
+	if analysis_type_int == db.AnalysisType.Биохимические_исследования:
+		data['tests'] = analisis_rules.tests_Биохимические_исследования
+		server['data'] = helper_view.data_to_json(data)
+		str = helper_view.render_template_ext('patient_analysis_add_1.html', server = server)
+	elif analysis_type_int == db.AnalysisType.Гемостаз:
+		data['tests'] = analisis_rules.tests_Гемостаз
+		server['data'] = helper_view.data_to_json(data)
+		str = helper_view.render_template_ext('patient_analysis_add_1.html', server = server)
+	elif analysis_type_int == db.AnalysisType.Клинический_анализ_крови:
+		data['tests'] = analisis_rules.tests_Клинический_анализ_крови
+		server['data'] = helper_view.data_to_json(data)
+		str = helper_view.render_template_ext('patient_analysis_add_1.html', server = server)
+	elif analysis_type_int == db.AnalysisType.Общий_анализ_мочи:
+		data['tests'] = analisis_rules.tests_Общий_анализ_мочи
+		server['data'] = helper_view.data_to_json(data)
+		str = helper_view.render_template_ext('patient_analysis_add_1.html', server = server)
+	elif analysis_type_int == db.AnalysisType.Биохимические_исследования:
+		data['tests'] = analisis_rules.tests_Биохимические_исследования
+		server['data'] = helper_view.data_to_json(data)
 		str = helper_view.render_template_ext('patient_analysis_add_1.html', server = server)
 	elif analysis_type_int == db.AnalysisType.Тест_NEWS:
 		str = helper_view.render_template_ext('patient_analysis_add_5.html', server = server)
@@ -827,14 +857,29 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 		abort(400)
 
 	# patient_id = int(request.json.get('patient_id'))
-	# analysis_type = int(request.json.get('analysis_type'))
-	result = request.json.get('result')
+
+	analysis_type_int = int_no_exc(analysis_type)
+	analysis_type_str = db.AnalysisTypeStr.get(analysis_type_int)
+
+	if not analysis_type_str:
+		abort(400)
 
 	data = {}
-	data['analysis_type'] = analysis_type
-	data['points'] = request.json.get('points')
-	data['isRed'] = request.json.get('isRed')
+	data['analysis_type'] = analysis_type_int
 	data['items'] = request.json.get('items')
+
+	if (
+		analysis_type_int == db.AnalysisType.Биохимические_исследования
+		or analysis_type_int == db.AnalysisType.Гемостаз
+		or analysis_type_int == db.AnalysisType.Клинический_анализ_крови
+		or analysis_type_int == db.AnalysisType.Общий_анализ_мочи
+		):
+		result = ''
+	else:
+		result = request.json.get('result')
+		data['points'] = request.json.get('points')
+		data['isRed'] = request.json.get('isRed')
+
 	data = json.dumps(data)
 	
 	if not patient_id or patient_id == '':

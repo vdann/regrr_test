@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="regrr\config.py" />
+    <Compile Include="regrr\analisis.py" />
     <Compile Include="regrr\helper_view.py" />
     <Compile Include="regrr\models.py">
       <SubType>Code</SubType>
@@ -47,6 +48,7 @@
     <Folder Include="regrr\static\content\" />
     <Folder Include="regrr\static\fonts\" />
     <Folder Include="regrr\static\js\" />
+    <Folder Include="regrr\static\js\moment\" />
     <Folder Include="regrr\static\_design\" />
     <Folder Include="regrr\static\scripts\" />
     <Folder Include="regrr\static\_design\assets\" />
@@ -224,6 +226,7 @@
     <Content Include="regrr\static\_design\LICENSE.txt" />
     <Content Include="regrr\static\_design\README.txt" />
     <Content Include="regrr\static\_design\tests_viewer.html" />
+    <Content Include="regrr\templates\patient_analysis_add_1.html" />
     <Content Include="regrr\templates\patient_analysis_add_6.html" />
     <Content Include="regrr\templates\patient_analysis_add_5.html" />
     <Content Include="regrr\templates\page_message.html" />

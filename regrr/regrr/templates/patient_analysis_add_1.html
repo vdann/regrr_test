@@ -5,7 +5,7 @@
 (% block block_head %)
 <style>
 	#app {
-		max-width: 800px;
+		max-width: 1000px;
 	}
 
 	.form-profile {
@@ -55,11 +55,40 @@
 		font-size: 1.2em;
 	}
 	
+	ul.arrow {
+		position: relative;
+		list-style: none;
+		margin-left: 0;
+		padding-left: 1.0em;
+
+		color: #3d4449;
+		font-family: "Roboto Slab", serif;
+		font-weight: 700;
+		line-height: 1.5;
+
+	}
+	ul.arrow li:before {
+		content: "»";
+		position: absolute;
+		left: 0;
+	}
+	
 </style>
 (% endblock %)
 
 
 (% block content %)
+
+	(#
+	<ul class="arrow" style="font-size: 1.5em;">
+		<li><a href="#">Пациенты</a></li>
+		<li><a href="#">Набиев Гасан Набиевич ((1))</a></li>
+		<li><a href="#">Клинический&nbsp;анализ&nbsp;крови</a></li>
+		<li>Новый</li>
+	</ul>
+
+	<br>
+	#)
 
 	<div id="app" v-cloak>
 
@@ -273,6 +302,11 @@
 		var icon_fail = 'fa fa-2x fa-exclamation-triangle clr-red';
 		var icon_wait = 'fa fa-2x fa-refresh fa-spin clr-blue';
 
+		for (var i = 0, n = data.tests.length; i < n; ++i) {
+			var test = data.tests[i];
+			test.result = test.result || '';
+		}
+
 		var app = new Vue({
 			el: '#app',
 			data: {
@@ -305,13 +339,16 @@
 
 				sendResult: function () {
 
-					var results = _.map(this.data.tests, 'result');
+					var items = _.map(this.data.tests, 'result');
 
 					var me = this;
 					var url = makeUrlFromRoute(data.route_analysis_add, data);
-					results
 
-					axios.post(url, results)
+					var result = {
+						items: items
+					};
+
+					axios.post(url, result)
 					.then(function (response) {
 
 						var url = makeUrlFromRoute(data.route_analysis_viewer, data);
