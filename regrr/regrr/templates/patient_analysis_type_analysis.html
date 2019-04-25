@@ -100,10 +100,15 @@
 	</div>
 
 	<script>
+		function str_to_num (s) {
+			s = s.replace(new RegExp(',', 'gm'), '.');
+			return +s;
+		}
+
 		function format_value(item) {
 
 			if (item.type == 'RANGE') {
-				var v = +item.value;
+				var v = str_to_num(item.value);
 				if (isNaN(v))
 					return '<i>' + item.value + '</i>';
 
@@ -114,7 +119,7 @@
 			}
 
 			if (item.type == 'LESS') {
-				var v = +item.value;
+				var v = str_to_num(item.value);
 				if (isNaN(v))
 					return '<i>' + item.value + '</i>';
 
@@ -125,7 +130,7 @@
 			}
 
 			if (item.type == 'MORE') {
-				var v = +item.value;
+				var v = str_to_num(item.value);
 				if (isNaN(v))
 					return '<i>' + item.value + '</i>';
 
