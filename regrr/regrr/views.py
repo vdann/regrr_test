@@ -1026,8 +1026,8 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 	analysis = db.Analysis(user_id, patient_id, analysis_type, result, data)
 	with db.session_scope() as db_session:
 		db_session.add(analysis)
-	
-	analysis_id = analysis.id		
+		db_session.commit()
+		analysis_id = analysis.id		
 
 	#result = query.first() == None
 	result = True

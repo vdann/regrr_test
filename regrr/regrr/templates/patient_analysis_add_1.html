@@ -147,7 +147,7 @@
 				<input type="submit"
 					value="Добавить"
 					class="primary"
-					:disabled="!isOk"
+					:disabled="!isOk || isSending"
 					@click="sendResult"/>
 			</li>
 		</ul>
@@ -156,37 +156,8 @@
 
 	<script>
 
-		window.onload = function () {
-/*			breakpoints.on('xlarge', function () {
-				console.log('ACTIVE xlarge');
-			});
-			breakpoints.on('large', function () {
-				console.log('ACTIVE large');
-			});
-			breakpoints.on('medium', function () {
-				console.log('ACTIVE medium');
-			});
-*/			breakpoints.on('min-to-small', function () {
-				app.isMobile = true;
-				console.log('ACTIVE min-to-small');
-			});
-			breakpoints.on('small-to-max', function () {
-				app.isMobile = false;
-				console.log('ACTIVE small-to-max');
-			});
-		};
-
-
-		function nbsp(s) {
-			return s.replace(/ /g, '&nbsp;');
-		}
-
-		function b(s) {
-			return '<b>' + s + '</b>';
-		}
-
+		//-----------------------------
 		var data = {};
-
 		try {
 			((server.data | safe));
 		}
@@ -194,6 +165,7 @@
 			console.log('Серверные данные не были проинициализированы');
 		}
 
+		/*
 		var tests = [
 			{
 				id: 1,
@@ -208,58 +180,8 @@
 				result: '', // 19,00
 				unit: 'Ед/л',
 				refs: '5,00 - 34,00'
-			},
-			{
-				id: 3,
-				name: 'Белок общий',
-				result: '', // 44,00
-				unit: 'г/л',
-				refs: '63,00 - 83,00'
-			},
-			{
-				id: 4,
-				name: 'Билирубин общий',
-				result: '', // 6,00
-				unit: 'мкмоль/л',
-				refs: '3,40 - 20,50'
-			},
-			{
-				id: 5,
-				name: 'Глюкоза',
-				result: '', // 6,19
-				unit: 'мкмоль/л',
-				refs: '3,89 - 5,83'
-			},
-			{
-				id: 6,
-				name: 'Креатинин',
-				result: '', // 52,20
-				unit: 'мкмоль/л',
-				refs: '63,60 - 110,50'
-			},
-			{
-				id: 7,
-				name: 'Клубочковая фильтрация CKD-EPI Креатинин',
-				result: '', // 111,56
-				unit: 'мл/мин.1.73м^2',
-				refs: '> 60,00'
-			},
-			{
-				id: 8,
-				name: 'Мочевина',
-				result: '', // 3,30
-				unit: 'мкмоль/л',
-				refs: '3,00 - 9,20'
-			},
-			{
-				id: 9,
-				name: 'С-реактивный белок',
-				result: '', // 61,90
-				unit: 'мг/л',
-				refs: '0,00 - 5,00'
-			},
+			}
 		];
-
 
 		var dataDef = {
 			analysis_str: 'Биохимические исследования', // 'Клинический анализ крови', 
@@ -274,102 +196,98 @@
 		};
 
 		data = _.extend({}, dataDef, data);
-
-
-
-		/*
-		function makeUrlFromRoute(route, params) {
-			for (key in params) {
-				var param = params[key];
-				var t = typeof param;
-				if (t === 'string' || t === 'number')
-					route = route.replace(new RegExp('<' + key + '>', 'gm'), param);
-			}
-
-			if (/<\w+(\:\w*)*>/gm.test(route))
-				console.warn('makeUrlFromRoute => Не все параметры маршрута заданы', route);
-
-			return route;
-		}*/
-
-		data.route_analysis_add = data.route_analysis_add
-			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add';
-
-		data.route_analysis_viewer = data.route_analysis_viewer
-			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis';
-
-		data.route_analysis_viewer_id = data.route_analysis_viewer_id
-			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis/<analysis_id>';
-
-		var icon_ok = 'fa fa-2x fa-check clr-green';
-		var icon_fail = 'fa fa-2x fa-exclamation-triangle clr-red';
-		var icon_wait = 'fa fa-2x fa-refresh fa-spin clr-blue';
+		*/
 
 		for (var i = 0, n = data.tests.length; i < n; ++i) {
 			var test = data.tests[i];
 			test.result = test.result || '';
 		}
 
-		var app = new Vue({
-			el: '#app',
-			data: {
-				data: data,
-				isMobile: false,
-				//isOk: false
-			},
-			computed: {
-				isOk: function () {
-					var tests = this.data.tests;
-					for (var i = 0, n = tests.length; i < n; ++i) {
-						var test = tests[i];
-						if (test.result == '')
-							return false;
-					}
-					
-					return true;
-				}
-			},
-			methods: {
-				nbsp: nbsp,
 
-				tr2: function (item) {
-					var s = '';
-					s += '<div>' + b(item.name) + '</div>';
-					s += '<div class="fs-small">' + nbsp(item.unit) + '</div>';
-					s += '<div class="fs-small">' + nbsp(item.refs) + '</div>';
-					return s;
+		//-----------------------------
+		window.onload = function () {
+			//-----------------------------
+			var nbsp = Utils.html.nbsp;
+			var b = Utils.html.b;
+
+			var route_analysis_add = data.route_analysis_add || '/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add';
+			var route_analysis_viewer_id = data.route_analysis_viewer_id || '/patient/<patient_id>/analysis_type/<analysis_type>/analysis/<analysis_id>';
+			var url_analysis_add = Utils.routes.makeUrlFromRoute(route_analysis_add, data);
+
+			data.isMobile = breakpoints.active('min-to-small');
+
+			var app = new Vue({
+				el: '#app',
+				data: {
+					data: data,
+					isMobile: false,
+					isSending: false
 				},
-
-				sendResult: function () {
-
-					var items = _.map(this.data.tests, 'result');
-
-					var me = this;
-					var url = Utils.routes.makeUrlFromRoute(data.route_analysis_add, data);
-
-					var result = {
-						items: items
-					};
-
-					axios.post(url, result)
-					.then(function (response) {
-
-						if (response.data.result) {
-							data.analysis_id = analysis_id;
-							var url = Utils.routes.makeUrlFromRoute(data);
-							window.location.replace(url);
+				computed: {
+					isOk: function () {
+						var tests = this.data.tests;
+						for (var i = 0, n = tests.length; i < n; ++i) {
+							var test = tests[i];
+							if (test.result == '')
+								return false;
 						}
-//						console.log(response.data.result);
-//						vm.username_icon = response.data.result ? icon_ok : icon_fail;
-					})
-					.catch(function (error) {
-//						vm.username_icon = icon_fail;
-						console.log('Error!');
-					});
+					
+						return true;
+					}
+				},
+				methods: {
+					nbsp: nbsp,
+					tr2: function (item) {
+						var s = '';
+						s += '<div>' + b(item.name) + '</div>';
+						s += '<div class="fs-small">' + nbsp(item.unit) + '</div>';
+						s += '<div class="fs-small">' + nbsp(item.refs) + '</div>';
+						return s;
+					},
 
+					sendResult: function () {
+						var this2 = this;
+						this2.isSending = true;
+						var items = _.map(this.data.tests, 'result');
+						var result = {
+							items: items
+						};
+
+						axios.post(url_analysis_add, result)
+						.then(function (response) {
+
+							if (!response.data.result) {
+								//TODO отработать ошибку
+								console.log('Error!');
+								return;
+							}
+
+							data.analysis_id = response.data.analysis_id;
+							var url = Utils.routes.makeUrlFromRoute(route_analysis_viewer_id, data);
+							window.location.replace(url);
+							// this2.isSending = false;
+							//						console.log(response.data.result);
+							//						vm.username_icon = response.data.result ? icon_ok : icon_fail;
+						})
+						.catch(function (error) {
+							//						vm.username_icon = icon_fail;
+							console.log('Error!');
+							this2.isSending = false;
+						});
+
+					}
 				}
-			}
-		});
+			});
+
+			breakpoints.on('min-to-small', function () {
+				app.isMobile = true;
+				console.log('ACTIVE min-to-small');
+			});
+			breakpoints.on('small-to-max', function () {
+				app.isMobile = false;
+				console.log('ACTIVE small-to-max');
+			});
+		};
 	</script>
 
 

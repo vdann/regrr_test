@@ -24,6 +24,7 @@ app.jinja_options.update(dict(
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.permanent_session_lifetime = timedelta(days=365)
 app.secret_key = '100' #os.urandom(12)
+app.url_map.strict_slashes = False
 
 #app.debug = True
 '''
