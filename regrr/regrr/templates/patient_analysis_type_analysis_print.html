@@ -1,0 +1,674 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Test</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+
+	<style>
+		.pad {
+			padding: 2px 30px 2px 30px;
+		}
+
+		.h {
+			text-align: center;
+			font-size: 1.2em;
+		}
+
+		.w_100 {
+			width: 100%;
+		}
+
+		.w_50 {
+			width: 50%;
+		}
+
+		.a_center {
+			text-align: center;
+		}
+
+		.a_right {
+			text-align: right;
+		}
+
+		.a_left {
+			text-align: left;
+		}
+
+		.va_top {
+			vertical-align: top;
+		}
+
+		.va_bottom {
+			vertical-align: bottom;
+		}
+
+		.va_middle {
+			vertical-align: middle;
+		}
+
+		.table_grid {
+			border-collapse: collapse;
+			border: 1px solid black;
+		}
+
+		.fw_normal {
+			font-weight: normal;
+		}
+
+		.fw-bold {
+			font-weight: bold;
+		}
+
+		.fs_italic {
+			font-style: italic;
+		}
+
+		#table_tests > tbody > tr > td > div,
+		#table_tests > thead > tr > th > div {
+			height: 1.2em;
+			min-height: 1.2em;
+		}
+
+		@media print {
+			/* здесь будут стили для печати */
+			body {
+				font-size: 0.8em;
+			}
+		}
+	</style>
+
+	<script src="/static/_design/extern/lodash.js-v4.17.11/lodash.js"></script>
+	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
+	<script src="/static/_design/extern/moment.js-v2.24.0/moment.min.js"></script>
+	<script src="/static/_design/extern/moment.js-v2.24.0/locale/ru.js"></script>
+	<script src="/static/js/utils.js"></script>
+
+</head>
+<body>
+
+	<div id="app" v-cloak>
+
+		<!--
+		<button v-on:click="prev">&larr;</button>
+		<span>{{ cur+1 }} из {{ count }}</span>
+		<button v-on:click="next">&rarr;</button>
+
+		<hr>
+		-->
+
+		<div class="h">Отделение лабораторной диагностики</div>
+
+		<hr>
+
+		<table class="w_100">
+			<tr>
+				<td class="w_50 va_top">
+					Пациент: <b>{{ patient.lastname_and_initials }}</b> Пол:&nbsp;<b>{{ patient.gender }}</b> <br />
+					Возраст: <b>{{ patient.age }}</b> <br />
+					Дата поступления образца: <b>{{ date_receipt_example }}</b>
+				</td>
+
+				<td class="w_50 va_top">
+					№ заявки: <b> {{ request_number }} </b> <br />
+					Заказчик: <b> {{ customer }} </b> <br />
+					Отделение: <b> {{ patient.department }} </b>
+				</td>
+			</tr>
+		</table>
+
+		<hr>
+
+		<div class="h"><b> {{ analysis_type_str }} </b></div>
+
+		<table id="table_tests" border="1" class="table_grid w_100">
+			<thead>
+				<tr>
+					<th class="fw_normal fs_italic" style="width: 48%"><div>Тест</div></th>
+					<th class="fw_normal fs_italic" style="width: 12%"><div>Результат</div></th>
+					<th class="fw_normal fs_italic" style="width: 20%"><div>Ед.&nbsp;изм.</div></th>
+					<th class="fw_normal fs_italic" style="width: 20%"><div>Референсные&nbsp;значения</div></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="test in tests">
+					<td v-html="test.name"><div></div></td>
+					<td class="pad a_center"><div v-html="test.valuef"></div></td>
+					<td class="pad a_center"><div v-html="nbsp(test.unit)"></div></td>
+					<td class="pad a_center"><div v-html="nbsp(test.refs)"></div></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="a_right">
+			<div>Исследованные биоматериалы: {{ biomaterials }} </div>
+			<div>Анализы выполнены на оборудовании: {{ equipment }} </div>
+		</div>
+
+		<div v-if="conclusion_note">
+			<hr>
+			<div><b>Заключение/Примечание:</b> <i>{{ conclusion_note }}</i></div>
+		</div>
+
+		<hr>
+
+		<table class="w_100">
+			<tr>
+				<td class="a_left va_bottom">
+					Исследование выполнил: <span v-html="research_performer"></span>
+				</td>
+
+				<td class="a_right va_bottom">
+					Дата доставки биоматериала: <b v-html="date_delivery_biomaterial"></b> <br />
+					Дата выполнения: <b v-html="date_completion"></b> <br />
+					Дата печати: <b v-html="date_print"></b> <br />
+				</td>
+			</tr>
+		</table>
+
+	</div>
+
+	<script>
+
+		function str_to_num(s) {
+			s = s.replace(new RegExp(',', 'gm'), '.');
+			return +s;
+		}
+
+		function format_value(item) {
+
+			if (item.type == 'RANGE') {
+				var v = str_to_num(item.value);
+				if (isNaN(v))
+					return '<i>' + item.value + '</i>';
+
+				if (item.v1 > v || item.v2 < v)
+					return '<b>' + v.toFixed(item.digits) + '</b>';
+
+				return v.toFixed(item.digits);
+			}
+
+			if (item.type == 'LESS') {
+				var v = str_to_num(item.value);
+				if (isNaN(v))
+					return '<i>' + item.value + '</i>';
+
+				if (item.v1 < v)
+					return '<b>' + v.toFixed(item.digits) + '</b>';
+
+				return v.toFixed(item.digits);
+			}
+
+			if (item.type == 'MORE') {
+				var v = str_to_num(item.value);
+				if (isNaN(v))
+					return '<i>' + item.value + '</i>';
+
+				if (item.v1 > v)
+					return '<b>' + v.toFixed(item.digits) + '</b>';
+
+				return v.toFixed(item.digits);
+			}
+
+			return item.value;
+		}
+
+		var data = {};
+		try {
+			((server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы');
+		}
+
+		if (typeof data.data === 'string')
+			data.data = JSON.parse(data.data);
+
+		if (data.tests) {
+			for (var i = 0, n = data.tests.length; i < n; ++i) {
+				var test = data.tests[i];
+				test.value = data.data.items[i];
+				test.valuef = format_value(test);
+			}
+		}
+
+		var age = moment(data.patient.date_of_birth, 'DD.MM.YYYY');
+		if (age.isValid())
+			age = age.fromNow(true);
+		else
+			age = '[---]';
+
+
+		data.patient.lastname_and_initials = data.patient.lastname + ' ' + data.patient.firstname[0] + '. ' + data.patient.middlename[0] + '.';
+		data.patient.lastname_and_initials = data.patient.lastname_and_initials.toUpperCase();
+		data.patient.gender = (data.patient.gender || 'М').toUpperCase();
+		data.patient.age = age;
+		//data.patient.department
+
+		data.date_receipt_example = data.date_receipt_example || '[---]';
+		data.request_number = data.request_number || '[---]';
+		data.customer = data.customer || '[---]'; //  НМИЦ онкологии
+
+		data.biomaterials = data.biomaterials || '[---]';
+		data.equipment = data.equipment || '[---]';
+		data.conclusion_note = data.conclusion_note || '[---]';
+
+		data.research_performer = data.research_performer || '[---]';
+
+		data.date_delivery_biomaterial = data.date_delivery_biomaterial || '[---]';
+		data.date_completion = data.date_completion || '[---]';
+		data.date_print = data.date_print || '[---]';
+
+
+		var app = new Vue({
+			el: '#app',
+			data: data,
+			filters: {
+				nbsp: function(v) {
+					return v.replace(/ /g, '&nbsp;');
+				}
+			},
+			methods: {
+				nbsp: Utils.html.nbsp,
+			}
+		});
+
+
+	</script>
+
+
+	<script>
+
+		/*
+		function nbsp(s) {
+			return s.replace(/ /g, '&nbsp;');
+		}
+
+		function b(s) {
+			return '<b>' + s + '</b>';
+		}
+
+
+		function t(name, result, unit, refs) {
+			return {
+				name: name,
+				result: result,
+				unit: unit,
+				refs: nbsp(refs)
+			};
+		}
+
+		function num_to_str(n, digits) {
+			return n.toFixed(digits).replace('.', ',');
+		}
+
+
+
+		var RULES = {
+			RANGE: {
+				init: function (digits, v1, v2) {
+					return {
+						digits: digits,
+						v1: v1,
+						v2: v2
+					};
+				},
+
+				toString: function (d) {
+					return d.v1.toFixed(d.digits) + ' - ' + d.v2.toFixed(d.digits);
+				},
+
+				isOk: function (d, v) {
+					return d.v1 >= v && d.v2 <= v;
+				}
+			},
+
+			LESS: true,
+			MORE: true
+
+		};
+
+
+
+		function rule_range(digits, v1, v2) {
+			return {
+				type: RULES.RANGE,
+				digits: digits,
+				v1: v1,
+				v2: v2
+			}
+		}
+
+		function rule_less(digits, v) {
+			return {
+				type: RULES.LESS,
+				digits: digits,
+				v: v,
+			}
+		}
+
+		function rule_more(digits, v) {
+			return {
+				type: RULES.MORE,
+				digits: digits,
+				v: v,
+			}
+		}
+
+		function rule_toString(rule) {
+			switch (rule.type) {
+				case RULES.RANGE: return rule.v1.toFixed(d.digits) + ' - ' + rule.v2.toFixed(d.digits);
+				case RULES.LESS: return '< ' + rule.v.toFixed(d.digits);
+				case RULES.MORE: return '> ' + rule.v.toFixed(d.digits);
+			}
+		}
+		function rule_isOk(rule, v) {
+			switch (rule.type) {
+				case RULES.RANGE: return rule.v1 >= v && rule.v2 <= v;
+				case RULES.LESS: return rule.v < v;
+				case RULES.MORE: return rule.v > v;
+			}
+		}
+
+		function Rules() {
+			this._rules = {};
+			return this;
+		}
+
+		Rules.TYPES = ['RANGE', 'LESS', 'MORE'];
+
+		var RULES2 = Rules.TYPES;
+		Rules.TYPES = {};
+		for (var i = 0, n = RULES2.length; i < n; ++i) {
+			Rules.TYPES[RULES2[i]] = RULES2[i]
+		}
+
+
+		Rules.prototype.add = function (name, unit, type, digits, v1, v2) {
+			if (this._rules[name])
+				throw ('!');
+
+			var rule = null;
+			switch (type) {
+
+				case Rules.TYPES.RANGE:
+					rule = {
+						name: name,
+						unit: unit,
+						type: type,
+						digits: digits,
+						v1: v1,
+						v2: v2
+					};
+					break;
+
+				case Rules.TYPES.LESS:
+					rule = {
+						name: name,
+						unit: unit,
+						type: type,
+						digits: digits,
+						v1: v1,
+					};
+					break;
+
+				case Rules.TYPES.MORE:
+					rule = {
+						name: name,
+						unit: unit,
+						type: type,
+						digits: digits,
+						v1: v1,
+					};
+					break;
+
+				default: throw ('!');
+			}
+
+
+			this._rules[name] = rule;
+		};
+
+		Rules.prototype.get = function (name) {
+			return this._rules[name];
+		};
+
+
+		Rules.prototype.toString = function (name) {
+			var rule = this._rules[name];
+			if (!rule)
+				return null;
+
+			switch (rule.type) {
+				case Rules.TYPES.RANGE: return num_to_str(rule.v1, rule.digits) + ' - ' + num_to_str(rule.v2, rule.digits);
+				case Rules.TYPES.LESS: return '< ' + num_to_str(rule.v1, rule.digits);
+				case Rules.TYPES.MORE: return '> ' + num_to_str(rule.v1, rule.digits);
+			}
+
+			return null;
+		};
+
+		Rules.prototype.isOk = function (name, v) {
+			var rule = this._rules[name];
+			if (!rule)
+				return false;
+
+			switch (rule.type) {
+				case Rules.TYPES.RANGE: return rule.v1 < v && rule.v2 > v;
+				case Rules.TYPES.LESS: return rule.v1 < v;
+				case Rules.TYPES.MORE: return rule.v1 > v;
+			}
+
+			return false;
+		};
+
+
+		var rules = new Rules();
+
+		rules.add('Лейкоциты', 'x10<sup>9</sup>/л', Rules.TYPES.RANGE, 2, 4, 9);
+		rules.add('Эритроциты', 'x10<sup>12</sup>/л', Rules.TYPES.RANGE, 2, 4, 5);
+		rules.add('Гемоглобин', 'г/л', Rules.TYPES.RANGE, 0, 130, 160);
+		rules.add('Гематокрит', '%', Rules.TYPES.RANGE, 0, 40, 48);
+		rules.add('Средний объем эритроцита', 'фл', Rules.TYPES.RANGE, 2, 80, 100);
+		rules.add('Среднее содержание гемоглобина в эритроците', 'пг', Rules.TYPES.RANGE, 2, 27, 31);
+		rules.add('Средняя концентрация гемоглобина в эритроците', 'г/л', Rules.TYPES.RANGE, 0, 320, 370);
+		rules.add('Коэффициент вариации относительной ширины распределения эритроцитов по объему', '%', Rules.TYPES.RANGE, 2, 10, 20);
+		rules.add('Тромбоциты', 'x10<sup>9</sup>/л', Rules.TYPES.RANGE, 0, 180, 320);
+		rules.add('Относительная ширина распределения тромбоцитов по объему', '%', Rules.TYPES.RANGE, 2, 10, 20);
+		rules.add('Средний объем тромбоцитов', 'фл', Rules.TYPES.RANGE, 2, 7.4, 10.4);
+		rules.add('Тромбокрит', '%', Rules.TYPES.RANGE, 2, 0.15, 0.4);
+
+		rules.add('Нейрофилы абс.', 'x10<sup>9</sup>/л', Rules.TYPES.RANGE, 2, 2.04, 5.80);
+		rules.add('Нейрофилы %', '%', Rules.TYPES.RANGE, 2, 48, 78);
+
+		rules.add('Лимфоциты абс.', 'x10<sup>9</sup>/л', Rules.TYPES.RANGE, 2, 1.2, 3);
+		rules.add('Лимфоциты %', '%', Rules.TYPES.RANGE, 2, 19, 37);
+
+		rules.add('Моноциты абс.', 'x10<sup>9</sup>/л', Rules.TYPES.RANGE, 2, 0.09, 0.6);
+		rules.add('Моноциты %', '%', Rules.TYPES.RANGE, 2, 3, 11);
+
+		rules.add('Эозинофилы абс.', 'x10<sup>9</sup>/л', Rules.TYPES.RANGE, 2, 0.02, 0.3);
+		rules.add('Эозинофилы %', '%', Rules.TYPES.RANGE, 2, 0.5, 5);
+
+		rules.add('Базофилы абс.', 'x10<sup>9</sup>/л', Rules.TYPES.RANGE, 2, 0.0, 0.065);
+		rules.add('Базофилы %', '%', Rules.TYPES.RANGE, 2, 0, 1);
+
+
+		function t2(name, result) {
+
+			var rule = rules.get(name);
+			if (!rule) {
+				debug;
+				return false;
+			}
+
+			if (!rules.isOk(name, result)) {
+				result = num_to_str(result, rule.digits);
+				result = b(result);
+			}
+			else {
+				result = num_to_str(result, rule.digits);
+			}
+
+
+			return {
+				name: name,
+				result: result,
+				unit: rule.unit,
+				refs: nbsp(rules.toString(name))
+			};
+		}
+
+
+
+		var analysis_reports = [
+		{
+			patient: nbsp("ТАРМАШЕВ А. Н."),
+			gender: 'М',
+			age: 58,
+			date_receipt_example: '12.11.2018',
+			number_request: '6810260156',
+			customer: 'НМИЦ онкологии',
+			department: '9. Отделение анестезиологии-реанимации',
+			name_analysis: 'Клинический анализ крови',
+			tests: [
+				t2('Лейкоциты', 27.6),
+				t2('Эритроциты', 3.38),
+				t2('Гемоглобин', 106),
+				t2('Гематокрит', 30),
+				t2('Средний объем эритроцита', 89.3),
+				t2('Среднее содержание гемоглобина в эритроците', 31.4),
+				t2('Средняя концентрация гемоглобина в эритроците', 351),
+				t2('Коэффициент вариации относительной ширины распределения эритроцитов по объему', 13.30),
+				t2('Тромбоциты', 505),
+				t2('Относительная ширина распределения тромбоцитов по объему', 17.80),
+				t2('Средний объем тромбоцитов', 6.20),
+				t2('Тромбокрит', 0.31),
+				t2('Нейрофилы абс.', 22.2),
+				t2('Нейрофилы %', 80.3),
+				t2('Лимфоциты абс.', 0.9),
+				t2('Лимфоциты %', 3.2),
+				t2('Моноциты абс.', 2.9),
+				t2('Моноциты %', 10.5),
+				t2('Эозинофилы абс.', 0.1),
+				t2('Эозинофилы %', 0.4),
+				t2('Базофилы абс.', 1.5),
+				t2('Базофилы %', 5.6),
+			],
+			biomaterials: 'Кровь (ЭДТА)',
+			equipment: 'МЕК 8222',
+			imprisonment_reference: null,
+			research_performer: nbsp('Грачева С. В.'),
+			date_delivery_biomaterial: nbsp('12.11.2018 19:03'),
+			date_completion: nbsp('12.11.2018 19:17'),
+			date_print: nbsp('12.11.2018'),
+		},
+
+		{
+			patient: nbsp("ТАРМАШЕВ А. Н."),
+			gender: 'М',
+			age: 58,
+			date_receipt_example: '20.11.2018',
+			number_request: '6810271447',
+			customer: 'НМИЦ онкологии',
+			department: '4. Хирургическое отделение абдоминальной онкологии',
+			name_analysis: 'Биохимические исследования',
+			tests: [
+				t('АЛТ', b('24,00'), 'Ед/л', '0,00 - 55,00'),
+				t('АСТ', '19,00', 'Ед/л', '5,00 - 34,00'),
+				t('Белок общий', b('44,00'), 'г/л', '63,00 - 83,00'),
+				t('Билирубин общий', '6,00', 'мкмоль/л', '3,40 - 20,50'),
+				t('Глюкоза', b('6,19'), 'мкмоль/л', '3,89 - 5,83'),
+				t('Креатинин', b('52,20'), 'мкмоль/л', '63,60 - 110,50'),
+				t('Клубочковая фильтрация CKD-EPI Креатинин', '111,56', 'мл/мин.1.73м^2', '> 60,00'),
+				t('Мочевина', '3,30', 'мкмоль/л', '3,00 - 9,20'),
+				t('С-реактивный белок', b('61,90'), 'мг/л', '0,00 - 5,00'),
+			],
+			biomaterials: 'Кровь (активатор свёртывания и гель)',
+			equipment: 'Architect c4000',
+			imprisonment_reference: 'Измерение Креатинина стандартизовано по методу IDMS',
+			research_performer: nbsp('Дзембак Т. М.'),
+			date_delivery_biomaterial: nbsp('20.11.2018 09:16'),
+			date_completion: nbsp('20.11.2018 11:23'),
+			date_print: nbsp('20.11.2018'),
+		},
+
+		{
+			patient: nbsp("ИВАНОВ И. И."),
+			gender: 'М',
+			age: 48,
+			date_receipt_example: '22.11.2018',
+			number_request: '6810261111',
+			customer: 'НМИЦ онкологии',
+			department: '9. Отделение анестезиологии-реанимации',
+			name_analysis: 'Клинический анализ крови',
+			tests: [
+				t('Лейкоциты', '5,60', 'x10<sup>9</sup>/л', '4,00 - 9,00'),
+				t('Эритроциты', '4,38', 'x10<sup>12</sup>/л', '4,00 - 5,00'),
+				t('Гемоглобин', b('100'), 'г/л', '130 - 160'),
+				t('Гематокрит', b('44'), '%', '40 - 48'),
+				t('Средний объем эритроцита', '89,30', 'фл', '80,00 - 100,00'),
+				t('Среднее содержание гемоглобина в эритроците', '31,00', 'пг', '27,00 - 31,00'),
+				t('Средняя концентрация гемоглобина в эритроците', b('300'), 'г/л', '320 - 370'),
+				t('Коэффициент вариации относительной ширины распределения эритроцитов по объему', '13,30', '%', '10,00 - 20,00'),
+				t('Тромбоциты', '305', 'x10<sup>9</sup>/л', '180 - 320'),
+				t('Относительная ширина распределения тромбоцитов по объему', '17,80', '%', '10,00 - 20,00'),
+				t('Средний объем тромбоцитов', b('5,20'), 'фл', '7,40 - 10,40'),
+				t('Тромбокрит', '0,31', '%', '0,15 - 0,40'),
+			],
+			biomaterials: 'Кровь (ЭДТА)',
+			equipment: 'МЕК 8222',
+			imprisonment_reference: null,
+			research_performer: nbsp('Грачева С. В.'),
+			date_delivery_biomaterial: nbsp('22.11.2018 10:03'),
+			date_completion: nbsp('22.11.2018 10:17'),
+			date_print: nbsp('22.11.2018'),
+		},
+		];
+
+		function copyJson(v) {
+			return JSON.parse(JSON.stringify(v));
+		}
+
+		function extendJson(vTarget, vFrom) {
+			for (var key in vFrom) {
+				vTarget[key] = copyJson(vFrom[key]);
+			}
+		}
+
+		var data = copyJson(analysis_reports[0]);
+
+		data.cur = 0;
+		data.count = analysis_reports.length;
+
+		var app = new Vue({
+			el: '#app',
+			data: data,
+			computed: {
+				is_imprisonment_reference: function () {
+					var b = !!this.imprisonment_reference;
+					return b;
+				}
+			},
+			methods: {
+				prev: function () {
+					--this.cur;
+					if (this.cur < 0)
+						this.cur = analysis_reports.length - 1;
+
+					extendJson(this, analysis_reports[this.cur]);
+				},
+				next: function () {
+					++this.cur;
+					if (this.cur >= analysis_reports.length)
+						this.cur = 0;
+
+					extendJson(this, analysis_reports[this.cur]);
+				}
+
+			}
+		});
+		*/
+	</script>
+</body>
+</html>

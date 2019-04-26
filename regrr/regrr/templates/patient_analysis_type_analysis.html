@@ -10,188 +10,196 @@
 
 (% block content %)
 
-	<div id="analisis" v-cloak>
-		<div v-if="tests">
+<div id="analisis" v-cloak>
+	<div v-if="tests">
 
-			<ul class="alt">
-				<li><b>Исследование выполнил:</b> &nbsp;&nbsp;&nbsp; <span v-html="user"></span></li>
-				<li><b>Дата выполнения:</b> &nbsp;&nbsp;&nbsp; <span v-html="date_of_creation"></span></li>
-				<li><b>Результат:</b> &nbsp;&nbsp;&nbsp; <span v-html="result"></span></li>
-			</ul>
+		<ul class="alt">
+			<li><b>Исследование выполнил:</b> &nbsp;&nbsp;&nbsp; <span v-html="user"></span></li>
+			<li><b>Дата выполнения:</b> &nbsp;&nbsp;&nbsp; <span v-html="date_of_creation"></span></li>
+			<li><b>Результат:</b> &nbsp;&nbsp;&nbsp; <span v-html="result"></span></li>
+		</ul>
 
-			<br>
+		<br>
 
-			<div class="table-wrapper">
-				<table class="alt" v-if="!isMobile">
-					<thead>
-						<tr>
-							<th class="ta-l va-m">Тест</th>
-							<th class="ta-c va-m">Результат</th>
-							<th class="ta-c va-m">Еденицы измерения</th>
-							<th class="ta-c va-m">Референсные значения</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="test in tests">
-							<td v-html="test.name" class="va-m"></td>
-							<td v-html="test.valuef" class="va-m ta-c"></td>
-							<td v-html="nbsp(test.unit)" class="ta-c va-m"></td>
-							<td v-html="nbsp(test.refs)" class="ta-c va-m"></td>
-						</tr>
-					</tbody>
-				</table>
-				<table class="alt" v-else>
-					<thead>
-						<tr>
-							<th class="ta-l va-m">Тест</th>
-							<th class="ta-c va-m">Результат</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="test in tests">
-							<td class="va-m">
-								<div><b v-html="test.name"></b></div>
-								<div v-html="nbsp(test.unit)" class="fs-small"></div>
-								<div v-html="nbsp(test.refs)" class="fs-small"></div>
-							</td>
-							<td v-html="test.valuef" class="va-m ta-c"></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
+		<div class="table-wrapper">
+			<table class="alt" v-if="!isMobile">
+				<thead>
+					<tr>
+						<th class="ta-l va-m">Тест</th>
+						<th class="ta-c va-m">Результат</th>
+						<th class="ta-c va-m">Еденицы измерения</th>
+						<th class="ta-c va-m">Референсные значения</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="test in tests">
+						<td v-html="test.name" class="va-m"></td>
+						<td v-html="test.valuef" class="va-m ta-c"></td>
+						<td v-html="nbsp(test.unit)" class="ta-c va-m"></td>
+						<td v-html="nbsp(test.refs)" class="ta-c va-m"></td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="alt" v-else>
+				<thead>
+					<tr>
+						<th class="ta-l va-m">Тест</th>
+						<th class="ta-c va-m">Результат</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="test in tests">
+						<td class="va-m">
+							<div><b v-html="test.name"></b></div>
+							<div v-html="nbsp(test.unit)" class="fs-small"></div>
+							<div v-html="nbsp(test.refs)" class="fs-small"></div>
+						</td>
+						<td v-html="test.valuef" class="va-m ta-c"></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 
-		<div v-else>
-			<ul class="alt">
-				<li><b>Исследование выполнил:</b> &nbsp;&nbsp;&nbsp; <span v-html="user"></span></li>
-				<li><b>Дата выполнения:</b> &nbsp;&nbsp;&nbsp; <span v-html="date_of_creation"></span></li>
-				<li><b>Результат:</b> &nbsp;&nbsp;&nbsp; <span v-html="result"></span></li>
-			</ul>
-
-			<br>
-
-			<div class="table-wrapper">
-				<table class="alt">
-					<thead>
-						<tr>
-							<th>№</th>
-							<th>Параметр</th>
-							<th>Значение</th>
-							<th>Очки</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="(item, i) in data.items" :key="i">
-							<td v-html="i + 1"></td>
-							<td v-html="item.name"></td>
-							<td v-html="item.label"></td>
-							<td v-html="item.points"></td>
-						</tr>
-					</tbody>
-					<tfoot>
-						<tr>
-							<td colspan="3" align="right">Всего очков</td>
-							<td v-html="data.points"></td>
-						</tr>
-					</tfoot>
-				</table>
-			</div>
-		</div>
+		<a :href="url_print" target="_blank">
+			<i class="fa fa-2x fa-print"></i>
+		</a>
 	</div>
 
-	<script>
-		function str_to_num (s) {
-			s = s.replace(new RegExp(',', 'gm'), '.');
-			return +s;
+	<div v-else>
+		<ul class="alt">
+			<li><b>Исследование выполнил:</b> &nbsp;&nbsp;&nbsp; <span v-html="user"></span></li>
+			<li><b>Дата выполнения:</b> &nbsp;&nbsp;&nbsp; <span v-html="date_of_creation"></span></li>
+			<li><b>Результат:</b> &nbsp;&nbsp;&nbsp; <span v-html="result"></span></li>
+		</ul>
+
+		<br>
+
+		<div class="table-wrapper">
+			<table class="alt">
+				<thead>
+					<tr>
+						<th>№</th>
+						<th>Параметр</th>
+						<th>Значение</th>
+						<th>Очки</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(item, i) in data.items" key="i">
+						<td v-html="i + 1"></td>
+						<td v-html="item.name"></td>
+						<td v-html="item.label"></td>
+						<td v-html="item.points"></td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="3" align="right">Всего очков</td>
+						<td v-html="data.points"></td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script>
+	function str_to_num(s) {
+		s = s.replace(new RegExp(',', 'gm'), '.');
+		return +s;
+	}
+
+	function format_value(item) {
+
+		if (item.type == 'RANGE') {
+			var v = str_to_num(item.value);
+			if (isNaN(v))
+				return '<i>' + item.value + '</i>';
+
+			if (item.v1 > v || item.v2 < v)
+				return '<b>' + v.toFixed(item.digits) + '</b>';
+
+			return v.toFixed(item.digits);
 		}
 
-		function format_value(item) {
+		if (item.type == 'LESS') {
+			var v = str_to_num(item.value);
+			if (isNaN(v))
+				return '<i>' + item.value + '</i>';
 
-			if (item.type == 'RANGE') {
-				var v = str_to_num(item.value);
-				if (isNaN(v))
-					return '<i>' + item.value + '</i>';
+			if (item.v1 < v)
+				return '<b>' + v.toFixed(item.digits) + '</b>';
 
-				if (item.v1 > v || item.v2 < v)
-					return '<b>' + v.toFixed(item.digits) + '</b>';
+			return v.toFixed(item.digits);
+		}
 
-				return v.toFixed(item.digits);
+		if (item.type == 'MORE') {
+			var v = str_to_num(item.value);
+			if (isNaN(v))
+				return '<i>' + item.value + '</i>';
+
+			if (item.v1 > v)
+				return '<b>' + v.toFixed(item.digits) + '</b>';
+
+			return v.toFixed(item.digits);
+		}
+
+		return item.value;
+	}
+
+	var data = {};
+	try {
+		((server.data | safe));
+	}
+	catch (e) {
+		console.log('Серверные данные не были проинициализированы');
+	}
+
+	if (typeof data.data === 'string')
+		data.data = JSON.parse(data.data);
+
+	if (data.tests) {
+		for (var i = 0, n = data.tests.length; i < n; ++i) {
+			var test = data.tests[i];
+			test.value = data.data.items[i];
+			test.valuef = format_value(test);
+		}
+
+		var route = data.route_analysis_print_id || '/patient/<patient_id>/analysis_type/<analysis_type>/analysis_print/<analysis_id>';
+		data.analysis_id = data.id;
+		data.url_print = Utils.routes.makeUrlFromRoute(route, data);
+	}
+
+
+
+
+	window.onload = function () {
+
+		//console.log('onload min-to-small:', breakpoints.active('min-to-small'));
+		//console.log('onload small-to-max:', breakpoints.active('small-to-max'));
+
+		data.isMobile = breakpoints.active('min-to-small');
+
+		var app = new Vue({
+			el: '#analisis',
+			data: data,
+			methods: {
+				nbsp: Utils.html.nbsp,
 			}
-
-			if (item.type == 'LESS') {
-				var v = str_to_num(item.value);
-				if (isNaN(v))
-					return '<i>' + item.value + '</i>';
-
-				if (item.v1 < v)
-					return '<b>' + v.toFixed(item.digits) + '</b>';
-
-				return v.toFixed(item.digits);
-			}
-
-			if (item.type == 'MORE') {
-				var v = str_to_num(item.value);
-				if (isNaN(v))
-					return '<i>' + item.value + '</i>';
-
-				if (item.v1 > v)
-					return '<b>' + v.toFixed(item.digits) + '</b>';
-
-				return v.toFixed(item.digits);
-			}
-
-			return item.value;
-		}
-
-		var data = {};
-		try {
-			((server.data | safe));
-		}
-		catch (e) {
-			console.log('Серверные данные не были проинициализированы');
-		}
-
-		if (typeof data.data === 'string')
-			data.data = JSON.parse(data.data);
-
-		if (data.tests) {
-			for (var i = 0, n = data.tests.length; i < n; ++i) {
-				var test = data.tests[i];
-				test.value = data.data.items[i];
-				test.valuef = format_value(test);
-			}
-		}
+		});
 
 
+		breakpoints.on('min-to-small', function () {
+			app.isMobile = true;
+			console.log('ACTIVE min-to-small');
+		});
+		breakpoints.on('small-to-max', function () {
+			app.isMobile = false;
+			console.log('ACTIVE small-to-max');
+		});
+	};
 
-		
-		window.onload = function () {
-
-			//console.log('onload min-to-small:', breakpoints.active('min-to-small'));
-			//console.log('onload small-to-max:', breakpoints.active('small-to-max'));
-
-			data.isMobile = breakpoints.active('min-to-small');
-
-			var app = new Vue({
-				el: '#analisis',
-				data: data,
-				methods: {
-					nbsp: Utils.html.nbsp,
-				}
-			});
-
-
-			breakpoints.on('min-to-small', function () {
-				app.isMobile = true;
-				console.log('ACTIVE min-to-small');
-			});
-			breakpoints.on('small-to-max', function () {
-				app.isMobile = false;
-				console.log('ACTIVE small-to-max');
-			});
-		};
-
-	</script>
+</script>
 
 
 (% endblock %)

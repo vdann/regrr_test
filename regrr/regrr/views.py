@@ -756,6 +756,140 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 	str = helper_view.render_template_ext('patient_analysis_type_analysis.html', server = server)
 	return str
 
+
+#############################################################
+@app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis_print/<analysis_id>', methods=['GET'])
+def patient_analysis_type_analysis_print(patient_id, analysis_type, analysis_id):
+	"""Просмотр версии анализа для печати с фильтрацией по типам"""
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+	if user_role != db.UserRole.USER:
+		exceptions.abort(403)
+
+	page_num = request.args.get('page', 1, type=int)
+	page_size = 10
+
+	analysis_id_int = int_no_exc(analysis_id)
+	analysis_type_int = int_no_exc(analysis_type)
+	analysis_type_str = db.AnalysisTypeStr.get(analysis_type_int)
+
+	patient_fullname = None
+	patient_json = None
+	data = None
+
+	username = user_info.get('username')
+	pageData = helper_view.PageData(None, username, menus_user, menucur='/')
+	pageData.add_breadcrumb('Пациенты', '/')
+
+	with db.session_scope() as db_session:
+		db_patient = db_session.query(db.Patient).filter(
+			db.Patient.id == patient_id
+			)
+		db_patient = db_patient.first()
+		if db_patient:
+			patient_fullname = db_patient.getFullname()
+			patient_json = db_patient.toJson()
+
+			if analysis_type_str:
+				db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
+					db.Analysis.id == analysis_id,
+					db.Analysis.type == analysis_type,
+					db.Analysis.patient_id == patient_id,
+					db.Analysis.user_id == db.User.id
+				).first()
+
+				if db_query:
+					data = db_query.Analysis.toJson()
+					data['user'] = db.make_lastname_and_initials(db_query.lastname, db_query.firstname, db_query.middlename)
+					data['analysis_type'] = analysis_type
+
+					db_query = db_session.query(db.Analysis).filter(
+						db.Analysis.id > analysis_id,
+						db.Analysis.type == analysis_type,
+						db.Analysis.patient_id == patient_id,
+						db.Analysis.user_id == db.User.id
+						).order_by(db.Analysis.id.asc()).first()
+					if db_query:
+						u = url_for('patient_analysis_type_analysis_viewer',
+							patient_id=patient_id, analysis_type=analysis_type, analysis_id=db_query.id)
+						pageData.set_prev(u)
+					else:
+						pageData.set_prev()
+
+
+					db_query = db_session.query(db.Analysis).filter(
+						db.Analysis.id < analysis_id,
+						db.Analysis.type == analysis_type,
+						db.Analysis.patient_id == patient_id,
+						db.Analysis.user_id == db.User.id
+						).order_by(db.Analysis.id.desc()).first()
+					if db_query:
+						u = url_for('patient_analysis_type_analysis_viewer',
+							patient_id=patient_id, analysis_type=analysis_type, analysis_id=db_query.id)
+						pageData.set_next(u)
+					else:
+						pageData.set_next()
+
+
+	if not patient_fullname:
+		pageData.title = "#%s" % patient_id
+		pageData.add_breadcrumb(pageData.title)
+		pageData.add_breadcrumb(analysis_type_str if analysis_type_str else 'Неизвестный анализ #%s' % analysis_type)
+		pageData.add_breadcrumb('#%s' % analysis_id)
+		server = pageData.to_dict()
+		server['message'] = '<h2>Пациент, <b>"#%s"</b>, не найден!</h2>' % patient_id
+		str = helper_view.render_template_ext('page_message.html', server = server)
+		return str
+
+
+	patient_label = "%s (#%s)" % (patient_fullname, patient_id)
+	pageData.add_breadcrumb(helper_view.str_nbsp(patient_label), url_for('patient_view', patient_id=patient_id))
+
+
+	if not analysis_type_str:
+		pageData.title = "#%s" % patient_id
+		pageData.add_breadcrumb(pageData.title)
+		pageData.message = '<h2>Пациент, <b>"#%s"</b>, не найден!</h2>' % patient_id
+		str = helper_view.render_template_ext('page_message.html', server = pageData.to_dict())
+		return str
+
+
+	analysis_type_url = url_for('patient_analysis_type_analyzes_viewer',
+		patient_id=patient_id, analysis_type=analysis_type)
+
+	pageData.add_breadcrumb(analysis_type_str, analysis_type_url)
+	pageData.add_breadcrumb('#%s' % analysis_id)
+	pageData.title = '%s #%s' % (analysis_type_str, analysis_id)
+
+
+	if not data:
+		server = pageData.to_dict()
+		server['message'] = '<h2>%s, <b>"#%s"</b>, не найден!</h2>' % (analysis_type_str, analysis_id)
+		str = helper_view.render_template_ext('page_message.html', server = server)
+		return str
+
+	if analysis_type_int == db.AnalysisType.Биохимические_исследования:
+		data['tests'] = analisis_rules.tests_Биохимические_исследования
+	elif analysis_type_int == db.AnalysisType.Гемостаз:
+		data['tests'] = analisis_rules.tests_Гемостаз
+	elif analysis_type_int == db.AnalysisType.Клинический_анализ_крови:
+		data['tests'] = analisis_rules.tests_Клинический_анализ_крови
+	elif analysis_type_int == db.AnalysisType.Общий_анализ_мочи:
+		data['tests'] = analisis_rules.tests_Общий_анализ_мочи
+
+	data['patient'] = patient_json
+	data['analysis_type_str'] = analysis_type_str
+
+	server = pageData.to_dict()
+	server['isOk'] = True
+	server['data'] = helper_view.data_to_json(data)
+	server['patient_id'] = patient_id
+	server['analysis_type'] = analysis_type
+
+	str = helper_view.render_template_ext('patient_analysis_type_analysis_print.html', server = server)
+	return str
+
 #############################################################
 @app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add', methods=['GET'])
 def patient_analysis_type_analysis_add(patient_id, analysis_type):
@@ -888,13 +1022,19 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 	user_info = session.get(SESSION_KEY_USER)
 	user_id = user_info.get('id')
 
+	#analysis_id = None
 	analysis = db.Analysis(user_id, patient_id, analysis_type, result, data)
 	with db.session_scope() as db_session:
 		db_session.add(analysis)
+	
+	analysis_id = analysis.id		
 
 	#result = query.first() == None
 	result = True
-	return jsonify({'result': result})
+	return jsonify({
+		'result': result,
+		'analysis_id': analysis_id
+		})
 
 
 

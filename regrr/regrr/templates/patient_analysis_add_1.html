@@ -277,7 +277,7 @@
 
 
 
-
+		/*
 		function makeUrlFromRoute(route, params) {
 			for (key in params) {
 				var param = params[key];
@@ -290,13 +290,16 @@
 				console.warn('makeUrlFromRoute => Не все параметры маршрута заданы', route);
 
 			return route;
-		}
+		}*/
 
 		data.route_analysis_add = data.route_analysis_add
 			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add';
 
 		data.route_analysis_viewer = data.route_analysis_viewer
 			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis';
+
+		data.route_analysis_viewer_id = data.route_analysis_viewer_id
+			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis/<analysis_id>';
 
 		var icon_ok = 'fa fa-2x fa-check clr-green';
 		var icon_fail = 'fa fa-2x fa-exclamation-triangle clr-red';
@@ -342,7 +345,7 @@
 					var items = _.map(this.data.tests, 'result');
 
 					var me = this;
-					var url = makeUrlFromRoute(data.route_analysis_add, data);
+					var url = Utils.routes.makeUrlFromRoute(data.route_analysis_add, data);
 
 					var result = {
 						items: items
@@ -351,8 +354,11 @@
 					axios.post(url, result)
 					.then(function (response) {
 
-						var url = makeUrlFromRoute(data.route_analysis_viewer, data);
-						window.location.replace(url);
+						if (response.data.result) {
+							data.analysis_id = analysis_id;
+							var url = Utils.routes.makeUrlFromRoute(data);
+							window.location.replace(url);
+						}
 //						console.log(response.data.result);
 //						vm.username_icon = response.data.result ? icon_ok : icon_fail;
 					})

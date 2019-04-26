@@ -40,6 +40,24 @@ var Utils = (function () {
 	};
 
 	//------------------------------------
+	function makeUrlFromRoute(route, params) {
+		for (key in params) {
+			var param = params[key];
+			var t = typeof param;
+			if (t === 'string' || t === 'number')
+				route = route.replace(new RegExp('<' + key + '>', 'gm'), param);
+		}
+
+		if (/<\w+(\:\w*)*>/gm.test(route))
+			console.warn('makeUrlFromRoute => Не все параметры маршрута заданы', route);
+
+		return route;
+	}
+
+	export_.routes = {
+		makeUrlFromRoute: makeUrlFromRoute
+	};
+
 
 	return export_;
 })();
