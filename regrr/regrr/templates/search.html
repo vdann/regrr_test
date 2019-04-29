@@ -1,0 +1,179 @@
+﻿(% extends "layout.html" %)
+(% import "macros.html" as macros %)
+
+
+(% block block_head %)
+<style>
+	#app {
+		max-width: 700px;
+	}
+
+	.input-group {
+		position: relative;
+		display: -ms-flexbox;
+		display: flex;
+		-ms-flex-wrap: wrap;
+		flex-wrap: wrap;
+		-ms-flex-align: stretch;
+		align-items: stretch;
+		width: 100%;
+	}
+
+	.input-group-append {
+		margin-left: -1px;
+	}
+
+	.input-group-append, .input-group-prepend {
+		display: -ms-flexbox;
+		display: flex;
+	}
+
+	.input-group > .form-control {
+		position: relative;
+		-ms-flex: 1 1 auto;
+		flex: 1 1 auto;
+		width: 1%;
+		margin-bottom: 0;
+	}
+
+	.input-group > :not(:last-child) {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+
+	.input-group > :not(:first-child) {
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+	}
+
+	.input-group > input[type="text"] {
+		height: unset;
+	}
+
+	.input-group > .button.icon {
+		/*padding: 0 1.25em;*/
+	}
+
+	.input-group > .button.icon:before {
+		margin-right: 0;
+	}
+</style>
+(% endblock %)
+
+
+
+(% block content %)
+
+<div id="app">
+	<div class="input-group mb-1em">
+		<input type="text"
+			   class="form-control"
+			   placeholder="Поиск"
+			   :value="query"
+			   	@input="query = $event.target.value"
+			   >
+		<a class="input-group-append button primary icon fa-search" @click="search">
+		</a>
+	</div>
+
+	<p v-if="query == ''">
+		Введите строку для поиска
+	</p>
+	<p v-else-if="results.length == 0">
+		По запросу <b>'{{ query }}'</b> ничего не найдено
+	</p>
+	<p v-else>
+		По запросу <b>'{{ query }}'</b> {{ number_results_label }}
+	</p>
+
+	<br>
+
+	<div class="table-wrapper">
+		<table class="alt">
+			<tr v-for="result in results">
+				<td v-html="makeItemResult(result)"></td>
+			</tr>
+		</table>
+	</div>
+
+</div>
+
+<script>
+	var data = {};
+	try {
+		((server.data | safe));
+	}
+	catch (e) {
+		console.log('Серверные данные не были проинициализированы');
+	}
+
+	data = data || {};
+	data.query = data.query || '';
+	data.results = data.results || [];
+
+	/*
+	[{
+		text: 'Иванов Иван Иванович #1)',
+		url: '/patient/1',
+	}, {
+		text: 'Воробъев Илья Игоревич #2)',
+		url: '/patient/2',
+	}, {
+		text: 'Зырянов Станислав Александрович #3)',
+		url: '/patient/3',
+	}];
+	*/
+
+	var app = new Vue({
+		el: '#app',
+		data: data/*,
+		mounted: function () {
+			$('<script src="//static//_design//assets//js//main.js"><//script>')
+				.appendTo('body');
+		}*/,
+		computed: {
+			inputing: function () {
+				var v = this.editing && !this.saving;
+				return v;
+			},
+
+			number_results_label: function () {
+				var label_pre = Utils.text.declinationOfNumbers(this.results.length, ['найден', 'найдены', 'найдены']);
+				var label = Utils.text.declinationOfNumbers(this.results.length, ['результат', 'результата', 'результатов']);
+				var str = label_pre + ' ' + this.results.length + ' ' + label;
+				return str;
+			},
+		},
+		methods: {
+			makeItemResult: function (result) {
+				var str = '<a href="' + result.url + '">' + result.text + '</a>';
+				return str;
+			},
+
+			search: function () {
+				console.log('search', this.query);
+
+				//this.saving = true;
+
+				var me = this;
+				axios.post('/api/v1.0/search', { query: this.query })
+				.then(function (response) {
+
+					console.log(response.data.results);
+					me.results = response.data.results;
+
+					//me.saving = false;
+					//me.endEditing(response.data.result);
+				})
+				.catch(function (error) {
+					console.log('Error!');
+
+					//me.saving = false;
+					//me.endEditing(false);
+				});
+
+			}
+		}
+	});
+</script>
+(% endblock %)

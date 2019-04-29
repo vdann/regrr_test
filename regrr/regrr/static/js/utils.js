@@ -39,7 +39,48 @@ var Utils = (function () {
 		b: b
 	};
 
+
 	//------------------------------------
+	/*
+		var r = declinationOfNumbers(10, ['результат', 'результата', 'результатов']);
+		assert(r == 'результатов');
+	 */
+	function declinationOfNumbers(number, label_1, label_234, label_0_56789) {
+		if (_.isArray(label_1)) {
+			label_234 = label_1[1];
+			label_0_56789 = label_1[2];
+			label_1 = label_1[0];
+		}
+
+		number = Math.abs(number) % 100;
+		if (number > 10 && number < 20) {
+			return label_0_56789;
+		}
+
+		number = number % 10;
+		if (number > 1 && number < 5) {
+			return label_234;
+		}
+
+		if (number == 1) {
+			return label_1;
+		}
+
+		return label_0_56789;
+	}
+
+	export_.text = {
+		declinationOfNumbers: declinationOfNumbers
+	};
+
+
+	//------------------------------------
+	/*
+	    var route = '/tms/1.0.0/<id>/<z>/<x>/<y>.png';
+        var params = {id:'land', z:1, x:2, y:3};
+        var url = makeUrlFromRoute(route, params);
+		assert(url, '/tms/1.0.0/land/1/2/3.png');
+	 */
 	function makeUrlFromRoute(route, params) {
 		for (key in params) {
 			var param = params[key];

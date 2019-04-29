@@ -240,6 +240,7 @@
     <Content Include="regrr\templates\patient.html" />
     <Content Include="regrr\templates\patient_add.html" />
     <Content Include="regrr\templates\patient_analysis_type_analysis_print.html" />
+    <Content Include="regrr\templates\search.html" />
     <Content Include="regrr\templates\_src_index.html" />
     <Content Include="regrr\templates\user.html" />
     <Content Include="regrr\templates\user_add.html" />

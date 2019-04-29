@@ -4,6 +4,10 @@ Routes and views for the flask application.
 
 import json
 
+import pdfkit
+
+from sqlalchemy import or_
+
 from datetime import datetime
 from flask import redirect
 from flask import session
@@ -310,6 +314,116 @@ def profile_post():
 	return jsonify({'result': True})
 
 ################################################################
+@app.route("/search", methods=['GET'])
+def search():
+
+	user_info = session.get(SESSION_KEY_USER)
+
+	username = user_info.get('username')
+	user_role = user_info.get('role')
+
+	pageData = helper_view.PageData('Поиск', username, menus_user)
+	pageData.add_breadcrumb(pageData.title)
+
+	isAdmin = False
+	if user_role == db.UserRole.ADMIN:
+		isAdmin = True
+		pageData.menus = menus_admin
+		pageData.style_ext = '_red'
+
+	server = pageData.to_dict()
+	server['isAdmin'] = isAdmin
+	data = {}
+
+	with db.session_scope() as db_session:
+		db_query = db_session.query(db.User).filter(
+			db.User.id == user_info.get('id')
+			)
+		db_query = db_query.first()
+		data = db_query.toJson()
+
+	server['data'] = helper_view.data_to_json(data)
+	str = helper_view.render_template_ext('search.html', server = server)
+	return str
+
+################################################################
+def search_result(user_role, query):
+	data = {}
+	if not query or query == '':
+		return data
+
+	data['query'] = query
+	query = '%' + query + '%';
+	results = []
+
+	if user_role == db.UserRole.ADMIN:
+		with db.session_scope() as db_session:
+			db_query = db_session.query(db.User).filter(
+				or_(db.User.id.ilike(query),
+					db.User.firstname.ilike(query),
+					db.User.lastname.ilike(query),
+					db.User.middlename.ilike(query)
+					)
+				)
+			db_query = db_query.all()
+			for db_item in db_query:
+				results.append({
+					'text': "%s (#%s)" % (db_item.getFullname(), db_item.username),
+					'url': url_for('user_view', username=db_item.username)
+					})
+		data['results'] = results
+		return data
+
+	if user_role == db.UserRole.USER:
+		with db.session_scope() as db_session:
+			db_query = db_session.query(db.Patient).filter(
+				or_(db.Patient.id.ilike(query),
+					db.Patient.firstname.ilike(query),
+					db.Patient.lastname.ilike(query),
+					db.Patient.middlename.ilike(query)
+					)
+				)
+			db_query = db_query.all()
+			for db_item in db_query:
+				results.append({
+					'text': "%s (#%s)" % (db_item.getFullname(), db_item.id),
+					'url': url_for('patient_view', patient_id=db_item.id)
+					})
+		data['results'] = results
+		return data
+
+	return data
+
+
+@app.route("/search", methods=['POST'])
+def search_post():
+
+	query = request.form.get('query')
+
+	user_info = session.get(SESSION_KEY_USER)
+
+	username = user_info.get('username')
+	user_role = user_info.get('role')
+
+	pageData = helper_view.PageData('Поиск', username, menus_user)
+	pageData.add_breadcrumb(pageData.title)
+
+	if user_role == db.UserRole.ADMIN:
+		pageData.menus = menus_admin
+		pageData.style_ext = '_red'
+		server = pageData.to_dict()
+	elif user_role == db.UserRole.USER:
+		server = pageData.to_dict()
+	else:
+		abort(500)
+
+	data = search_result(user_role, query)
+	server['data'] = helper_view.data_to_json(data)
+	str = helper_view.render_template_ext('search.html', server = server)
+	return str
+
+
+################################################################
 @app.route('/user/<username>', methods=['GET'])
 def user_view(username):
 
@@ -523,12 +637,14 @@ def patient_add_post():
 	if not date_of_birth:
 		date_of_birth = '01.01.1900'
 
+	patient_id = None
 	patient = db.Patient(lastname, firstname, middlename, date_of_birth, department, diagnosis)
-
 	with db.session_scope() as db_session:
 		db_session.add(patient)
+		db_session.commit()
+		patient_id = patient.id
 
-	return redirect('/')
+	return redirect(url_for('patient_view', patient_id=patient_id))
 
 ################################################################
 @app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis', methods=['GET'])
@@ -775,6 +891,7 @@ def patient_analysis_type_analysis_print(patient_id, analysis_type, analysis_id)
 	analysis_type_str = db.AnalysisTypeStr.get(analysis_type_int)
 
 	patient_fullname = None
+	patient_lastname_and_initials = None
 	patient_json = None
 	data = None
 
@@ -789,6 +906,7 @@ def patient_analysis_type_analysis_print(patient_id, analysis_type, analysis_id)
 		db_patient = db_patient.first()
 		if db_patient:
 			patient_fullname = db_patient.getFullname()
+			patient_lastname_and_initials = db_patient.getLastnameAndInitials()
 			patient_json = db_patient.toJson()
 
 			if analysis_type_str:
@@ -869,6 +987,15 @@ def patient_analysis_type_analysis_print(patient_id, analysis_type, analysis_id)
 		str = helper_view.render_template_ext('page_message.html', server = server)
 		return str
 
+	server = pageData.to_dict()
+	server['isOk'] = True
+	server['patient'] = patient_json
+	server['patient_id'] = patient_id
+	server['patient_lastname_and_initials'] = patient_lastname_and_initials
+	server['analysis_type'] = analysis_type
+	server['analysis_type_str'] = analysis_type_str
+
+
 	if analysis_type_int == db.AnalysisType.Биохимические_исследования:
 		data['tests'] = analisis_rules.tests_Биохимические_исследования
 	elif analysis_type_int == db.AnalysisType.Гемостаз:
@@ -880,14 +1007,12 @@ def patient_analysis_type_analysis_print(patient_id, analysis_type, analysis_id)
 
 	data['patient'] = patient_json
 	data['analysis_type_str'] = analysis_type_str
-
-	server = pageData.to_dict()
-	server['isOk'] = True
 	server['data'] = helper_view.data_to_json(data)
-	server['patient_id'] = patient_id
-	server['analysis_type'] = analysis_type
 
-	str = helper_view.render_template_ext('patient_analysis_type_analysis_print.html', server = server)
+	#server['data'] = data
+
+	str = helper_view.render_template_ext('patient_analysis_type_analysis_pdf.html', server = server)
+	#pdf = pdfkit.from_string(str, False)
 	return str
 
 #############################################################
@@ -1061,6 +1186,21 @@ def api_test_username():
 		result = query.first() == None
 
 	return jsonify({'result': result})
+
+@app.route('/api/v1.0/search', methods=['POST'])
+def api_search():
+	if not request.json:
+		abort(400)
+
+	query = request.json.get('query', '')
+	if query == '':
+		abort(400)
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+
+	data = search_result(user_role, query)
+	return jsonify(data)
 
 ################################################################
 @app.route('/feedback', methods=['GET'])
