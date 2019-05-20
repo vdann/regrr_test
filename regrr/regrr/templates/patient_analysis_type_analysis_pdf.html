@@ -1,0 +1,243 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>(( server.patient_lastname_and_initials ))</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+
+	<style>
+		.pad {
+			padding: 2px 30px 2px 30px;
+		}
+
+		.h {
+			text-align: center;
+			font-size: 1.2em;
+		}
+
+		.w_100 {
+			width: 100%;
+		}
+
+		.w_50 {
+			width: 50%;
+		}
+
+		.a_center {
+			text-align: center;
+		}
+
+		.a_right {
+			text-align: right;
+		}
+
+		.a_left {
+			text-align: left;
+		}
+
+		.va_top {
+			vertical-align: top;
+		}
+
+		.va_bottom {
+			vertical-align: bottom;
+		}
+
+		.va_middle {
+			vertical-align: middle;
+		}
+
+		.table_grid {
+			border-collapse: collapse;
+			border: 1px solid black;
+		}
+
+		.fw_normal {
+			font-weight: normal;
+		}
+
+		.fw-bold {
+			font-weight: bold;
+		}
+
+		.fs_italic {
+			font-style: italic;
+		}
+
+		#table_tests > tbody > tr > td > div,
+		#table_tests > thead > tr > th > div {
+			height: 1.2em;
+			min-height: 1.2em;
+		}
+
+		@media print {
+			/* здесь будут стили для печати */
+			body {
+				font-size: 0.8em;
+			}
+		}
+
+		/* vue.js */
+		[v-cloak] {
+			display: none;
+		}
+	</style>
+
+	(( customutil.include_script_inline('static/_design/extern/lodash.js-v4.17.11/lodash.js') ))
+	(( customutil.include_script_inline('static/_design/extern/vue.js-v2.5.22/vue.js') ))
+	(( customutil.include_script_inline('static/_design/extern/moment.js-v2.24.0/moment.min.js') ))
+	(( customutil.include_script_inline('static/_design/extern/moment.js-v2.24.0/locale/ru.js') ))
+	(( customutil.include_script_inline('static/js/utils.js') ))
+
+	<!--
+	<script src="/static/_design/extern/lodash.js-v4.17.11/lodash.js"></script>
+	<script src="/static/_design/extern/vue.js-v2.5.22/vue.js"></script>
+	<script src="/static/_design/extern/moment.js-v2.24.0/moment.min.js"></script>
+	<script src="/static/_design/extern/moment.js-v2.24.0/locale/ru.js"></script>
+	<script src="/static/js/utils.js"></script>
+	-->
+</head>
+<body>
+
+	<div id="app" v-cloak>
+
+		<!--
+		<button v-on:click="prev">&larr;</button>
+		<span>{{ cur+1 }} из {{ count }}</span>
+		<button v-on:click="next">&rarr;</button>
+
+		<hr>
+		-->
+
+		<div class="h">Отделение лабораторной диагностики</div>
+
+		<hr>
+
+		<table class="w_100">
+			<tr>
+				<td class="w_50 va_top">
+					Пациент: <b>{{ patient.lastname_and_initials }}</b> Пол:&nbsp;<b>{{ patient.gender_str_short }}</b> <br />
+					Возраст: <b>{{ patient.age }}</b> <br />
+					Дата поступления образца: <b>{{ params.date_receipt_example }}</b>
+				</td>
+
+				<td class="w_50 va_top">
+					№ заявки: <b> {{ params.request_number }} </b> <br />
+					Заказчик: <b> {{ params.customer }} </b> <br />
+					Отделение: <b> {{ patient.department }} </b>
+				</td>
+			</tr>
+		</table>
+
+		<hr>
+
+		<div class="h"><b> {{ analysis_type_str }} </b></div>
+
+		<table id="table_tests" border="1" class="table_grid w_100">
+			<thead>
+				<tr>
+					<th class="fw_normal fs_italic" style="width: 48%"><div>Тест</div></th>
+					<th class="fw_normal fs_italic" style="width: 12%"><div>Результат</div></th>
+					<th class="fw_normal fs_italic" style="width: 20%"><div>Ед.&nbsp;изм.</div></th>
+					<th class="fw_normal fs_italic" style="width: 20%"><div>Референсные&nbsp;значения</div></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="test in tests">
+					<td v-html="test.name"><div></div></td>
+					<td class="pad a_center"><div v-html="test.valuef"></div></td>
+					<td class="pad a_center"><div v-html="nbsp(test.unit)"></div></td>
+					<td class="pad a_center"><div v-html="nbsp(test.refs)"></div></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div class="a_right">
+			<div>Исследованные биоматериалы: {{ params.biomaterials }} </div>
+			<div>Анализы выполнены на оборудовании: {{ params.equipment }} </div>
+		</div>
+
+		<div v-if="params.conclusion_note">
+			<hr>
+			<div><b>Заключение/Примечание:</b> <i>{{ params.conclusion_note }}</i></div>
+		</div>
+
+		<hr>
+
+		<table class="w_100">
+			<tr>
+				<td class="a_left va_bottom">
+					Исследование выполнил: <span v-html="research_performer"></span>
+				</td>
+
+				<td class="a_right va_bottom">
+					Дата доставки биоматериала: <b v-html="params.date_delivery_biomaterial"></b> <br />
+					Дата выполнения: <b v-html="params.date_completion"></b> <br />
+					Дата печати: <b v-html="params.date_print"></b> <br />
+				</td>
+			</tr>
+		</table>
+
+	</div>
+
+	<script>
+		var data = {};
+		try {
+			((server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы');
+		}
+
+		if (typeof data.data === 'string')
+			data.data = JSON.parse(data.data);
+
+		if (data.tests) {
+			for (var i = 0, n = data.tests.length; i < n; ++i) {
+				var test = data.tests[i];
+				test.value = data.data.items[i];
+				test.valuef = Utils.rules.value_get_descformat(test).value_format;
+			}
+		}
+
+		var age = moment(data.patient.date_of_birth, 'DD.MM.YYYY');
+		if (age.isValid())
+			age = age.fromNow(true);
+		else
+			age = '[---]';
+
+
+		data.patient.lastname_and_initials = data.patient.lastname + ' ' + data.patient.firstname[0] + '. ' + data.patient.middlename[0] + '.';
+		data.patient.lastname_and_initials = data.patient.lastname_and_initials.toUpperCase();
+		data.patient.gender_str_short = (data.patient.gender_str_short || 'М').toUpperCase();
+		data.patient.age = age;
+
+		data.research_performer = data.research_performer || data.user;
+		//data.patient.department
+
+		var dataParams = {
+			date_receipt_example: '[---]',
+			request_number: '[---]',
+			customer: '[---]', // НМИЦ онкологии
+			//department: '',
+			date_delivery_biomaterial: '[---]',
+			date_completion: '[---]',
+			date_print: '[---]',
+			biomaterials: '[---]', // Кровь (активатор свертывания и гель)
+			equipment: '[---]', // Architect c4000
+			conclusion_note: '', // Измерение Креатинина стандартизовано по методу IDMS
+		};
+
+		data.params = _.extend({}, dataParams, data.data.params);
+
+		var app = new Vue({
+			el: '#app',
+			data: data,
+			methods: {
+				nbsp: Utils.html.nbsp,
+			}
+		});
+
+	</script>
+</body>
+</html>

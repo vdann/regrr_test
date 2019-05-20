@@ -14,9 +14,18 @@
 	<div v-if="tests">
 
 		<ul class="alt">
-			<li><b>Исследование выполнил:</b> &nbsp;&nbsp;&nbsp; <span v-html="user"></span></li>
-			<li><b>Дата выполнения:</b> &nbsp;&nbsp;&nbsp; <span v-html="date_of_creation"></span></li>
-			<li><b>Результат:</b> &nbsp;&nbsp;&nbsp; <span v-html="result"></span></li>
+			<li><b>Дата поступления образца:</b> <span v-html="nbsps + data.params.date_receipt_example"></span></li>
+			<li><b>Дата доставки биоматериала:</b> <span v-html="nbsps + data.params.date_delivery_biomaterial"></span></li>
+			<li><b>Дата выполнения:</b><span v-html="nbsps + data.params.date_completion"></span></li>
+			<li><b>Дата печати:</b><span v-html="nbsps + data.params.date_print"></span></li>
+			<li><b>№ заявки:</b><span v-html="nbsps + data.params.request_number"></span></li>
+			<li><b>Заказчик:</b><span v-html="nbsps + data.params.customer"></span></li>
+			<li><b>Исследованные биоматериалы:</b><span v-html="nbsps + data.params.biomaterials"></span></li>
+			<li><b>Анализы выполнены на оборудовании:</b><span v-html="nbsps + data.params.equipment"></span></li>
+			<li><b>Заключение/Примечание:</b><span v-html="nbsps + data.params.conclusion_note"></span></li>
+			<li><b>Исследование выполнил:</b><span v-html="nbsps + user"></span></li>
+			<li><b>Дата фиксации:</b><span v-html="nbsps + date_of_creation"></span></li>
+			<li><b>Результат:</b><span v-html="nbsps + result"></span></li>
 		</ul>
 
 		<br>
@@ -67,9 +76,9 @@
 
 	<div v-else>
 		<ul class="alt">
-			<li><b>Исследование выполнил:</b> &nbsp;&nbsp;&nbsp; <span v-html="user"></span></li>
-			<li><b>Дата выполнения:</b> &nbsp;&nbsp;&nbsp; <span v-html="date_of_creation"></span></li>
-			<li><b>Результат:</b> &nbsp;&nbsp;&nbsp; <span v-html="result"></span></li>
+			<li><b>Исследование выполнил:</b><span v-html="nbsp('   ') + user"></span></li>
+			<li><b>Дата выполнения:</b><span v-html="nbsp('   ') + date_of_creation"></span></li>
+			<li><b>Результат:</b><span v-html="nbsp('   ') + result"></span></li>
 		</ul>
 
 		<br>
@@ -104,77 +113,38 @@
 </div>
 
 <script>
-	function str_to_num(s) {
-		s = s.replace(new RegExp(',', 'gm'), '.');
-		return +s;
-	}
-
-	function format_value(item) {
-
-		if (item.type == 'RANGE') {
-			var v = str_to_num(item.value);
-			if (isNaN(v))
-				return '<i>' + item.value + '</i>';
-
-			if (item.v1 > v || item.v2 < v)
-				return '<b>' + v.toFixed(item.digits) + '</b>';
-
-			return v.toFixed(item.digits);
-		}
-
-		if (item.type == 'LESS') {
-			var v = str_to_num(item.value);
-			if (isNaN(v))
-				return '<i>' + item.value + '</i>';
-
-			if (item.v1 < v)
-				return '<b>' + v.toFixed(item.digits) + '</b>';
-
-			return v.toFixed(item.digits);
-		}
-
-		if (item.type == 'MORE') {
-			var v = str_to_num(item.value);
-			if (isNaN(v))
-				return '<i>' + item.value + '</i>';
-
-			if (item.v1 > v)
-				return '<b>' + v.toFixed(item.digits) + '</b>';
-
-			return v.toFixed(item.digits);
-		}
-
-		return item.value;
-	}
 
 	var data = {};
 	try {
 		((server.data | safe));
 	}
 	catch (e) {
-		console.log('Серверные данные не были проинициализированы');
+		console.warn('Серверные данные не были проинициализированы');
 	}
 
 	if (typeof data.data === 'string')
 		data.data = JSON.parse(data.data);
 
-	if (data.tests) {
-		for (var i = 0, n = data.tests.length; i < n; ++i) {
-			var test = data.tests[i];
-			test.value = data.data.items[i];
-			test.valuef = format_value(test);
-		}
+
+	window.onload = function () {
 
 		var route = data.route_analysis_print_id || '/patient/<patient_id>/analysis_type/<analysis_type>/analysis_print/<analysis_id>';
 		data.analysis_id = data.id;
 		data.url_print = Utils.routes.makeUrlFromRoute(route, data);
-	}
+		data.nbsps = Utils.html.nbsp('    ');
 
+		if (data.tests) {
 
-	window.onload = function () {
-
-		//console.log('onload min-to-small:', breakpoints.active('min-to-small'));
-		//console.log('onload small-to-max:', breakpoints.active('small-to-max'));
+			if (data.tests.length != data.data.items.length)
+				console.warn('Количество тестов не равно количеству результатов');
+			else {
+				for (var i = 0, n = data.tests.length; i < n; ++i) {
+					var test = data.tests[i];
+					test.value = data.data.items[i];
+					test.valuef = Utils.rules.value_get_descformat(test).value_format;
+				}
+			}
+		}
 
 		data.isMobile = breakpoints.active('min-to-small');
 

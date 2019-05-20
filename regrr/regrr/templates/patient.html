@@ -3,17 +3,22 @@
 
 
 (% block block_head %)
+	(( moment.include_jquery(local_js='/static/_design/assets/js/jquery.min.js') ))
+	(( moment.include_moment(no_js=True) ))
+	(( moment.lang("ru") ))
 (% endblock %)
-
 
 
 (% block content %)
 
 	<ul class="alt">
-		<li><b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;<spin id="date_of_birth">(( server.patient.date_of_birth ))</spin></li>
-		<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
-		<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
-	</ul>
+	<li>
+		<b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;(( moment(server.patient.date_of_birth).format('DD.MM.YYYY') )) (<span>((moment(server.patient.date_of_birth).fromNow(true)))</span>)
+	</li>
+	<li><b>Пол:</b> &nbsp;&nbsp;&nbsp;(( server.patient.gender_str ))</li>
+	<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
+	<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
+</ul>
 
 	<br>
 
@@ -36,7 +41,7 @@
 	<script>
 		window.onload = function () {
 
-			moment.locale('ru');
+			/*moment.locale('ru');
 
 			var $date_of_birth = $('#date_of_birth');
 			var date_of_birth = $date_of_birth.text();
@@ -46,6 +51,7 @@
 				var str = m.fromNow(true);
 				$date_of_birth.after(' (' + str + ')');
 			}
+			*/
 		}
 	</script>
 

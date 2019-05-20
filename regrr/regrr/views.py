@@ -9,12 +9,15 @@ import pdfkit
 from sqlalchemy import or_
 
 from datetime import datetime
+from dateutil import parser
+
 from flask import redirect
 from flask import session
 from flask import request
 from flask import url_for
 from flask import abort
 from flask import jsonify
+from flask import make_response
 
 import werkzeug.exceptions as exceptions
 from sqlalchemy_pagination import paginate
@@ -353,7 +356,7 @@ def search_result(user_role, query):
 		return data
 
 	data['query'] = query
-	query = '%' + query + '%';
+	query = '%' + query.lower() + '%';
 	results = []
 
 	if user_role == db.UserRole.ADMIN:
@@ -526,6 +529,13 @@ AnalysisTypes = [
 	db.AnalysisType.Тест_VTE
 ]
 
+from dateutil.relativedelta import relativedelta
+
+def yearsago(years, from_date=None):
+    if from_date is None:
+        from_date = datetime.now()
+    return from_date - relativedelta(years=years)
+
 ################################################################
 @app.route('/patient/<patient_id>', methods=['GET'])
 def patient_view(patient_id):
@@ -547,7 +557,7 @@ def patient_view(patient_id):
 			)
 		db_patient = db_patient.first()
 		if db_patient:
-			j_patient = db_patient.toJson()
+			j_patient = db_patient.toJson(True)
 			patient_fullname = db_patient.getFullname()
 
 			db_query = db_session.query(db.Patient).filter(
@@ -580,6 +590,23 @@ def patient_view(patient_id):
 	server = pageData.to_dict()
 
 	server['isOk'] = True
+
+	date_of_birth = j_patient['date_of_birth']
+	#date_of_birth2 = parser.parse(date_of_birth)
+	date_of_birth2 = datetime.strptime(date_of_birth, '%d.%m.%Y')
+	
+	now = datetime.now()
+	delta = now - date_of_birth2
+
+	d = relativedelta(now, date_of_birth2)
+
+	#yearsago(date_of_birth2.year)
+	#j_patient['age'] = delta.years
+
+	j_patient['date_of_birth'] = date_of_birth2
+
+	j_patient['date_of_birth_str'] = date_of_birth2.strftime('%d.%m.%Y')
+
 	server['patient'] = j_patient
 
 	analysis_types = []
@@ -629,6 +656,7 @@ def patient_add_post():
 	lastname = request.form.get('lastname')
 	firstname = request.form.get('firstname')
 	middlename = request.form.get('middlename')
+	gender = request.form.get('gender', int(db.Gender.NOT_SPECIFIED))
 	date_of_birth = request.form.get('date_of_birth')
 	department = request.form.get('department')
 	#email = request.form.get('email')
@@ -638,7 +666,7 @@ def patient_add_post():
 		date_of_birth = '01.01.1900'
 
 	patient_id = None
-	patient = db.Patient(lastname, firstname, middlename, date_of_birth, department, diagnosis)
+	patient = db.Patient(lastname, firstname, middlename, gender, date_of_birth, department, diagnosis)
 	with db.session_scope() as db_session:
 		db_session.add(patient)
 		db_session.commit()
@@ -907,7 +935,7 @@ def patient_analysis_type_analysis_print(patient_id, analysis_type, analysis_id)
 		if db_patient:
 			patient_fullname = db_patient.getFullname()
 			patient_lastname_and_initials = db_patient.getLastnameAndInitials()
-			patient_json = db_patient.toJson()
+			patient_json = db_patient.toJson(True)
 
 			if analysis_type_str:
 				db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
@@ -992,6 +1020,7 @@ def patient_analysis_type_analysis_print(patient_id, analysis_type, analysis_id)
 	server['patient'] = patient_json
 	server['patient_id'] = patient_id
 	server['patient_lastname_and_initials'] = patient_lastname_and_initials
+	#server['patient_gender'] = patient_gender
 	server['analysis_type'] = analysis_type
 	server['analysis_type_str'] = analysis_type_str
 
@@ -1007,13 +1036,22 @@ def patient_analysis_type_analysis_print(patient_id, analysis_type, analysis_id)
 
 	data['patient'] = patient_json
 	data['analysis_type_str'] = analysis_type_str
+	#server['data'] = data
 	server['data'] = helper_view.data_to_json(data)
 
-	#server['data'] = data
 
 	str = helper_view.render_template_ext('patient_analysis_type_analysis_pdf.html', server = server)
-	#pdf = pdfkit.from_string(str, False)
+	# str = str.encode("utf-8")
 	return str
+
+	wkhtmltopdf = os.path.join(app.root_path, 'bin\\wkhtmltox-0.12.5-1.mxe-cross-win64\\wkhtmltopdf.exe')
+	configuration = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf)
+	pdf = pdfkit.from_string(str, False, configuration=configuration)
+
+	response = make_response(pdf)
+	response.headers.set('Content-Type', 'application/pdf')
+	response.headers.set('Content-Disposition', 'attachment', filename='analisis %s.pdf' % analysis_id)
+	return response
 
 #############################################################
 @app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis_add', methods=['GET'])
@@ -1123,9 +1161,6 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 	if not analysis_type_str:
 		abort(400)
 
-	data = {}
-	data['analysis_type'] = analysis_type_int
-	data['items'] = request.json.get('items')
 
 	if (
 		analysis_type_int == db.AnalysisType.Биохимические_исследования
@@ -1134,10 +1169,16 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 		or analysis_type_int == db.AnalysisType.Общий_анализ_мочи
 		):
 		result = ''
+		data = request.json
 	else:
 		result = request.json.get('result')
+		
+		data = {}
+		data['items'] = request.json.get('items')
 		data['points'] = request.json.get('points')
 		data['isRed'] = request.json.get('isRed')
+
+	data['analysis_type'] = analysis_type_int
 
 	data = json.dumps(data)
 	

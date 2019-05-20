@@ -5,81 +5,26 @@
 import json
 
 ############################################################
-
-tests_all = [{
-		#id: 1,
-		'name': 'АЛТ',
-		#result: '', // 24,00
-		'unit': 'Ед/л',
-		'refs': '0,00 - 55,00'
-	},
-	{
-		#id: 2,
-		'name': 'АСТ',
-		#result: '', // 19,00
-		'unit': 'Ед/л',
-		'refs': '5,00 - 34,00'
-	},
-	{
-		#id: 3,
-		'name': 'Белок общий',
-		#result: '', // 44,00
-		'unit': 'г/л',
-		'refs': '63,00 - 83,00'
-	},
-	{
-		#id: 4,
-		'name': 'Билирубин общий',
-		#result: '', // 6,00
-		'unit': 'мкмоль/л',
-		'refs': '3,40 - 20,50'
-	},
-	{
-		#id: 5,
-		'name': 'Глюкоза',
-		#result: '', // 6,19
-		'unit': 'мкмоль/л',
-		'refs': '3,89 - 5,83'
-	},
-	{
-		#id: 6,
-		'name': 'Креатинин',
-		#result: '', // 52,20
-		'unit': 'мкмоль/л',
-		'refs': '63,60 - 110,50'
-	},
-	{
-		#id: 7,
-		'name': 'Клубочковая фильтрация CKD-EPI Креатинин',
-		#result: '', // 111,56
-		'unit': 'мл/мин.1.73м^2',
-		'refs': '> 60,00'
-	},
-	{
-		id: 8,
-		'name': 'Мочевина',
-		#result: '', // 3,30
-		'unit': 'мкмоль/л',
-		'refs': '3,00 - 9,20'
-	},
-	{
-		id: 9,
-		'name': 'С-реактивный белок',
-		#result: '', // 61,90
-		'unit': 'мг/л',
-		'refs': '0,00 - 5,00'
-	},
-	]
-
-############################################################
 def num_to_str(num, digits):
 	return '{:.{}f}'.format(num, digits)
+
+def range_to_str(digits, min, max):
+	return '{:.{}f} - {:.{}f}'.format(min, digits, max, digits)
+
+def less_to_str(digits, v):
+	return '< {:.{}f}'.format(v, digits)
+
+def more_to_str(digits, v):
+	return '> {:.{}f}'.format(v, digits)
 
 ############################################################
 class RuleTYPES:
 	RANGE = 'RANGE'
 	LESS = 'LESS'
 	MORE = 'MORE'
+	NEG = 'NEG'
+	ANY = 'ANY'
+	STR = 'STR'
 
 ############################################################
 class Rules:
@@ -89,17 +34,28 @@ class Rules:
 	def __init__(self):
 		self.rules = {}
 
-	def add(self, name, unit, type, digits, v1, v2=None):
+	def add(self, name, unit, type, digits=None, v1=None, v2=None, refs=None):
 		if self.rules.get(name):
 			throw ('!')
 
-		refs = None
 		if type == self.TYPES.RANGE:
-			refs = '{:.{}f} - {:.{}f}'.format(v1, digits, v2, digits)
+			if not refs:
+				refs = range_to_str(digits, v1, v2)
 		elif type == self.TYPES.LESS:
-			refs = '< {:.{}f}'.format(v1, digits)
+			if not refs:
+				refs = less_to_str(digits, v1)
 		elif type == self.TYPES.MORE:
-			refs = '> {:.{}f}'.format(v1, digits)
+			if not refs:
+				refs = more_to_str(digits, v1)
+		elif type == self.TYPES.NEG:
+			if not refs:
+				refs = 'отриц.'
+		elif type == self.TYPES.ANY:
+			if not refs:
+				refs = ''
+		elif type == self.TYPES.STR:
+			if not refs:
+				refs = v1.lower()
 		else:
 			throw ('!')
 			
@@ -128,8 +84,8 @@ class Rules:
 rules = Rules()
 
 # Клинический_анализ_крови
-rules.add('Лейкоциты', 'x10<sup>9</sup>/л', Rules.TYPES.RANGE, 2, 4, 9);
-rules.add('Эритроциты', 'x10<sup>12</sup>/л', Rules.TYPES.RANGE, 2, 4, 5);
+rules.add('Лейкоциты (кровь)', 'x10<sup>9</sup>/л', Rules.TYPES.RANGE, 2, 4, 9);
+rules.add('Эритроциты (кровь)', 'x10<sup>12</sup>/л', Rules.TYPES.RANGE, 2, 4, 5);
 rules.add('Гемоглобин', 'г/л', Rules.TYPES.RANGE, 0, 130, 160);
 rules.add('Гематокрит', '%', Rules.TYPES.RANGE, 0, 40, 48);
 rules.add('Средний объем эритроцита', 'фл', Rules.TYPES.RANGE, 2, 80, 100);
@@ -171,7 +127,7 @@ rules.add('Альфа-Амилаза', 'Ед/л', Rules.TYPES.RANGE, 2, 25.00, 1
 rules.add('Белок общий', 'г/л', Rules.TYPES.RANGE, 2, 63, 83);
 rules.add('Билирубин общий', 'мкмоль/л', Rules.TYPES.RANGE, 2, 3.40, 20.50);
 rules.add('Билирубин прямой', 'мкмоль/л', Rules.TYPES.RANGE, 2, 0.00, 8.60);
-rules.add('Глюкоза', 'мкмоль/л', Rules.TYPES.RANGE, 2, 3.89, 5.83);
+rules.add('Глюкоза (кровь)', 'мкмоль/л', Rules.TYPES.RANGE, 2, 3.89, 5.83);
 rules.add('Креатинин', 'мкмоль/л', Rules.TYPES.RANGE, 2, 63.60, 110.50);
 #rules.add('Клубочковая фильтрация CKD-EPI Креатинин', 'мл/мин.1.73м^2', Rules.TYPES.RANGE, 2, 0, 55);
 rules.add('Клубочковая фильтрация CKD-EPI Креатинин', 'мл/мин.1.73м<sup>2</sup>', Rules.TYPES.MORE, 2, 60.00);
@@ -183,14 +139,38 @@ rules.add('С-реактивный белок', 'мг/л', Rules.TYPES.RANGE, 2,
 rules.add('Протромбиновое время', 'сек', Rules.TYPES.RANGE, 2, 9.80, 12.10);
 rules.add('МНО (международное нормализов. отношение)', '', Rules.TYPES.RANGE, 2, 0.85, 1.15);
 rules.add('Процент протромбина по Квику', '%', Rules.TYPES.RANGE, 1, 70, 130);
+rules.add('АПТВ тест', 'сек', Rules.TYPES.RANGE, 2, 23.40, 31.50);
+rules.add('Индекс АПТВ', '', Rules.TYPES.RANGE, 2, 0.89, 1.20);
+rules.add('Тромбиновое время', 'сек', Rules.TYPES.RANGE, 2, 14.00, 21.00);
+rules.add('Фибриноген', 'г/л', Rules.TYPES.RANGE, 2, 2.00, 4.00);
 
 # Общий анализ мочи
+rules.add('Глюкоза (моча)', 'ммоль/л', Rules.TYPES.LESS, 2, 1.70);
+rules.add('Белок', 'г/л', Rules.TYPES.LESS, 2, 0.10);
+rules.add('Билирубин', 'мкмоль/л', Rules.TYPES.NEG);
+rules.add('Уробилиноген', 'мкмоль/л', Rules.TYPES.LESS, 2, 34.00);
 rules.add('pH', '', Rules.TYPES.RANGE, 2, 4.50, 7.50);
+rules.add('Кровь', 'мг/л', Rules.TYPES.NEG);
+rules.add('Кетоны', 'ммоль/л', Rules.TYPES.NEG);
+rules.add('Нитриты', '', Rules.TYPES.NEG);
+rules.add('Лейкоциты', 'ЛЕЙК/мкл', Rules.TYPES.NEG); #+++++++++++++++
+rules.add('Лейкоциты (моча, наличие)', 'ЛЕЙК/мкл', Rules.TYPES.NEG);
+rules.add('Прозрачность', '', Rules.TYPES.ANY, refs='прозрачная');
 rules.add('Уделный вес', '', Rules.TYPES.RANGE, 3, 1.010, 1.025);
+rules.add('Цвет', '', Rules.TYPES.STR, v1='соломенно-желтый');
+rules.add('Эпителий плоский', 'в п/зр', Rules.TYPES.LESS, 0, 5);
+rules.add('Лейкоциты (моча, уровень)', 'в п/зр', Rules.TYPES.RANGE, 0, 0, 5);
+rules.add('Эритроциты (моча)', 'в п/зр', Rules.TYPES.RANGE, 0, 0, 5, refs='<5 ПВУ');
+rules.add('Слизь', 'в п/зр', Rules.TYPES.ANY, refs='< мало');
+rules.add('Сгустки лейкоцитов', 'в п/зр', Rules.TYPES.ANY, refs='< РЕДК');
+rules.add('Кристалл мочевой кислоты', 'в п/зр', Rules.TYPES.ANY, refs='отсуствует');
+rules.add('Оксалаты', 'в п/зр', Rules.TYPES.ANY, refs='< МАЛО');
+rules.add('Бактерии', 'в п/зр', Rules.TYPES.ANY, refs='< +');
+rules.add('Сперматозоиды', '', Rules.TYPES.ANY);
 
 rules_Клинический_анализ_крови = [
-	'Лейкоциты',
-	'Эритроциты',
+	'Лейкоциты (кровь)',
+	'Эритроциты (кровь)',
 	'Гемоглобин',
 	'Гематокрит',
 	'Средний объем эритроцита',
@@ -230,7 +210,7 @@ rules_Биохимические_исследования = [
 	'Белок общий',
 	'Билирубин общий',
 	'Билирубин прямой',
-	'Глюкоза',
+	'Глюкоза (кровь)',
 	'Креатинин',
 	'Клубочковая фильтрация CKD-EPI Креатинин',
 	'Липаза',
@@ -246,7 +226,11 @@ for r in rules_Биохимические_исследования:
 rules_Гемостаз = [
 	'Протромбиновое время',
 	'МНО (международное нормализов. отношение)',
-	'Процент протромбина по Квику'
+	'Процент протромбина по Квику',
+	'АПТВ тест',
+	'Индекс АПТВ',
+	'Тромбиновое время',
+	'Фибриноген',
 	]
 
 tests_Гемостаз = []
@@ -255,8 +239,27 @@ for r in rules_Гемостаз:
 
 # Общий_анализ_мочи
 rules_Общий_анализ_мочи = [
+	'Глюкоза (моча)',
+	'Белок',
+	'Билирубин',
+	'Уробилиноген',
 	'pH',
+	'Кровь',
+	'Кетоны',
+	'Нитриты',
+	'Лейкоциты (моча, наличие)',
+	'Прозрачность',
 	'Уделный вес',
+	'Цвет',
+	'Эпителий плоский',
+	'Лейкоциты (моча, уровень)',
+	'Эритроциты (моча)',
+	'Слизь',
+	'Сгустки лейкоцитов',
+	'Кристалл мочевой кислоты',
+	'Оксалаты',
+	'Бактерии',
+	'Сперматозоиды',
 	]
 
 tests_Общий_анализ_мочи = []

@@ -18,6 +18,7 @@ var Utils = (function () {
 
 
 	//------------------------------------
+	// icons
 	var icons = {};
 	icons.ok = 'fa fa-2x fa-check clr-green';
 	icons.fail = 'fa fa-2x fa-exclamation-triangle clr-red';
@@ -26,6 +27,7 @@ var Utils = (function () {
 	export_.icons = icons;
 
 	//------------------------------------
+	// html
 	function nbsp(s) {
 		return s.replace(/ /g, '&nbsp;');
 	}
@@ -41,6 +43,7 @@ var Utils = (function () {
 
 
 	//------------------------------------
+	// text
 	/*
 		var r = declinationOfNumbers(10, ['результат', 'результата', 'результатов']);
 		assert(r == 'результатов');
@@ -75,6 +78,7 @@ var Utils = (function () {
 
 
 	//------------------------------------
+	// routes
 	/*
 	    var route = '/tms/1.0.0/<id>/<z>/<x>/<y>.png';
         var params = {id:'land', z:1, x:2, y:3};
@@ -99,6 +103,103 @@ var Utils = (function () {
 		makeUrlFromRoute: makeUrlFromRoute
 	};
 
+	//------------------------------------
+	// rules
 
+	function str_to_num(s) {
+		s = s.replace(new RegExp(',', 'gm'), '.');
+		return +s;
+	}
+
+	function desc(value, is_valid, is_fail) {
+		return {
+			is_valid: is_valid,
+			is_fail: is_fail,
+			value_str: value,
+			value_format: value
+		};
+	}
+
+
+	function value_get_desc(item) {
+
+		if (item.type == 'RANGE') {
+			var v = str_to_num(item.value);
+			if (isNaN(v))
+				return desc(item.value);
+
+			if (item.v1 > v || item.v2 < v)
+				return desc(v.toFixed(item.digits), true, true);
+
+			return desc(v.toFixed(item.digits), true);
+		}
+
+		if (item.type == 'LESS') {
+			var v = str_to_num(item.value);
+			if (isNaN(v))
+				return desc(item.value);
+
+			if (item.v1 < v)
+				return desc(v.toFixed(item.digits), true, true);
+
+			return desc(v.toFixed(item.digits), true);
+		}
+
+
+		if (item.type == 'MORE') {
+			var v = str_to_num(item.value);
+			if (isNaN(v))
+				return desc(item.value);
+
+			if (item.v1 > v)
+				return desc(v.toFixed(item.digits), true, true);
+
+			return desc(v.toFixed(item.digits), true);
+		}
+
+		if (item.type == 'NEG') {
+			var v = str_to_num(item.value);
+			if (isNaN(v))
+				return desc(item.value);
+
+			if (v > 0)
+				return desc(v.toFixed(item.digits), true, true);
+
+			return desc(v.toFixed(item.digits), true);
+		}
+
+		if (item.type == 'ANY') {
+			return desc(item.value, true);
+		}
+
+		if (item.type == 'STR') {
+			var v = item.value.toLowerCase();
+			return desc(v, true, item.v1.toLowerCase() != v);
+		}
+
+		throw 'Неизвестный тип правила: ' + item.type;
+		return desc(item.value);
+	}
+
+
+	function value_get_descformat(item) {
+		var v = value_get_desc(item);
+
+		if (!v.is_valid)
+			v.value_format = '<i>' + v.value_str + '</i>';
+		else if (v.is_fail)
+			v.value_format = '<b>' + v.value_str + '</b>';
+
+		return v;
+	}
+
+
+	export_.rules = {
+		str_to_num: str_to_num,
+		value_get_desc: value_get_desc,
+		value_get_descformat: value_get_descformat
+	};
+
+	//------------------------------------
 	return export_;
 })();

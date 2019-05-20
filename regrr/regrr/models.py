@@ -45,7 +45,8 @@ def make_lastname_and_initials(lastname, firstname, middlename):
 	return str
 
 ########################################################################
-from enum import IntEnum
+from enum import Enum, IntEnum, unique
+@unique
 class UserRole(IntEnum):
 	ADMIN = 1
 	USER = 2
@@ -140,6 +141,37 @@ class User(Base):
 		return str
 
 
+@unique
+class ClassifEnum(Enum):
+
+	def __init__(self, value, label, label_short):
+
+		if not hasattr(self.__class__, '_int_to_member_'):
+			self.__class__._int_to_member_ = {}
+		
+		self._value_ = value
+		self.label = label
+		self.label_short = label_short
+
+		self.__class__._int_to_member_[value] = self
+
+	def __int__(self):
+		return self.value
+
+	@classmethod
+	def from_int(cls, num):
+		return cls._int_to_member_.get(num, None)
+
+@unique
+class Gender(ClassifEnum):
+	NOT_SPECIFIED = (0, 'не указан', '-')
+	MALE = (1, 'мужcкой', 'М')
+	FEMALE = (2, 'женский', 'Ж')
+
+gender2 = Gender.from_int(0)
+gender2 = Gender.from_int(1)
+gender2 = Gender.from_int(2)
+
 ########################################################################
 class Patient(Base):
 	"""Пациенты"""
@@ -153,6 +185,8 @@ class Patient(Base):
 	lastname = sa.Column(sa.String)
 	firstname = sa.Column(sa.String)
 	middlename = sa.Column(sa.String)
+	gender = sa.Column(sa.Integer)
+
 	date_of_birth = sa.Column(sa.String)
 
 	department = sa.Column(sa.String) # отделение
@@ -162,16 +196,22 @@ class Patient(Base):
 	#----------------------------------------------------------------------
 	def __init__(self,#username, password, role,
 		lastname, firstname, middlename,
+		gender,
 		date_of_birth,
 		department,
 		diagnosis):
 		""""""
+
+		if isinstance(gender, Gender):
+			gender = int(gender)
+
 		#self.username = username
 		#self.password = password
 		#self.role = role
 		self.lastname = lastname
 		self.firstname = firstname
 		self.middlename = middlename
+		self.gender = gender
 		self.date_of_birth = date_of_birth
 		self.department = department
 		self.diagnosis = diagnosis
@@ -179,7 +219,7 @@ class Patient(Base):
 	def __repr__(self):
 		return "<Patient (id: %s, %s %s %s)>" % (self.id, self.lastname, self.firstname, self.middlename)
 
-	def toJson(self):
+	def toJson(self, isStr=False):
 		j = {}
 		j['id'] = self.id
 		#j['username'] = self.username
@@ -188,13 +228,19 @@ class Patient(Base):
 		j['lastname'] = self.lastname
 		j['firstname'] = self.firstname
 		j['middlename'] = self.middlename
+		j['gender'] = self.gender
 		j['date_of_birth'] = self.date_of_birth
 		j['department'] = self.department
 		j['diagnosis'] = self.diagnosis
+
+		if isStr:
+			j['gender_str'] = Gender.from_int(self.gender).label
+			j['gender_str_short'] = Gender.from_int(self.gender).label_short
+
 		return j
 	
 	def getLastnameAndInitials(self):
-		str = "{} {}.{}.".format(self.lastname, self.firstname[0], self.middlename[0])
+		str = "{} {}. {}.".format(self.lastname, self.firstname[0], self.middlename[0])
 		return str
 
 	def getFullname(self):
@@ -372,13 +418,16 @@ def initTestUsers():
 
 	resultPatients = session.query(Patient).all()
 	if len(resultPatients) == 0:
-		patient = Patient('Набиев', 'Гасан', 'Набиевич', '01.01.1980', '9. Отделение анестезиологии-реанимации', 'Диагноз 1')
+		patient = Patient('Набиев', 'Гасан', 'Набиевич', Gender.MALE, '01.01.1980', '9. Отделение анестезиологии-реанимации', 'Диагноз 1')
 		session.add(patient)
 		
-		patient = Patient('Воробъев', 'Илья', 'Игоревич', '02.02.1965', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 2')
+		patient = Patient('Воробъев', 'Илья', 'Игоревич', Gender.MALE, '02.02.1965', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 2')
 		session.add(patient)
 
-		patient = Patient('Зырянов', 'Станислав', 'Александрович', '12.03.1970', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 3')
+		patient = Patient('Зырянов', 'Станислав', 'Александрович', Gender.MALE, '12.03.1970', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 3')
+		session.add(patient)
+
+		patient = Patient('Зырянова', 'Станислава', 'Александровна', Gender.FEMALE, '12.03.1971', '4. Хирургическое отделение абдоминальной онкологии', 'Диагноз 3')
 		session.add(patient)
 
 
@@ -402,7 +451,7 @@ def initTestUsers():
 	resultPatients = session.query(Patient).count()
 	if resultPatients < 10:
 		for i in range(1, 80):
-			patient = Patient('Набиев' + str(i), 'Гасан', 'Набиевич', '01.01.1980', '9. Отделение анестезиологии-реанимации', 'Диагноз 1')
+			patient = Patient('Набиев' + str(i), 'Гасан', 'Набиевич', Gender.NOT_SPECIFIED, '01.01.1980', '9. Отделение анестезиологии-реанимации', 'Диагноз 1')
 			session.add(patient)
 
 

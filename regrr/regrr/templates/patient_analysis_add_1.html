@@ -115,6 +115,116 @@
 			</li>
 		</ul>
 
+		<div class="table-wrapper" style="max-width:800px;">
+			<table class="alt1" style="border-collapse: unset;">
+				<tbody>
+					<tr>
+						<td v-html="nbsp('Дата поступления образца')"></td>
+						<td width="100%">
+							<input type="text"
+								:value="data.date_receipt_example"
+								@input="data.date_receipt_example = $event.target.value"
+								placeholder="Дата поступления образца"
+							    />
+						</td>
+					</tr>
+
+					<tr>
+						<td v-html="nbsp('Дата доставки биоматериала')"></td>
+						<td width="100%">
+							<input type="text"
+   								:value="data.date_delivery_biomaterial"
+								@input="data.date_delivery_biomaterial = $event.target.value"
+								placeholder="Дата доставки биоматериала"
+							    />
+						</td>
+					</tr>
+
+					<tr>
+						<td v-html="nbsp('Дата выполнения')"></td>
+						<td width="100%">
+							<input type="text"
+   								:value="data.date_completion"
+								@input="data.date_completion = $event.target.value"
+								placeholder="Дата выполнения"
+							    />
+						</td>
+					</tr>
+
+					<tr>
+						<td v-html="nbsp('Дата печати')"></td>
+						<td width="100%">
+							<input type="text"
+   								:value="data.date_print"
+								@input="data.date_print = $event.target.value"
+								placeholder="Дата печати"
+							    />
+						</td>
+					</tr>
+
+					<tr>
+						<td v-html="nbsp('№ заявки')"></td>
+						<td width="100%">
+							<input type="text"
+   								:value="data.request_number"
+								@input="data.request_number = $event.target.value"
+								placeholder="№ заявки"
+							    />
+						</td>
+					</tr>
+
+					<tr>
+						<td v-html="nbsp('Заказчик')"></td>
+						<td width="100%">
+							<input type="text"
+   								:value="data.customer"
+								@input="data.customer = $event.target.value"
+								placeholder="Заказчик"
+							    />
+							
+						</td>
+					</tr>
+
+					<tr>
+						<td v-html="nbsp('Исследованные биоматериалы')"></td>
+						<td width="100%">
+							<input type="text"
+   								:value="data.biomaterials"
+								@input="data.biomaterials = $event.target.value"
+								placeholder="Исследованные биоматериалы"
+							    />
+						</td>
+					</tr>
+
+					<tr>
+						<td v-html="nbsp('Анализы выполнены на оборудовании')"></td>
+						<td width="100%">
+							<input type="text"
+   								:value="data.equipment"
+								@input="data.equipment = $event.target.value"
+								placeholder="Анализы выполнены на оборудовании"
+							    />
+						</td>
+					</tr>
+
+					<tr>
+						<td v-html="nbsp('Заключение/Примечание')"></td>
+						<td width="100%">
+							<textarea 
+   								:value="data.conclusion_note"
+								@input="data.conclusion_note = $event.target.value"
+								placeholder="Заключение/Примечание"
+							    rows="4"
+								></textarea>
+						</td>
+					</tr>
+
+				</tbody>
+			</table>
+		</div>
+
+		<br>
+
 		<div class="table-wrapper">
 			<table class="alt1">
 				<thead>
@@ -183,20 +293,40 @@
 			}
 		];
 
-		var dataDef = {
-			analysis_str: 'Биохимические исследования', // 'Клинический анализ крови', 
-			patient: 'Иванов И.И.',
-			gender: 'м',
-			age: 40,
-			date_receipt_example: '18.04.2019',
-			number_request: 12345,
-			customer: '',
-			department: '',
-			tests: tests
+		*/
+
+		var dataConst = {
+			analysis_str: 'Не задано', // 'Биохимические исследования', // 'Клинический анализ крови', 
+			patient: 'Не задано', //'Иванов И.И.',
+			//gender: 'м',
+			//age: 40,
 		};
 
-		data = _.extend({}, dataDef, data);
-		*/
+		var dataDef = {
+			date_receipt_example: moment().format('DD.MM.YYYY'),
+			request_number: '',
+			customer: '', // НМИЦ онкологии
+			//department: '',
+			date_delivery_biomaterial: moment().subtract(2, 'hours').format('DD.MM.YYYY HH:mm'),
+			date_completion: moment().format('DD.MM.YYYY HH:mm'),
+			date_print: moment().format('DD.MM.YYYY'),
+			biomaterials: '', // Кровь (активатор свертывания и гель)
+			equipment: '', // Architect c4000
+			conclusion_note: '', // Измерение Креатинина стандартизовано по методу IDMS
+			//tests: tests
+		};
+
+		var dataTest = {
+			request_number: '12345',
+			customer: 'НМИЦ онкологии',
+			biomaterials: 'Кровь (активатор свертывания и гель)',
+			equipment: 'Architect c4000',
+			conclusion_note: 'Измерение Креатинина стандартизовано по методу IDMS'
+		};
+
+		//data = _.extend({}, dataDef, /*dataTest, */data);
+		data = _.extend({}, dataDef, dataTest, data);
+
 
 		for (var i = 0, n = data.tests.length; i < n; ++i) {
 			var test = data.tests[i];
@@ -248,10 +378,19 @@
 					sendResult: function () {
 						var this2 = this;
 						this2.isSending = true;
+
+						//var keys = _.keys(dataDef);
+						var result = {};
+						var params = {};
+						for (var k in dataDef) {
+							params[k] = this.data[k];
+						}
+						result['params'] = params;
+
 						var items = _.map(this.data.tests, 'result');
-						var result = {
-							items: items
-						};
+						result['items'] = items;
+
+						//console.log('Error!');
 
 						axios.post(url_analysis_add, result)
 						.then(function (response) {
