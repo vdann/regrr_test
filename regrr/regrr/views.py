@@ -356,7 +356,8 @@ def search_result(user_role, query):
 		return data
 
 	data['query'] = query
-	query = '%' + query.lower() + '%';
+	#query = '%' + query.lower() + '%';
+	query = '%' + query + '%';
 	results = []
 
 	if user_role == db.UserRole.ADMIN:
