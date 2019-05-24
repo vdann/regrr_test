@@ -172,6 +172,12 @@ gender2 = Gender.from_int(0)
 gender2 = Gender.from_int(1)
 gender2 = Gender.from_int(2)
 
+
+@unique
+class PatientStatus(IntEnum):
+	NORMAL = 1
+	ARCHIVE = 2
+
 ########################################################################
 class Patient(Base):
 	"""Пациенты"""
@@ -191,6 +197,7 @@ class Patient(Base):
 
 	department = sa.Column(sa.String) # отделение
 	diagnosis = sa.Column(sa.String) # диагноз
+	status = sa.Column(sa.String)
 
 
 	#----------------------------------------------------------------------
@@ -215,6 +222,7 @@ class Patient(Base):
 		self.date_of_birth = date_of_birth
 		self.department = department
 		self.diagnosis = diagnosis
+		self.status = PatientStatus.NORMAL
 
 	def __repr__(self):
 		return "<Patient (id: %s, %s %s %s)>" % (self.id, self.lastname, self.firstname, self.middlename)
@@ -232,6 +240,7 @@ class Patient(Base):
 		j['date_of_birth'] = self.date_of_birth
 		j['department'] = self.department
 		j['diagnosis'] = self.diagnosis
+		j['status'] = self.status
 
 		if isStr:
 			j['gender_str'] = Gender.from_int(self.gender).label

@@ -3,56 +3,206 @@
 
 
 (% block block_head %)
-	(( moment.include_jquery(local_js='/static/_design/assets/js/jquery.min.js') ))
-	(( moment.include_moment(no_js=True) ))
-	(( moment.lang("ru") ))
+<style>
+	.alert {
+		color: red !important;
+		border-color: red !important;
+		box-shadow: inset 0 0 0 2px red;
+	}
+
+		.alert:hover {
+			color: red !important;
+			border-color: red !important;
+			box-shadow: inset 0 0 0 2px red;
+			background-color: rgba(245, 106, 106, 0.15);
+		}
+
+	.animate {
+		transition: all 200ms ease-in;
+	}
+
+	.animate-rotate {
+		transition: transform 200ms ease-in;
+	}
+
+	.rotate-180 {
+		transform: rotate(180deg);
+		/*	transition: transform 180ms ease-in;*/
+	}
+</style>
 (% endblock %)
 
 
 (% block content %)
 
-	<ul class="alt">
-	<li>
-		<b>Дата рождения:</b> &nbsp;&nbsp;&nbsp;(( moment(server.patient.date_of_birth).format('DD.MM.YYYY') )) (<span>((moment(server.patient.date_of_birth).fromNow(true)))</span>)
-	</li>
-	<li><b>Пол:</b> &nbsp;&nbsp;&nbsp;(( server.patient.gender_str ))</li>
-	<li><b>Отеделение:</b> &nbsp;&nbsp;&nbsp;(( server.patient.department ))</li>
-	<li><b>Диагноз:</b> &nbsp;&nbsp;&nbsp;(( server.patient.diagnosis ))</li>
-</ul>
 
+<div id="app" v-cloak>
+
+	<div>
+		&nbsp;
+		<a style="padding: 0 1.5em;"
+		   class="button f-right animate"
+		   v-bind:class="{alert: !is_archive}"
+		   v-bind:title="is_archive ? 'Из архива' : 'В архив'"
+		   @click="archive">
+			<i style="vertical-align: middle;"
+			   class="fa fa-2x fa-long-arrow-right animate-rotate"
+			   v-bind:class="{'rotate-180': is_archive}"></i>
+			&nbsp;&nbsp;&nbsp;
+			<i class="fa fa-2x fa-archive" style="vertical-align: middle;"></i>
+		</a>
+	</div>
+	<br>
 	<br>
 
-	<div class="row">
-		<div class="col-10 col-12-small">
+	<div class="animate"
+		 v-bind:class="{disabled: is_archive}">
+
+		<ul class="alt">
+			<li><b>Дата рождения:</b><span v-html="nbsps + patient.date_of_birth"></span></li>
+			<li><b>Пол:</b><span v-html="nbsps + patient.gender_str"></span></li>
+			<li><b>Отеделение:</b><span v-html="nbsps + patient.department"></span></li>
+			<li><b>Диагноз:</b><span v-html="nbsps + patient.diagnosis"></span></li>
+		</ul>
+
+		<br>
+
+		<section v-for="(group, i) in groups">
+			<header class="major">
+				<h2 style="margin-bottom: 1em;">{{ group.name }}</h2style=>
+			</header>
+
 			<div class="row">
+				<div class="col-10 col-12-small">
+					<div class="row">
 
-				(% for item in server.analysis_types %)
-				<div class="col-4 col-6-xlarge col-12-small mb-1_5em">
-					<a href="/patient/(( server.patient.id ))/analysis_type/(( item.id ))/analysis" class="button fit primary">
-						(( item.text ))
-					</a>
+						<div class="col-4 col-6-xlarge col-12-small mb-1_5em"
+							 v-for="analysis in group.analyzes">
+							<a class="button fit primary"
+							   v-bind:class="{disabled: is_archive}"
+							   v-bind:href="makeUrlAnalisis(analysis.analysis_type)">
+								{{ analysis.analysis_type_str }}
+							</a>
+						</div>
+
+					</div>
 				</div>
-				(% endfor %)
-
 			</div>
-		</div>
+			<br>
+		</section>
+
 	</div>
+</div>
 
-	<script>
-		window.onload = function () {
+<script>
 
-			/*moment.locale('ru');
+	var data = {};
+	try {
+		((server.data | safe));
+	}
+	catch (e) {
+		console.warn('Серверные данные не были проинициализированы');
+	}
 
-			var $date_of_birth = $('#date_of_birth');
-			var date_of_birth = $date_of_birth.text();
 
-			var m = moment(date_of_birth, 'DD.MM.YYYY');
-			if (m.isValid()) {
-				var str = m.fromNow(true);
-				$date_of_birth.after(' (' + str + ')');
-			}
-			*/
+	window.onload = function () {
+
+		moment.locale('ru');
+
+		//
+		var m = moment(data.patient.date_of_birth, 'DD.MM.YYYY');
+		if (m.isValid()) {
+			data.patient.date_of_birth += ' (' + m.fromNow(true) + ')';
 		}
-	</script>
+
+
+		var route_analysis = "/patient/<patient_id>/analysis_type/<analysis_type>/analysis";
+		var route_api_status = "/api/v1.0/patient/<patient_id>/status";
+		route_api_status = Utils.routes.makeUrlFromRoute(route_api_status, { patient_id: data.patient.id });
+
+		var groups = [{
+			name: 'Кровь',
+			analyzes: [{
+				analysis_type: 1,
+				analysis_type_str: 'Биохимические исследования',
+			}, {
+				analysis_type: 2,
+				analysis_type_str: 'Гемостаз',
+			}, {
+				analysis_type: 3,
+				analysis_type_str: 'Клинический анализ крови',
+			}]
+		}, {
+			name: 'Моча',
+			analyzes: [{
+				analysis_type: 4,
+				analysis_type_str: 'Общий анализ мочи. Химические свойства',
+			}]
+		}, {
+			name: 'Остальные',
+			analyzes: [{
+				analysis_type: 5,
+				analysis_type_str: 'Тест NEWS',
+			}, {
+				analysis_type: 6,
+				analysis_type_str: 'Тест VTE',
+			}]
+		}];
+
+		data.groups = groups;
+		data.nbsps = Utils.html.nbsp('    ');
+
+		var app = new Vue({
+			el: '#app',
+			data: data,
+			computed: {
+				is_archive: function () {
+					return this.patient.status == 2;
+				}
+			},
+			methods: {
+				makeUrlAnalisis: function (analysis_type) {
+					var params = { patient_id: this.patient.id, analysis_type: analysis_type };
+					return Utils.routes.makeUrlFromRoute(route_analysis, params);
+				},
+
+				archive: function () {
+					if (this.patient.status != 2)
+						this.patient.status = 2;
+					else
+						this.patient.status = 1;
+
+					axios.post(route_api_status, {
+						status: this.patient.status
+					})
+					.then(function (response) {
+						console.log(response.data.result);
+						//vm.username_icon = response.data.result ? icon_ok : icon_fail;
+					})
+					.catch(function (error) {
+						//vm.username_icon = icon_fail;
+						console.log('Error!');
+					});
+				}
+			}
+		});
+
+		//;
+
+		//status
+
+		/*moment.locale('ru');
+
+		var $date_of_birth = $('#date_of_birth');
+		var date_of_birth = $date_of_birth.text();
+
+		var m = moment(date_of_birth, 'DD.MM.YYYY');
+		if (m.isValid()) {
+			var str = m.fromNow(true);
+			$date_of_birth.after(' (' + str + ')');
+		}
+		*/
+	}
+</script>
 
 (% endblock %)

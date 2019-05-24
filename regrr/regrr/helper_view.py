@@ -102,7 +102,7 @@ def pagination_ext(pagination, page_cur, page_size, endpoint, **values):
 
 ############################################################
 def data_to_json(data):
-	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False) + ';'
+	data = 'data = ' + json.dumps(data, indent=4,  ensure_ascii=False, default=str) + ';'
 	return data
 
 ############################################################

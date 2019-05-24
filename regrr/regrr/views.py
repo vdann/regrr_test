@@ -594,6 +594,7 @@ def patient_view(patient_id):
 
 	date_of_birth = j_patient['date_of_birth']
 	#date_of_birth2 = parser.parse(date_of_birth)
+	"""
 	date_of_birth2 = datetime.strptime(date_of_birth, '%d.%m.%Y')
 	
 	now = datetime.now()
@@ -607,7 +608,7 @@ def patient_view(patient_id):
 	j_patient['date_of_birth'] = date_of_birth2
 
 	j_patient['date_of_birth_str'] = date_of_birth2.strftime('%d.%m.%Y')
-
+	"""
 	server['patient'] = j_patient
 
 	analysis_types = []
@@ -618,6 +619,13 @@ def patient_view(patient_id):
 			})
 
 	server['analysis_types'] = analysis_types
+
+	server['PatientStatus'] = db.PatientStatus
+
+	data = {}
+	#data['username'] = username
+	data['patient'] = j_patient
+	server['data'] = helper_view.data_to_json(data)
 
 	str = helper_view.render_template_ext('patient.html', server = server)
 	return str
@@ -1243,6 +1251,37 @@ def api_search():
 
 	data = search_result(user_role, query)
 	return jsonify(data)
+
+@app.route('/api/v1.0/patient/<patient_id>/status', methods=['POST'])
+def api_patient_status(patient_id):
+	if not request.json:
+		abort(400)
+
+	status = request.json.get('status', None)
+	if status == None:
+		abort(400)
+
+	if status not in db.PatientStatus._value2member_map_:
+		abort(400)
+
+	user_info = session.get(SESSION_KEY_USER)
+	user_role = user_info.get('role')
+
+	result = False
+	with db.session_scope() as db_session:
+		db_patient = db_session.query(db.Patient).filter(
+			db.Patient.id == patient_id
+			)
+		db_patient = db_patient.first()
+		if db_patient:
+			if db_patient.status == status:
+				result = True
+			else:
+				db_patient.status = status
+				result = True
+				db_session.commit()
+
+	return jsonify({'result': result})
 
 ################################################################
 @app.route('/feedback', methods=['GET'])

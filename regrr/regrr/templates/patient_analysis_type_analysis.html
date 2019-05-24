@@ -14,15 +14,15 @@
 	<div v-if="tests">
 
 		<ul class="alt">
-			<li><b>Дата поступления образца:</b> <span v-html="nbsps + data.params.date_receipt_example"></span></li>
-			<li><b>Дата доставки биоматериала:</b> <span v-html="nbsps + data.params.date_delivery_biomaterial"></span></li>
-			<li><b>Дата выполнения:</b><span v-html="nbsps + data.params.date_completion"></span></li>
-			<li><b>Дата печати:</b><span v-html="nbsps + data.params.date_print"></span></li>
-			<li><b>№ заявки:</b><span v-html="nbsps + data.params.request_number"></span></li>
-			<li><b>Заказчик:</b><span v-html="nbsps + data.params.customer"></span></li>
-			<li><b>Исследованные биоматериалы:</b><span v-html="nbsps + data.params.biomaterials"></span></li>
-			<li><b>Анализы выполнены на оборудовании:</b><span v-html="nbsps + data.params.equipment"></span></li>
-			<li><b>Заключение/Примечание:</b><span v-html="nbsps + data.params.conclusion_note"></span></li>
+			<li><b>Дата поступления образца:</b> <span v-html="nbsps + params.date_receipt_example"></span></li>
+			<li><b>Дата доставки биоматериала:</b> <span v-html="nbsps + params.date_delivery_biomaterial"></span></li>
+			<li><b>Дата выполнения:</b><span v-html="nbsps + params.date_completion"></span></li>
+			<li><b>Дата печати:</b><span v-html="nbsps + params.date_print"></span></li>
+			<li><b>№ заявки:</b><span v-html="nbsps + params.request_number"></span></li>
+			<li><b>Заказчик:</b><span v-html="nbsps + params.customer"></span></li>
+			<li><b>Исследованные биоматериалы:</b><span v-html="nbsps + params.biomaterials"></span></li>
+			<li><b>Анализы выполнены на оборудовании:</b><span v-html="nbsps + params.equipment"></span></li>
+			<li><b>Заключение/Примечание:</b><span v-html="nbsps + params.conclusion_note"></span></li>
 			<li><b>Исследование выполнил:</b><span v-html="nbsps + user"></span></li>
 			<li><b>Дата фиксации:</b><span v-html="nbsps + date_of_creation"></span></li>
 			<li><b>Результат:</b><span v-html="nbsps + result"></span></li>
@@ -145,6 +145,21 @@
 				}
 			}
 		}
+
+		var dataParams = {
+			date_receipt_example: '[---]',
+			request_number: '[---]',
+			customer: '[---]', // НМИЦ онкологии
+			//department: '',
+			date_delivery_biomaterial: '[---]',
+			date_completion: '[---]',
+			date_print: '[---]',
+			biomaterials: '[---]', // Кровь (активатор свертывания и гель)
+			equipment: '[---]', // Architect c4000
+			conclusion_note: '', // Измерение Креатинина стандартизовано по методу IDMS
+		};
+
+		data.params = _.extend({}, dataParams, data.data.params);
 
 		data.isMobile = breakpoints.active('min-to-small');
 
