@@ -29,6 +29,15 @@
 		transform: rotate(180deg);
 		/*	transition: transform 180ms ease-in;*/
 	}
+
+	.disable {
+		opacity: 0.5;
+	}
+
+	.disable .button {
+	    pointer-events: none;
+	}
+
 </style>
 (% endblock %)
 
@@ -56,7 +65,7 @@
 	<br>
 
 	<div class="animate"
-		 v-bind:class="{disabled: is_archive}">
+		 v-bind:class="{disable: is_archive}">
 
 		<ul class="alt">
 			<li><b>Дата рождения:</b><span v-html="nbsps + patient.date_of_birth"></span></li>
@@ -79,7 +88,6 @@
 						<div class="col-4 col-6-xlarge col-12-small mb-1_5em"
 							 v-for="analysis in group.analyzes">
 							<a class="button fit primary"
-							   v-bind:class="{disabled: is_archive}"
 							   v-bind:href="makeUrlAnalisis(analysis.analysis_type)">
 								{{ analysis.analysis_type_str }}
 							</a>
@@ -136,7 +144,7 @@
 			name: 'Моча',
 			analyzes: [{
 				analysis_type: 4,
-				analysis_type_str: 'Общий анализ мочи. Химические свойства',
+				analysis_type_str: 'Общий анализ мочи',
 			}]
 		}, {
 			name: 'Остальные',
