@@ -82,7 +82,7 @@
 
 					<div class="content">
 
-						<header class="major1 mb-2em">
+						<header class="major1 mb-2em" id="nav_context" style="opacity:0;">
 							(% if server.breadcrumbs %)
 
 							<!--Breadcrumbs-->
@@ -259,6 +259,15 @@
 	<script src="/static/_design/assets/js/breakpoints.min.js"></script>
 	<script src="/static/_design/assets/js/util.js"></script>
 	<script src="/static/_design/assets/js/main.js"></script>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function (event) {
+			console.log('document.addEventListener("DOMContentLoaded") layout');
+			$('#nav_context').css('opacity', 1);
+		});
+
+	</script>
+
 
 </body>
 </html>

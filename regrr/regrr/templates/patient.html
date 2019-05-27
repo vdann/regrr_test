@@ -112,20 +112,56 @@
 		console.warn('Серверные данные не были проинициализированы');
 	}
 
-	var el_breadcrumb = document.querySelectorAll('.breadcrumbs a')[0];
+	function setMenuCur(text0) {
+		var $menu = $('nav#menu ul');
 
-	if (data.patient.status == 2) {
-		el_breadcrumb.innerText = 'Архив';
+		setMenuCur = function (text) {
+			var $item = $menu.find('.active');
+			if ($item.length) {
+				var $a = $item.find('a');
+				if ($a.text().trim() == text)
+					return;
+
+				$item.removeClass('active');
+			}
+
+			if (!text || text == '')
+				return;
+
+			//text = text.toUpperCase();
+
+			$item = $menu.find('a:contains(' + text + ')');
+			if (!$item.length)
+				return;
+
+			$item.parent().addClass('active');
+		};
+
+		setMenuCur(text0);
+	}
+
+	function setStatusArchive(isArchive) {
+		var el_breadcrumb = document.querySelectorAll('.breadcrumbs a')[0];
+		if (isArchive) {
+			el_breadcrumb.innerText = 'Архив';
+			el_breadcrumb.href = '/archive';
+			setMenuCur('Архив');
+		}
+		else {
+			el_breadcrumb.innerText = 'Пациенты';
+			el_breadcrumb.href = '/';
+			setMenuCur('Пациенты');
+		}
 	}
 
 
-	window.onload = function () {
+	document.addEventListener("DOMContentLoaded", function (event) {
 
-		var $breadcrumb = $('.breadcrumbs a').eq(0);
+		console.log('document.addEventListener("DOMContentLoaded") pathient');
 
-		if (data.patient.status == 2) {
-			$breadcrumb.text('Архив');
-		}
+		setStatusArchive(data.patient.status == 2);
+
+		$('#nav_context').css('opacity', 1);
 
 		moment.locale('ru');
 
@@ -187,14 +223,15 @@
 				},
 
 				archive: function () {
+
 					if (this.patient.status != 2) {
 						this.patient.status = 2;
-						$breadcrumb.text('Архив');
 					}
 					else {
 						this.patient.status = 1;
-						$breadcrumb.text('Пациенты');
 					}
+
+					setStatusArchive(data.patient.status == 2);
 
 					axios.post(route_api_status, {
 						status: this.patient.status
@@ -226,7 +263,7 @@
 			$date_of_birth.after(' (' + str + ')');
 		}
 		*/
-	}
+	});
 </script>
 
 (% endblock %)

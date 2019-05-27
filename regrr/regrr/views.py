@@ -190,7 +190,7 @@ def index():
 		data['patients_offset'] = (page_num - 1) * page_size
 
 		with db.session_scope() as db_session:
-			db_patients = db_session.query(db.Patient)
+			db_patients = db_session.query(db.Patient).filter(db.Patient.status != db.PatientStatus.ARCHIVE)
 			pagination = paginate(db_patients, page_num, page_size)
 
 			patients = []
@@ -547,7 +547,8 @@ def patient_view(patient_id):
 	if user_role != db.UserRole.USER:
 		exceptions.abort(403)
 
-	pageData = helper_view.PageData(None, user_info.get('username'), menus_user, menucur='/')
+	#pageData = helper_view.PageData(None, user_info.get('username'), menus_user, menucur='/')
+	pageData = helper_view.PageData(None, user_info.get('username'), menus_user)
 	pageData.add_breadcrumb('Пациенты', '/')
 
 	j_patient = None
