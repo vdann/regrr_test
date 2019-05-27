@@ -30,13 +30,25 @@
 		
 		(% else %)
 
-			<div id="analizes" class="table-wrapper">
+			<div id="analizes" class="table-wrapper" v-cloak>
 				<table class="alt">
 					<thead>
 						<tr>
 							<th>№</th>
 							<th>#</th>
-							<th>Результат</th>
+							<th v-if="tests">
+								<select v-model="model_test">
+									<option
+											v-for="(test, i) in tests"
+											v-bind:value="i"
+											>
+										{{ test.name }}
+									</option>
+								</select>
+							</th>
+							<th v-else>
+								Результат
+							</th>
 							<th>Исследование выполнил</th>
 							<th>Дата выполнения</th>
 						</tr>
@@ -45,7 +57,8 @@
 						<tr v-for="(analysis, i) in analyzes" :key="i">
 							<td v-html="analyzes_offset + i + 1"></td>
 							<td v-html="makeLinkAnalysis(analysis, analysis.id)"></td>
-							<td v-html="makeLinkAnalysis(analysis, analysis.result)"></td>
+							<td v-if="tests" v-html="analyzes[i].data.items[model_test]"></td>
+							<td v-else v-html="makeLinkAnalysis(analysis, analysis.result)"></td>
 							<td v-html="analysis.user"></td>
 							<td v-html="analysis.date_of_creation"></td>
 						</tr>
@@ -73,41 +86,25 @@
 					console.log('Серверные данные не были проинициализированы');
 				}
 
-				data.analyzes_offset = data.analyzes_offset || 0;
+				if (!data.tests)
+					data.tests = null;
 
-				//data.editing = data.editing || true;
-				//data.saving = data.saving || false;
+				for (var i = 0, n = data.analyzes.length; i < n; ++i) {
+					var analysis = data.analyzes[i];
+					if (typeof analysis.data === 'string')
+						analysis.data = JSON.parse(analysis.data);
 
-				function makeUrlFromRoute(route, params) {
-					for (key in params) {
-						var param = params[key];
-						var t = typeof param;
-						if (t === 'string' || t === 'number')
-							route = route.replace(new RegExp('<' + key + '>', 'gm'), param);
-					}
-
-					if (/<\w+(\:\w*)*>/gm.test(route))
-						console.warn('makeUrlFromRoute => Не все параметры маршрута заданы', route);
-
-					return route;
 				}
+
+				data.analyzes_offset = data.analyzes_offset || 0;
+				data.model_test = 0;
 
 				data.route_patient_analysis_type_analysis = data.route_patient_analysis_type_analysis
 					|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis/<analysis_id>';
 
-				// test
-				// route_1 = '/patient_<patient_id>/analysis_type_<analysis_type>/analysis_<analysis>/ <patient_id>';
-				// var u1 = makeUrlFromRoute(route_1, {patient_id: 100});
-				// var u2 = makeUrlFromRoute(route_1, {patient_id: 100, analysis_type: 10, analysis: 0});
 
 				var app = new Vue({
 					el: '#analizes',
-					/*
-						data['patient_id'] = patient_id
-						data['analysis_type'] = analysis_type
-						data['analyzes'] = [{
-						}]
-					*/
 					data: data,
 					methods: {
 						makeLink: function (href, text) {
@@ -115,7 +112,7 @@
 						},
 
 						makeLinkAnalysis: function (analysis, text) {
-							var href = makeUrlFromRoute(this.route_patient_analysis_type_analysis, {
+							var href = Utils.routes.makeUrlFromRoute(this.route_patient_analysis_type_analysis, {
 								patient_id: this.patient_id,
 								analysis_type: this.analysis_type,
 								analysis_id: analysis.id

@@ -94,7 +94,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="(item, i) in data.items" key="i">
+					<tr v-for="(item, i) in data.items" v-bind:key="i">
 						<td v-html="i + 1"></td>
 						<td v-html="item.name"></td>
 						<td v-html="item.label"></td>
@@ -145,6 +145,8 @@
 				}
 			}
 		}
+		else
+			data.tests = null;
 
 		var dataParams = {
 			date_receipt_example: '[---]',

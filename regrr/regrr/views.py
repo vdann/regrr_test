@@ -698,7 +698,8 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	page_num = request.args.get('page', 1, type=int)
 	page_size = 10
 
-	analysis_type_str = db.AnalysisTypeStr.get(int_no_exc(analysis_type))
+	analysis_type_int = int_no_exc(analysis_type)
+	analysis_type_str = db.AnalysisTypeStr.get(analysis_type_int)
 
 	patient_fullname = None
 	janalyzes = None
@@ -777,6 +778,17 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	data['analysis_type'] = analysis_type
 	data['analyzes'] = janalyzes
 	data['analyzes_offset'] = (page_num - 1) * page_size
+
+	if analysis_type_int == db.AnalysisType.Биохимические_исследования:
+		data['tests'] = analisis_rules.tests_Биохимические_исследования
+	elif analysis_type_int == db.AnalysisType.Гемостаз:
+		data['tests'] = analisis_rules.tests_Гемостаз
+	elif analysis_type_int == db.AnalysisType.Клинический_анализ_крови:
+		data['tests'] = analisis_rules.tests_Клинический_анализ_крови
+	elif analysis_type_int == db.AnalysisType.Общий_анализ_мочи:
+		data['tests'] = analisis_rules.tests_Общий_анализ_мочи
+
+
 	server['data'] = helper_view.data_to_json(data)
 
 	str = helper_view.render_template_ext('patient_analysis_type.html', server = server)
