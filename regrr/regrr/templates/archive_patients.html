@@ -1,0 +1,69 @@
+﻿(% extends "layout.html" %)
+(% import "macros.html" as macros %)
+
+
+(% block block_head %)
+<style>
+</style>
+(% endblock %)
+
+
+
+(% block content %)
+
+
+	<div class="table-wrapper" id="patients">
+		<table class="alt">
+			<thead>
+				<tr>
+					<th>№</th>
+					<th>ФИО</th>
+					<th>Отеделение</th>
+					<th>Диагноз</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="(patient, i) in patients" key="patient.id">
+					<td v-html="patients_offset + i + 1"></td>
+					<td v-html="getFullname(patient)"></td>
+					<td v-html="patient.department"></td>
+					<td v-html="patient.diagnosis"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	(( macros.pagination(server.pagination) ))
+
+	<script>
+
+		var data = {};
+
+		try {
+			(( server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы (patients)');
+		}
+
+		data.url_patient = data.url_patient || '/patient';
+		data.users = data.users || [];
+		data.patients_offset = data.patients_offset || 0;
+
+
+		var appPatients = new Vue({
+			el: '#patients',
+			data: data,
+			methods: {
+				_makeA: function (href, text) {
+					return '<a href="' + href + '">' + text + '</a>';
+				},
+				getFullname: function (patient) {
+					var fullname = patient.lastname + ' ' + patient.firstname + ' ' + patient.middlename;
+					return this._makeA(this.url_patient + '/' + patient.id, fullname);
+				}
+			}
+		});
+	</script>
+
+(% endblock %)

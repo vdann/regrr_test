@@ -98,7 +98,8 @@ menus_admin.extend(menus_all)
 
 
 menus_user = [
-	helper_view.PageData.make_menu_item('/', 'Пациенты')
+	helper_view.PageData.make_menu_item('/', 'Пациенты'),
+	helper_view.PageData.make_menu_item('/archive', 'Архив')
 	]
 menus_user.extend(menus_all)
 
@@ -1217,6 +1218,51 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 def patient_analysis_viewer(patient_id, analysis_id):
 	"""Просмотр анализа по id (Не реализовано)"""
 	return 'Не реализовано'
+
+################################################################
+@app.route('/archive', methods=['GET'])
+def archive_patients():
+	"""Просмотр пациентов в архиве"""
+
+	user_info = session.get(SESSION_KEY_USER)
+
+	page_num = request.args.get('page', 1, type=int)
+	page_size = 10
+
+	username = user_info.get('username')
+	user_role = user_info.get('role')
+
+	if user_role == db.UserRole.ADMIN:
+		exceptions.abort(403)
+
+	elif user_role == db.UserRole.USER:
+
+		pageData = helper_view.PageData('Архив', username, menus_user, menucur='/archive')
+		pageData.add_breadcrumb(pageData.title)
+
+		server = pageData.to_dict()
+
+		data = {}
+		data['patients_offset'] = (page_num - 1) * page_size
+
+		with db.session_scope() as db_session:
+			db_patients = db_session.query(db.Patient).filter(
+				db.Patient.status == db.PatientStatus.ARCHIVE)
+			pagination = paginate(db_patients, page_num, page_size)
+
+			patients = []
+			for db_patient in pagination.items:
+				patients.append(db_patient.toJson())
+
+			data['patients'] = patients
+			server['pagination'] = helper_view.pagination_ext(pagination, page_num, page_size, 'archive_patients')
+		
+		server['data'] = helper_view.data_to_json(data)
+		str = helper_view.render_template_ext('archive_patients.html', server = server)
+		return str
+
+	abort(500)
+
 
 import json
 

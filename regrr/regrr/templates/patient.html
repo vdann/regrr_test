@@ -78,7 +78,7 @@
 
 		<section v-for="(group, i) in groups">
 			<header class="major">
-				<h2 style="margin-bottom: 1em;">{{ group.name }}</h2style=>
+				<h2 style="margin-bottom: 1em;">{{ group.name }}</h2>
 			</header>
 
 			<div class="row">
@@ -112,8 +112,20 @@
 		console.warn('Серверные данные не были проинициализированы');
 	}
 
+	var el_breadcrumb = document.querySelectorAll('.breadcrumbs a')[0];
+
+	if (data.patient.status == 2) {
+		el_breadcrumb.innerText = 'Архив';
+	}
+
 
 	window.onload = function () {
+
+		var $breadcrumb = $('.breadcrumbs a').eq(0);
+
+		if (data.patient.status == 2) {
+			$breadcrumb.text('Архив');
+		}
 
 		moment.locale('ru');
 
@@ -175,10 +187,14 @@
 				},
 
 				archive: function () {
-					if (this.patient.status != 2)
+					if (this.patient.status != 2) {
 						this.patient.status = 2;
-					else
+						$breadcrumb.text('Архив');
+					}
+					else {
 						this.patient.status = 1;
+						$breadcrumb.text('Пациенты');
+					}
 
 					axios.post(route_api_status, {
 						status: this.patient.status
