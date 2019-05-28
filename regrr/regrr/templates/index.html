@@ -91,15 +91,12 @@
 					.appendTo('body');
 			}*/
 			methods: {
-				_makeA: function (href, text) {
-					return '<a href="' + href + '">' + text + '</a>';
-				},
 				getUsername: function (user) {
-					return this._makeA(this.url_user + '/' + user.username, user.username);
+					return Utils.html.a(this.url_user + '/' + user.username, user.username);
 				},
 				getFullname: function (user) {
 					var fullname = user.lastname + ' ' + user.firstname + ' ' + user.middlename;
-					return this._makeA(this.url_user + '/' + user.username, fullname);
+					return Utils.html.a(this.url_user + '/' + user.username, fullname);
 				}
 			}
 		});
@@ -168,12 +165,9 @@
 					.appendTo('body');
 			}*/
 			methods: {
-				_makeA: function (href, text) {
-					return '<a href="' + href + '">' + text + '</a>';
-				},
 				getFullname: function (patient) {
 					var fullname = patient.lastname + ' ' + patient.firstname + ' ' + patient.middlename;
-					return this._makeA(this.url_patient + '/' + patient.id, fullname);
+					return Utils.html.a(this.url_patient + '/' + patient.id, fullname);
 				}
 			}
 		});

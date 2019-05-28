@@ -55,12 +55,9 @@
 			el: '#patients',
 			data: data,
 			methods: {
-				_makeA: function (href, text) {
-					return '<a href="' + href + '">' + text + '</a>';
-				},
 				getFullname: function (patient) {
 					var fullname = patient.lastname + ' ' + patient.firstname + ' ' + patient.middlename;
-					return this._makeA(this.url_patient + '/' + patient.id, fullname);
+					return Utils.html.a(this.url_patient + '/' + patient.id, fullname);
 				}
 			}
 		});

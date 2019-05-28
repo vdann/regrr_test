@@ -36,9 +36,14 @@ var Utils = (function () {
 		return '<b>' + s + '</b>';
 	}
 
+	function a(href, text) {
+		return '<a href="' + href + '">' + text + '</a>';
+	}
+
 	export_.html = {
 		nbsp: nbsp,
-		b: b
+		b: b,
+		a: a
 	};
 
 

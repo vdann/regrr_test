@@ -146,7 +146,7 @@
 		},
 		methods: {
 			makeItemResult: function (result) {
-				var str = '<a href="' + result.url + '">' + result.text + '</a>';
+				var str = Utils.html.a(result.url, result.text);
 				return str;
 			},
 

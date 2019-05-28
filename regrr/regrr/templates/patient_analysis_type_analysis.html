@@ -4,6 +4,13 @@
 
 (% block block_head %)
 <style>
+	.fs-small {
+		font-size: 0.85em;
+	}
+
+	.fs-large {
+		font-size: 1.2em;
+	}
 </style>
 (% endblock %)
 
@@ -52,7 +59,11 @@
 			<table class="alt" v-else>
 				<thead>
 					<tr>
-						<th class="ta-l va-m">Тест</th>
+						<th class="ta-l va-m">
+							<div><b>Тест</b></div>
+							<div class="fs-small" style="color:#7f888f;">Еденицы измерения</div>
+							<div class="fs-small" style="color:#7f888f;">Референсные значения</div>
+						</th>
 						<th class="ta-c va-m">Результат</th>
 					</tr>
 				</thead>
@@ -126,7 +137,7 @@
 		data.data = JSON.parse(data.data);
 
 
-	window.onload = function () {
+	document.addEventListener("DOMContentLoaded", function (event) {
 
 		var route = data.route_analysis_print_id || '/patient/<patient_id>/analysis_type/<analysis_type>/analysis_print/<analysis_id>';
 		data.analysis_id = data.id;
@@ -182,7 +193,7 @@
 			app.isMobile = false;
 			console.log('ACTIVE small-to-max');
 		});
-	};
+	});
 
 </script>
 

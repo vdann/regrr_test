@@ -7,128 +7,176 @@
 	#form_profile {
 		max-width: 700px;
 	}
+
+	.fs-small {
+		font-size: 0.85em;
+	}
+
+	.fs-large {
+		font-size: 1.2em;
+	}
+
 </style>
 (% endblock %)
 
 
 (% block content %)
 
-	<div>
+<div>
 
-		<div class="row">
-			<div class="col-12">
-				<a class="button primary"
-					href="/patient/((server.patient_id))/analysis_type/((server.analysis_type))/analysis_add"
-					title="Добавить новый анализ">Добавить</a>
-			</div>
+	<div class="row">
+		<div class="col-12">
+			<a class="button primary"
+			   href="/patient/((server.patient_id))/analysis_type/((server.analysis_type))/analysis_add"
+			   title="Добавить новый анализ">Добавить</a>
 		</div>
-		<br>
-
-		(% if server.pagination.list|length == 0 %)
-
-			<p>Нет записей</p>
-		
-		(% else %)
-
-			<div id="analizes" class="table-wrapper" v-cloak>
-				<table class="alt">
-					<thead>
-						<tr>
-							<th>№</th>
-							<th>#</th>
-							<th v-if="tests">
-								<select v-model="model_test">
-									<option
-											v-for="(test, i) in tests"
-											v-bind:value="i"
-											>
-										{{ test.name }}
-									</option>
-								</select>
-							</th>
-							<th v-else>
-								Результат
-							</th>
-							<th>Исследование выполнил</th>
-							<th>Дата выполнения</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="(analysis, i) in analyzes" :key="i">
-							<td v-html="analyzes_offset + i + 1"></td>
-							<td v-html="makeLinkAnalysis(analysis, analysis.id)"></td>
-							<td v-if="tests" v-html="analyzes[i].data.items[model_test]"></td>
-							<td v-else v-html="makeLinkAnalysis(analysis, analysis.result)"></td>
-							<td v-html="analysis.user"></td>
-							<td v-html="analysis.date_of_creation"></td>
-						</tr>
-					</tbody>
-					<tfoot>
-						<tr>
-							<!--										<td v-html="patients.length"></td>
-							-->
-						</tr>
-					</tfoot>
-				</table>
-			</div>
-
-			(( macros.pagination(server.pagination) ))
-
-
-
-			<script>
-				var data = {};
-
-				try {
-					((server.data | safe));
-				}
-				catch (e) {
-					console.log('Серверные данные не были проинициализированы');
-				}
-
-				if (!data.tests)
-					data.tests = null;
-
-				for (var i = 0, n = data.analyzes.length; i < n; ++i) {
-					var analysis = data.analyzes[i];
-					if (typeof analysis.data === 'string')
-						analysis.data = JSON.parse(analysis.data);
-
-				}
-
-				data.analyzes_offset = data.analyzes_offset || 0;
-				data.model_test = 0;
-
-				data.route_patient_analysis_type_analysis = data.route_patient_analysis_type_analysis
-					|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis/<analysis_id>';
-
-
-				var app = new Vue({
-					el: '#analizes',
-					data: data,
-					methods: {
-						makeLink: function (href, text) {
-							return '<a href="' + href + '">' + text + '</a>';
-						},
-
-						makeLinkAnalysis: function (analysis, text) {
-							var href = Utils.routes.makeUrlFromRoute(this.route_patient_analysis_type_analysis, {
-								patient_id: this.patient_id,
-								analysis_type: this.analysis_type,
-								analysis_id: analysis.id
-							});
-
-							var s = this.makeLink(href, text);
-							return s;
-						}
-					}
-				});
-
-			</script>
-
-		(% endif %)
-
 	</div>
+	<br>
+
+	(% if server.pagination.list|length == 0 %)
+
+	<p>Нет записей</p>
+
+	(% else %)
+
+	<div id="analizes" class="table-wrapper" v-cloak>
+
+		<table class="alt" v-if="!isMobile">
+			<thead>
+				<tr>
+					<th>№</th>
+					<th>ID</th>
+					<th>Исследование выполнил</th>
+					<th>Дата выполнения</th>
+					<th v-if="tests">
+						<select v-model="model_test">
+							<option v-for="(test, i) in tests" v-bind:value="i">
+								{{ test.name }}
+							</option>
+						</select>
+					</th>
+					<th v-else>
+						Результат
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="(analysis, i) in analyzes" v-bind:key="i">
+					<td v-html="analyzes_offset + i + 1"></td>
+					<td v-html="makeLinkAnalysis(analysis, analysis.id)"></td>
+					<td style="width:25%" class="va-m" v-html="nbsp(analysis.user)"></td>
+					<td style="width:30%" class="va-m" v-html="nbsp(analysis.date_of_creation)"></td>
+					<td class="va-m ta-c" v-if="tests" v-html="analyzes[i].data.items[model_test]"></td>
+					<td class="va-m ta-c" v-else v-html="makeLinkAnalysis(analysis, analysis.result)"></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<table class="alt" v-else>
+			<thead>
+				<tr>
+					<th class="va-m">№</th>
+					<th class="va-m">
+						<div><b>ID</b></div>
+						<div class="fs-small" style="color:#7f888f;" v-html="nbsp('Исследование выполнил')"></div>
+						<div class="fs-small" style="color:#7f888f;" v-html="nbsp('Дата выполнения')"></div>
+					</th>
+					<th class="va-m" v-if="tests">
+						<select v-model="model_test">
+							<option v-for="(test, i) in tests" v-bind:value="i">
+								{{ test.name }}
+							</option>
+						</select>
+					</th>
+					<th class="va-m" v-else>
+						Результат
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="(analysis, i) in analyzes" v-bind:key="i">
+					<td class="va-m ta-r" v-html="analyzes_offset + i + 1"></td>
+					<td class="va-m" style="width:45%">
+						<div v-html="makeLinkAnalysis(analysis, analysis.id)"></div>
+						<div class="fs-small" v-html="nbsp(analysis.user)"></div>
+						<div class="fs-small" v-html="nbsp(analysis.date_of_creation)"></div>
+					</td>
+
+					<td class="va-m ta-c" v-if="tests" v-html="analyzes[i].data.items[model_test]"></td>
+					<td class="va-m ta-c" v-else v-html="makeLinkAnalysis(analysis, analysis.result)"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	(( macros.pagination(server.pagination) ))
+
+
+
+	<script>
+		var data = {};
+
+		try {
+			((server.data | safe));
+		}
+		catch (e) {
+			console.log('Серверные данные не были проинициализированы');
+		}
+
+		if (!data.tests)
+			data.tests = null;
+
+		for (var i = 0, n = data.analyzes.length; i < n; ++i) {
+			var analysis = data.analyzes[i];
+			if (typeof analysis.data === 'string')
+				analysis.data = JSON.parse(analysis.data);
+
+		}
+
+		data.analyzes_offset = data.analyzes_offset || 0;
+		data.model_test = 0;
+
+		data.route_patient_analysis_type_analysis = data.route_patient_analysis_type_analysis
+			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis/<analysis_id>';
+
+		document.addEventListener("DOMContentLoaded", function (event) {
+
+			data.isMobile = breakpoints.active('min-to-small');
+
+			var app = new Vue({
+				el: '#analizes',
+				data: data,
+				methods: {
+					nbsp: Utils.html.nbsp,
+					makeLinkAnalysis: function (analysis, text) {
+						var href = Utils.routes.makeUrlFromRoute(this.route_patient_analysis_type_analysis, {
+							patient_id: this.patient_id,
+							analysis_type: this.analysis_type,
+							analysis_id: analysis.id
+						});
+
+						var s = Utils.html.a(href, text);
+						return s;
+					}
+				}
+			});
+
+			breakpoints.on('min-to-small', function () {
+				app.isMobile = true;
+				console.log('ACTIVE min-to-small');
+			});
+			breakpoints.on('small-to-max', function () {
+				app.isMobile = false;
+				console.log('ACTIVE small-to-max');
+			});
+
+		});
+
+	</script>
+
+	(% endif %)
+
+</div>
 
 
 
