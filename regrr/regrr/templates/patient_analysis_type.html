@@ -44,18 +44,18 @@
 		<table class="alt" v-if="!isMobile">
 			<thead>
 				<tr>
-					<th>№</th>
-					<th>ID</th>
-					<th>Исследование выполнил</th>
-					<th>Дата выполнения</th>
-					<th v-if="tests">
+					<th class="va-m">№</th>
+					<th class="va-m">ID</th>
+					<th class="va-m">Исследование выполнил</th>
+					<th class="va-m">Дата выполнения</th>
+					<th class="va-m" v-if="tests">
 						<select v-model="model_test">
 							<option v-for="(test, i) in tests" v-bind:value="i">
 								{{ test.name }}
 							</option>
 						</select>
 					</th>
-					<th v-else>
+					<th class="va-m" v-else>
 						Результат
 					</th>
 				</tr>
@@ -160,7 +160,7 @@
 					}
 				}
 			});
-
+		
 			breakpoints.on('min-to-small', function () {
 				app.isMobile = true;
 				console.log('ACTIVE min-to-small');
@@ -169,7 +169,7 @@
 				app.isMobile = false;
 				console.log('ACTIVE small-to-max');
 			});
-
+			
 		});
 
 	</script>
