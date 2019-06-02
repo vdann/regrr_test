@@ -1163,8 +1163,10 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 		server['data'] = helper_view.data_to_json(data)
 		str = helper_view.render_template_ext('patient_analysis_add_1.html', server = server)
 	elif analysis_type_int == db.AnalysisType.Тест_NEWS:
+		server['data'] = helper_view.data_to_json(data)
 		str = helper_view.render_template_ext('patient_analysis_add_5.html', server = server)
 	elif analysis_type_int == db.AnalysisType.Тест_VTE:
+		server['data'] = helper_view.data_to_json(data)
 		str = helper_view.render_template_ext('patient_analysis_add_6.html', server = server)
 	
 	return str
