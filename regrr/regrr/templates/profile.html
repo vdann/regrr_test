@@ -7,14 +7,50 @@
 	#form_profile {
 		max-width: 700px;
 	}
+
+	.dialog-content {
+		padding: 2em;
+		border-radius: 0.75em;
+		border-width: 0px;
+		box-shadow: inset 0 0 0 2px #000000;
+	}
+
+	#dialog_change_password .dialog-content {
+		width: 90%;
+		max-width: 500px;
+	}
+
+	.error-message {
+	    color: red;
+		display: inline-block;
+		font-size: 1em;
+		line-height: 1em;
+		margin: 5px 0 0;
+	}
+
+	.dialog-alert-icon {
+		margin-right: 0.6em;
+	}
+
 </style>
 (% endblock %)
 
 
 
 (% block content %)
+<div id="form_profile">
 
-	<form v-cloak method="post" action="#" id="form_profile">
+	<div>
+		<a class="button" title="Изменить пароль" style="padding: 0em 1.1em 0em 1.1em;"
+		   @click="changePassword">
+			<i style="vertical-align: middle;"
+			   class="fa fa-2x fa-key"></i>
+		</a>
+	</div>
+
+	<br>
+
+	<form v-cloak method="post" action="#">
 		<div class="row gtr-uniform">
 
 			<!-- username -->
@@ -23,14 +59,15 @@
 			</div>
 			<div class="col-8 col-12-xsmall">
 				<input class="input-static" type="text"
-					:value="user.username"
-					@input="user.username = $event.target.value"
-					disabled />
+					   v-bind:value="user.username"
+					   @input="user.username = $event.target.value"
+					   disabled />
 			</div>
 
 
 			<!-- lastname -->
-			<div class="col-4 col-12-xsmall"><!-- <div class="col-4 col-10-xsmall"> -->
+			<div class="col-4 col-12-xsmall">
+				<!-- <div class="col-4 col-10-xsmall"> -->
 				<input class="input-static input-static-bold" type="text" value="Фамилия" disabled />
 			</div>
 			<!--
@@ -41,14 +78,15 @@
 			</div>
 			-->
 
-			<div class="col-8 col-12-xsmall"><!-- <div class="col-7 col-12-xsmall"> -->
+			<div class="col-8 col-12-xsmall">
+				<!-- <div class="col-7 col-12-xsmall"> -->
 				<input type="text"
-					:class="{'input-static': !inputing}"
-					:disabled="!inputing"
-					:value="user.lastname"
-					@input="changeUserParam('lastname', $event.target.value)"
-					placeholder="Фамилия"
-					required />
+					   v-bind:class="{'input-static': !inputing}"
+					   v-bind:disabled="!inputing"
+					   v-bind:value="user.lastname"
+					   @input="changeUserParam('lastname', $event.target.value)"
+					   placeholder="Фамилия"
+					   required />
 			</div>
 			<!--
 			<div class="col-1 col-0-xsmall">
@@ -57,18 +95,17 @@
 				</div>
 			</div>
 			-->
-
-
 			<!-- firstname -->
 			<div class="col-4 col-12-xsmall">
 				<input class="input-static input-static-bold" type="text" value="Имя" disabled />
 			</div>
 			<div class="col-8 col-12-xsmall">
-				<input type="text" name="firstname" id="firstname" :class="{'input-static': !inputing}"
-					:disabled="!inputing"
-					:value="user.firstname"
-					@input="user.firstname = $event.target.value"
-					placeholder="Имя" />
+				<input type="text" name="firstname" id="firstname"
+					   v-bind:class="{'input-static': !inputing}"
+					   v-bind:disabled="!inputing"
+					   v-bind:value="user.firstname"
+					   @input="user.firstname = $event.target.value"
+					   placeholder="Имя" />
 			</div>
 
 
@@ -76,28 +113,29 @@
 				<input type="text" class="input-static input-static-bold" value="Отчество" disabled />
 			</div>
 			<div class="col-8 col-12-xsmall">
-				<input type="text" name="middlename" id="middlename" :class="{'input-static': !inputing}"
-					:disabled="!inputing"
-					:value="user.middlename"
-					@input="user.middlename = $event.target.value"
-					placeholder="Отчество" />
+				<input type="text" name="middlename" id="middlename"
+					   v-bind:class="{'input-static': !inputing}"
+					   v-bind:disabled="!inputing"
+					   v-bind:value="user.middlename"
+					   @input="user.middlename = $event.target.value"
+					   placeholder="Отчество" />
 			</div>
 
 
 			<div class="col-4 col-12-xsmall">
 				<input type="text"
-					value="Должность"
-					class="input-static input-static-bold"
-					disabled />
+					   value="Должность"
+					   class="input-static input-static-bold"
+					   disabled />
 			</div>
 			<div class="col-8 col-12-xsmall">
 				<input type="text"
-					name="position" id="position"
-					:class="{'input-static': !inputing}"
-					:disabled="!inputing"
-					:value="user.position"
-					@input="user.position = $event.target.value"
-					placeholder="Должность" />
+					   name="position" id="position"
+					   v-bind:class="{'input-static': !inputing}"
+					   v-bind:disabled="!inputing"
+					   v-bind:value="user.position"
+					   @input="user.position = $event.target.value"
+					   placeholder="Должность" />
 			</div>
 
 
@@ -106,27 +144,27 @@
 			</div>
 			<div class="col-8 col-12-xsmall">
 				<input type="email" name="email" id="email"
-					:class="{'input-static': !inputing}"
-					:disabled="!inputing"
-					:value="user.email"
-					@input="user.email = $event.target.value"
-					placeholder="email@ya.ru" />
+					   v-bind:class="{'input-static': !inputing}"
+					   v-bind:disabled="!inputing"
+					   v-bind:value="user.email"
+					   @input="user.email = $event.target.value"
+					   placeholder="email@ya.ru" />
 			</div>
 
 			<div class="col-12">
 				<ul class="actions">
 					<li>
 						<input type="button"
-							:value="!editing ? 'Изменить' : 'Отменить'"
-							:class="{primary: !editing}"
-							@click="toggleEditing()"
-							:disabled="saving" />
+							   v-bind:value="!editing ? 'Изменить' : 'Отменить'"
+							   v-bind:class="{primary: !editing}"
+							   @click="toggleEditing()"
+							   v-bind:disabled="saving" />
 					</li>
 
 					<li v-if="editing">
 						<input type="button" value="Сохранить" class="primary"
-							@click="save"
-							:disabled="!isEnabledSave" />
+							   @click="save"
+							   v-bind:disabled="!isEnabledSave" />
 						<template v-if="saving">
 							&nbsp;&nbsp;
 							<i class="va-m fa fa-refresh fa-spin fa-2x fa-fw"> </i>
@@ -137,57 +175,174 @@
 		</div>
 	</form>
 
-	<script>
+	<div class="dialog" id="dialog_change_password">
+		<div class="dialog-overlay" tabindex="-1" data-a11y-dialog-hide></div>
+		<dialog class="dialog-content" aria-labelledby="dialog_change_password_title" aria-describedby="dialog_change_password_description">
 
-		var data = {
-			user: {
-				username: 'ivanov',
-				lastname: 'Иванов',
-				firstname: 'Иван',
-				middlename: 'Иванович',
-				position: '[Врач]',
-				//date_of_birth: '01.01.1980',
-				email: 'ivanov@yan.ru',
-			},
-			editing: false,
-			saving: false,
-		};
+			<h3 id="dialog_change_password_title">Изменение пароля</h3>
 
-		try {
-			((server.data | safe));
+			<!--
+			<p id="dialog_change_password_description"></p>
+				-->
 
-			data = data || {};
-			data = { user: data };
-			var user = data.user;
+			<label for="password_old">Старый пароль</label>
+			<input type="password" id="password_old"
+				   placeholder="Введите старый пароль"
+				   v-bind:value="password_old"
+				   @input="password_old = $event.target.value"
+				   required>
+			<br>
 
-			user.username = user.username || '';
-			user.lastname = user.lastname || ' ';
-			user.firstname = user.firstname || ' ';
-			user.middlename = user.middlename || ' ';
-			user.position = user.position || ' ';
-			//date_of_birth = date_of_birth || ' ';
-			user.email = user.email || ' ';
+			<label for="password_new">Новый пароль</label>
+			<input type="password" id="password_new"
+				   placeholder="Введите новый пароль"
+				   v-bind:value="password_new"
+				   @input="password_new = $event.target.value"
+				   required>
+			<br>
 
-			data.user0 = _.cloneDeep(user);
+			<label for="password_new_2">Повторите новый пароль</label>
+			<input type="password" id="password_new_2"
+				   placeholder="Введите новый пароль еще раз"
+				   v-bind:value="password_new2"
+				   @input="password_new2 = $event.target.value"
+				   required>
+			<div class="error-message" v-if="password_new2 != '' && password_new != password_new2">
+				Пароли не совпадают!
+			</div>
 
-			for (var k in user) {
-				data[k + '_icon'] = null;
-			}
+			<br>
+			<br>
 
-			data.editing = data.editing || false;
-			data.saving = data.saving || false;
+			<div class="f-right">
+				<button data-a11y-dialog-hide class="dialog-close">Отмена</button>
+				&nbsp;
+				<button class="button primary"
+						v-bind:disabled="password_old == '' || password_new == '' || password_new != password_new2"
+						@click="changePassword2">
+					Изменить
+				</button>
+			</div>
+		</dialog>
+	</div>
+
+	<div class="dialog" id="dialog_alert">
+		<div class="dialog-overlay" tabindex="-1" data-a11y-dialog-hide></div>
+		<dialog class="dialog-content" aria-labelledby="dialog_alert_title" aria-describedby="dialog_alert_description">
+
+			<h3 id="dialog_alert_title" v-html="dialog_alert_title"></h3>
+
+			<div id="dialog_alert_description" style="margin-bottom:2em; display:table;"
+				 v-if="dialog_alert_description">
+
+				<span style="vertical-align:middle; display:table-cell;"
+					  v-if="dialog_alert_icon">
+					<i class="dialog-alert-icon"
+					   v-bind:class="dialog_alert_icon">
+					</i>
+				</span>
+
+				<div style="display:inline-block;"
+					 v-html="dialog_alert_description">
+				</div>
+			</div>
+
+			<div class="f-right">
+				<button data-a11y-dialog-hide class="dialog-close primary"
+						v-bind:disabled="!dialog_alert_enable_close">Закрыть</button>
+			</div>
+		</dialog>
+	</div>
+</div>
+
+
+<script>
+
+	var data = {
+		user: {
+			username: 'ivanov',
+			lastname: 'Иванов',
+			firstname: 'Иван',
+			middlename: 'Иванович',
+			position: '[Врач]',
+			//date_of_birth: '01.01.1980',
+			email: 'ivanov@yan.ru',
+		},
+		editing: false,
+		saving: false,
+	};
+
+	try {
+		((server.data | safe));
+
+		data = data || {};
+		data = { user: data };
+		var user = data.user;
+
+		user.username = user.username || '';
+		user.lastname = user.lastname || ' ';
+		user.firstname = user.firstname || ' ';
+		user.middlename = user.middlename || ' ';
+		user.position = user.position || ' ';
+		//date_of_birth = date_of_birth || ' ';
+		user.email = user.email || ' ';
+
+		data.user0 = _.cloneDeep(user);
+
+		for (var k in user) {
+			data[k + '_icon'] = null;
 		}
-		catch (e) {
-			console.log('Серверные данные не были проинициализированы');
-		}
+
+		data.editing = data.editing || false;
+		data.saving = data.saving || false;
+	}
+	catch (e) {
+		console.log('Серверные данные не были проинициализированы');
+	}
+
+	document.addEventListener('DOMContentLoaded', function () {
+
+		data.password_old = '';
+		data.password_new = '';
+		data.password_new2 = '';
+		data.dialog_alert_title = null;
+		data.dialog_alert_description = null;
+		data.dialog_alert_icon = null;
+		data.dialog_alert_enable_close = true;
+
+		// To manually control the dialog:
+		// dialog.show()
+		// dialog.hide()
+		// dialog.destroy()
+
 
 		var app = new Vue({
 			el: '#form_profile',
-			data: data/*,
+			data: data,
 			mounted: function () {
-				$('<script src="//static//_design//assets//js//main.js"><//script>')
-					.appendTo('body');
-			}*/,
+
+				var mainEl = document.querySelector('body');
+
+				var dialogEl = document.getElementById('dialog_change_password');
+				var dialog = new window.A11yDialog(dialogEl, mainEl);
+				dialog.on('show', function (dialogEl, triggerEl) {
+					console.log(dialogEl);
+					console.log(triggerEl);
+				});
+
+				this._dialog = dialog;
+
+
+				var dialogEl2 = document.getElementById('dialog_alert');
+				//var mainEl = document.querySelector('body');
+				var dialogAlert = new window.A11yDialog(dialogEl2, mainEl);
+				dialogAlert.on('show', function (dialogEl, triggerEl) {
+					console.log(dialogEl);
+					console.log(triggerEl);
+				});
+
+				this._dialogAlert = dialogAlert;
+			},
 			computed: {
 				inputing: function () {
 					var v = this.editing && !this.saving;
@@ -251,9 +406,66 @@
 						me.endEditing(false);
 					});
 
-				}
+				},
+
+				changePassword: function () {
+					this.password_old = '';
+					this.password_new = '';
+					this.password_new2 = '';
+					this._dialog.show();
+				},
+
+				changePassword2: function () {
+
+					var data = {
+						password_old: this.password_old,
+						password_new: this.password_new
+					};
+
+					this.dialog_alert_title = 'Изменение пароля';
+					this.dialog_alert_icon = Utils.icons.wait;
+					this.dialog_alert_description = 'Запрос';
+					this.dialog_alert_enable_close = false;
+					this._dialogAlert.show();
+
+					var me = this;
+					axios.post('/profile_change_password', data)
+					.then(function (response) {
+						console.log(response.data.result);
+
+						me.dialog_alert_enable_close = true;
+
+						if (!response.data.result) {
+							me.dialog_alert_icon = Utils.icons.fail;
+							me.dialog_alert_description = response.data.errors.join('<br>');
+							return;
+						}
+
+						me.dialog_alert_icon = Utils.icons.ok;
+						me.dialog_alert_description = 'Пароль изменен!';
+						me.password_old = '';
+						me.password_new = '';
+						me.password_new2 = '';
+						me._dialog.hide();
+					})
+					.catch(function (error) {
+						console.log('Error!');
+
+						me.dialog_alert_enable_close = true;
+
+						var s = ['Ошибка!'];
+						if (error.message)
+							s.push(error.message);
+						s.push('<code>' + error.response.status + ' (' + error.response.statusText + ')</code>');
+
+						me.dialog_alert_icon = Utils.icons.fail;
+						me.dialog_alert_description = s.join('<br>');
+					});
+				},
+				
 			}
 		});
-	</script>
+	});
 
-(% endblock %)
+</script>
+	(% endblock %)

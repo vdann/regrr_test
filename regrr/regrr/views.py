@@ -297,12 +297,27 @@ def profile():
 	return str
 
 ################################################################
+def result_true(data=None, messages=None):
+	result = { 'result': True }
+	if data:
+		result['data'] = data
+	if messages:
+		result['messages'] = messages
+	return jsonify(result)
+
+def result_false(errors):
+	result = { 'result': False }
+	if errors:
+		result['errors'] = errors
+	return jsonify(result)
+
+################################################################
 @app.route("/profile", methods=['POST'])
 def profile_post():
 
 	if not request.json:
 		# abort(400)
-		return jsonify({'result': False, 'errors': ['invalid json']})
+		return result_false(['invalid json'])
 
 	user_info = session.get(SESSION_KEY_USER)
 
@@ -315,7 +330,41 @@ def profile_post():
 		db_query.position = request.json.get('position', '-')
 		db_query.email = request.json.get('email', '-')
 	
-	return jsonify({'result': True})
+	return result_true()
+
+
+################################################################
+@app.route("/profile_change_password", methods=['POST'])
+def profile_change_password_post():
+
+	if not request.json:
+		# abort(400)
+		return result_false(['invalid json'])
+
+	user_info = session.get(SESSION_KEY_USER)
+
+	password_old = request.json['password_old']
+	password_new = request.json['password_new']
+
+	if password_new == '':
+		return result_false(['Пароль не может быть пустым!'])
+
+	if password_new == password_old:
+		return result_false(['Старый и новый пароли не должны совпадать!'])
+
+	errors = []
+
+	with db.session_scope() as db_session:
+		db_query = db_session.query(db.User).get(user_info.get('id'))
+		if (db_query.password != password_old):
+			errors.append('Не правильный старый пароль!')
+		else:
+			db_query.password = password_new
+	
+	if len(errors):
+		return result_false(errors)
+
+	return result_true();
 
 ################################################################
 @app.route("/search", methods=['GET'])
