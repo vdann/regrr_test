@@ -15,6 +15,14 @@
 	<link rel="stylesheet" type="text/css" href="/static/content/bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" href="/static/content/site.css" />
 -->
+	<style>
+	.dialog-content {
+		padding: 2em;
+		border-radius: 0.75em;
+		border-width: 0px;
+		box-shadow: inset 0 0 0 2px #000000;
+	}
+	</style>
 
 	<script src="/static/scripts/modernizr-2.6.2.js"></script>
 	<script src="/static/_design/extern/es6-promise.js-v4.2.6/es6-promise.auto.js"></script>
@@ -159,7 +167,7 @@
 
 						(% if server.username %)
 
-						<a class="button fit1 primary" href="/logout" title="Выйти" style="padding: 0 1.2em;">
+						<a id="btn_logout" class="button fit1 primary" href="/logout" title="Выйти" style="padding: 0 1.2em;">
 							<i class="fa fa-sign-out fa-flip-horizontal fa-2x" style="vertical-align: middle;"></i>
 						</a>
 
@@ -219,7 +227,8 @@
 				</nav>
 
 
-				<!-- Section -- >
+				<!-- Section -->
+				<!--
 				<section>
 					<header class="major">
 						<h2>Связь</h2>
@@ -238,9 +247,10 @@
 						</li>
 					</ul>
 				</section>
+				-->
 
-
-				<!-- Footer -- >
+				<!-- Footer -->
+				<!--
 				<footer id="footer">
 					<p class="copyright">
 						&copy; (( server.year )) - clinstudy.ru. Все права защищены<br>
@@ -248,7 +258,7 @@
 						Design: <a href="https://html5up.net">HTML5 UP</a>
 					</p>
 				</footer>
-					-->
+				-->
 			</div>
 		</div>
 	</div>
@@ -265,10 +275,46 @@
 		document.addEventListener("DOMContentLoaded", function (event) {
 			console.log('document.addEventListener("DOMContentLoaded") layout');
 			$('#nav_context').css('opacity', 1);
+
+			var mainEl = document.querySelector('body');
+			var dialogEl = document.getElementById('dialog_logout');
+			var dialog = new window.A11yDialog(dialogEl, mainEl);
+			dialog.on('show', function (dialogEl, triggerEl) {
+				console.log(dialogEl);
+				console.log(triggerEl);
+			});
+
+			var btnLogout = document.getElementById('btn_logout');
+			btnLogout.onclick = function (e) {
+				dialog.show();
+				e.stopPropagation();
+				return false;
+			};
+
+			var btnDialogLogout = document.getElementById('dialog_logout_btn');
+			btnDialogLogout.onclick = function (e) {
+				window.location.href = '/logout';
+			};
+
+			
 		});
-
 	</script>
+	
+	<div class="dialog" id="dialog_logout">
+		<div class="dialog-overlay" tabindex="-1" data-a11y-dialog-hide></div>
+		<dialog class="dialog-content" aria-labelledby="dialog_logout_title" aria-describedby="dialog_logout_description">
 
+			<h3 id="dialog_logout_title">
+				Вы действительно хотите выйти?
+			</h3>
+
+			<div class="f-right">
+				<button data-a11y-dialog-hide class="dialog-close">Отмена</button>
+				&nbsp;
+				<button id="dialog_logout_btn" data-a11y-dialog-hide class="dialog-close primary">Выйти</button>
+			</div>
+		</dialog>
+	</div>
 
 </body>
 </html>

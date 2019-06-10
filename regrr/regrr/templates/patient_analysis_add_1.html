@@ -324,8 +324,7 @@
 			conclusion_note: 'Измерение Креатинина стандартизовано по методу IDMS'
 		};
 
-		//data = _.extend({}, dataDef, /*dataTest, */data);
-		data = _.extend({}, dataDef, dataTest, data);
+		data = _.extend({}, dataDef, /*dataTest, */data);
 
 
 		for (var i = 0, n = data.tests.length; i < n; ++i) {
@@ -335,8 +334,8 @@
 
 
 		//-----------------------------
-		window.onload = function () {
-			//-----------------------------
+		document.addEventListener("DOMContentLoaded", function (event) {
+
 			var nbsp = Utils.html.nbsp;
 			var b = Utils.html.b;
 
@@ -356,13 +355,14 @@
 				computed: {
 					isOk: function () {
 						var tests = this.data.tests;
+
 						for (var i = 0, n = tests.length; i < n; ++i) {
 							var test = tests[i];
-							if (test.result == '')
-								return false;
+							if (test.result != '')
+								return true;
 						}
 					
-						return true;
+						return false;
 					}
 				},
 				methods: {
@@ -426,7 +426,7 @@
 				app.isMobile = false;
 				console.log('ACTIVE small-to-max');
 			});
-		};
+		});
 	</script>
 
 

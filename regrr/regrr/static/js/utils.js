@@ -112,6 +112,8 @@ var Utils = (function () {
 	// rules
 
 	function str_to_num(s) {
+		if (s == '')
+			return NaN;
 		s = s.replace(new RegExp(',', 'gm'), '.');
 		return +s;
 	}
