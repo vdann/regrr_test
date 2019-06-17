@@ -94,6 +94,29 @@
 				</div>
 			</div>
 
+			<!-- label + input - gender -->
+			<div class="col-4 col-10-xsmall">
+				<input class="input-static input-static-bold" type="text" value="Пол" disabled />
+			</div>
+			<div class="col-0 col-2-xsmall align-right">
+				<div v-if="gender_icon" class="icon-va-center">
+					<i v-bind:class="[gender_icon]"></i>
+				</div>
+			</div>
+			<div class="col-7 col-12-xsmall">
+				<select name="gender" id="gender" v-model="gender">
+					<option disabled value="">- Пол -</option>
+					<option value="0">Не указан</option>
+					<option value="1">Мужской</option>
+					<option value="2">Женский</option>
+				</select>
+			</div>
+			<div class="col-1 col-0-xsmall">
+				<div v-if="gender_icon" class="icon-va-center">
+					<i v-bind:class="[gender_icon]"></i>
+				</div>
+			</div>
+
 			<!-- label + input - date_of_birth -->
 			<div class="col-4 col-10-xsmall">
 				<input class="input-static input-static-bold" type="text" value="Дата рождения" disabled />
@@ -210,6 +233,8 @@
 		data.firstname_icon = null;
 		data.middlename = data.middlename || '';
 		data.middlename_icon = null;
+		data.gender = data.gender || '';
+		data.gender_icon = null;
 		data.date_of_birth = data.date_of_birth || '';
 		data.date_of_birth_icon = null;
 		data.department = data.department || '';
@@ -235,6 +260,7 @@
 						/*&&*/ this.lastname_icon == icon_ok
 						&& this.firstname_icon == icon_ok
 						&& this.middlename_icon == icon_ok
+						&& this.gender_icon == icon_ok
 						&& this.date_of_birth_icon == icon_ok
 						&& this.department_icon == icon_ok
 						&& this.diagnosis_icon == icon_ok
@@ -258,6 +284,9 @@
 				},
 				middlename: function (val, valOld) {
 					this.middlename_icon = val != '' ? icon_ok : icon_fail;
+				},
+				gender: function (val, valOld) {
+					this.gender_icon = val != '' ? icon_ok : icon_fail;
 				},
 				date_of_birth: function (val, valOld) {
 					this.date_of_birth_icon = val != '' ? icon_ok : icon_fail;
