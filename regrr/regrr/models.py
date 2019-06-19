@@ -37,7 +37,16 @@ def utc_to_local(utc):
 	return utc + offset
 
 def datetime_to_str(utc):
-	return utc_to_local(utc).strftime("%Y-%m-%d %H:%M:%S")
+	return utc_to_local(utc).strftime("%d.%m.%Y %H:%M:%S")
+
+def datetime_to_str_date_hms(utc):
+	return utc_to_local(utc).strftime("%d.%m.%Y %H:%M:%S")
+
+def datetime_to_str_date_hm(utc):
+	return utc_to_local(utc).strftime("%d.%m.%Y %H:%M")
+
+def datetime_to_str_date(utc):
+	return utc_to_local(utc).strftime("%d.%m.%Y")
 
 ########################################################################
 def make_lastname_and_initials(lastname, firstname, middlename):
