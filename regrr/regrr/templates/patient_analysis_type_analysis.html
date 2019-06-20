@@ -37,6 +37,9 @@
 
 		<br>
 
+		<input type="checkbox" id="isHideEmpty" name="isHideEmpty" v-model="isHideEmpty">
+		<label for="isHideEmpty">Скрыть пустые результаты</label>
+
 		<div class="table-wrapper">
 			<table class="alt" v-if="!isMobile">
 				<thead>
@@ -48,7 +51,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="test in tests">
+					<tr v-for="test in tests2">
 						<td v-html="test.name" class="va-m"></td>
 						<td v-html="test.valuef" class="va-m ta-c"></td>
 						<td v-html="nbsp(test.unit)" class="ta-c va-m"></td>
@@ -68,7 +71,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="test in tests">
+					<tr v-for="test in tests2">
 						<td class="va-m">
 							<div><b v-html="test.name"></b></div>
 							<div v-html="nbsp(test.unit)" class="fs-small"></div>
@@ -146,9 +149,25 @@
 
 		if (data.tests) {
 
-			if (data.tests.length != data.data.items.length)
-				console.warn('Количество тестов не равно количеству результатов');
+			if (data.tests.length >= data.data.items.length) {
+				for (var i = 0, n = data.data.items.length; i < n; ++i) {
+					var test = data.tests[i];
+					test.value = data.data.items[i];
+					test.valuef = Utils.rules.value_get_descformat(test).value_format;
+				}
+
+				if (data.tests.length > data.data.items.length) {
+					console.warn('Количество тестов больше количества результатов, лишние тесты будут заполнены пустыми строками');
+
+					for (var i = data.data.items.length, n = data.tests.length; i < n; ++i) {
+						var test = data.tests[i];
+						test.value = '';
+						test.valuef = Utils.rules.value_get_descformat(test).value_format;
+					}
+				}
+			}
 			else {
+				console.warn('Количество тестов меньше количества результатов');
 				for (var i = 0, n = data.tests.length; i < n; ++i) {
 					var test = data.tests[i];
 					test.value = data.data.items[i];
@@ -175,12 +194,28 @@
 		data.params = _.extend({}, dataParams, data.data.params);
 
 		data.isMobile = breakpoints.active('min-to-small');
+		data.isHideEmpty = false;
 
 		var app = new Vue({
 			el: '#analisis',
 			data: data,
 			methods: {
 				nbsp: Utils.html.nbsp,
+			},
+			computed: {
+				tests2: function () {
+					if (!this.isHideEmpty)
+						return this.tests;
+
+					var tests2 = [];
+					for (var i = 0, n = this.tests.length; i < n; ++i) {
+						var test = this.tests[i];
+						if (test.valuef)
+							tests2.push(test);
+					}
+
+					return tests2;
+				}
 			}
 		});
 

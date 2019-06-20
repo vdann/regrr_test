@@ -192,8 +192,12 @@ var Utils = (function () {
 	function value_get_descformat(item) {
 		var v = value_get_desc(item);
 
-		if (!v.is_valid)
-			v.value_format = '<i>' + v.value_str + '</i>';
+		if (!v.is_valid) {
+			if (!v.value_str)
+				v.value_format = '';
+			else
+				v.value_format = '<i>' + v.value_str + '</i>';
+		}
 		else if (v.is_fail)
 			v.value_format = '<b>' + v.value_str + '</b>';
 

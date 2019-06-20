@@ -577,7 +577,8 @@ AnalysisTypes = [
 	db.AnalysisType.Клинический_анализ_крови,
 	db.AnalysisType.Общий_анализ_мочи,
 	db.AnalysisType.Тест_NEWS,
-	db.AnalysisType.Тест_VTE
+	db.AnalysisType.Тест_VTE,
+	db.AnalysisType.Дополнительно
 ]
 
 from dateutil.relativedelta import relativedelta
@@ -836,6 +837,8 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 		data['tests'] = analisis_rules.tests_Клинический_анализ_крови
 	elif analysis_type_int == db.AnalysisType.Общий_анализ_мочи:
 		data['tests'] = analisis_rules.tests_Общий_анализ_мочи
+	elif analysis_type_int == db.AnalysisType.Дополнительно:
+		data['tests'] = analisis_rules.tests_Дополнительно
 
 
 	server['data'] = helper_view.data_to_json(data)
@@ -962,6 +965,8 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 		data['tests'] = analisis_rules.tests_Клинический_анализ_крови
 	elif analysis_type_int == db.AnalysisType.Общий_анализ_мочи:
 		data['tests'] = analisis_rules.tests_Общий_анализ_мочи
+	elif analysis_type_int == db.AnalysisType.Дополнительно:
+		data['tests'] = analisis_rules.tests_Дополнительно
 
 	server = pageData.to_dict()
 	server['isOk'] = True
@@ -1105,6 +1110,8 @@ def patient_analysis_type_analysis_print(patient_id, analysis_type, analysis_id)
 		data['tests'] = analisis_rules.tests_Клинический_анализ_крови
 	elif analysis_type_int == db.AnalysisType.Общий_анализ_мочи:
 		data['tests'] = analisis_rules.tests_Общий_анализ_мочи
+	elif analysis_type_int == db.AnalysisType.Дополнительно:
+		data['tests'] = analisis_rules.tests_Дополнительно
 
 	data['patient'] = patient_json
 	data['analysis_type_str'] = analysis_type_str
@@ -1217,6 +1224,10 @@ def patient_analysis_type_analysis_add(patient_id, analysis_type):
 	elif analysis_type_int == db.AnalysisType.Тест_VTE:
 		server['data'] = helper_view.data_to_json(data)
 		str = helper_view.render_template_ext('patient_analysis_add_6.html', server = server)
+	elif analysis_type_int == db.AnalysisType.Дополнительно:
+		data['tests'] = analisis_rules.tests_Дополнительно
+		server['data'] = helper_view.data_to_json(data)
+		str = helper_view.render_template_ext('patient_analysis_add_1.html', server = server)
 	
 	return str
 
@@ -1241,6 +1252,7 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 		or analysis_type_int == db.AnalysisType.Гемостаз
 		or analysis_type_int == db.AnalysisType.Клинический_анализ_крови
 		or analysis_type_int == db.AnalysisType.Общий_анализ_мочи
+		or analysis_type_int == db.AnalysisType.Дополнительно
 		):
 		result = ''
 		data = request.json
