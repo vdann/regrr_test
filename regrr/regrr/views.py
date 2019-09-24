@@ -764,11 +764,18 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 			patient_fullname = db_patient.getFullname()
 
 			if analysis_type_str:
+				'''
 				db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
 					db.Analysis.type == analysis_type,
 					db.Analysis.patient_id == patient_id,
 					db.Analysis.user_id == db.User.id
 				).order_by(db.Analysis.id.desc())
+				'''
+				db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
+					db.Analysis.type == analysis_type,
+					db.Analysis.patient_id == patient_id,
+					db.Analysis.user_id == db.User.id
+				).order_by(db.Analysis.date_completion)
 
 				pagination = paginate(db_query, page_num, page_size)
 
@@ -828,6 +835,10 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 	data['analysis_type'] = analysis_type
 	data['analyzes'] = janalyzes
 	data['analyzes_offset'] = (page_num - 1) * page_size
+
+	settings = {}
+	settings['is_hide_empty'] = True
+	data['settings'] = settings
 
 	if analysis_type_int == db.AnalysisType.Биохимические_исследования:
 		data['tests'] = analisis_rules.tests_Биохимические_исследования
@@ -968,11 +979,16 @@ def patient_analysis_type_analysis_viewer(patient_id, analysis_type, analysis_id
 	elif analysis_type_int == db.AnalysisType.Дополнительно:
 		data['tests'] = analisis_rules.tests_Дополнительно
 
+	settings = {}
+	settings['is_hide_empty'] = True
+	data['settings'] = settings
+
 	server = pageData.to_dict()
 	server['isOk'] = True
 	server['data'] = helper_view.data_to_json(data)
 	server['patient_id'] = patient_id
 	server['analysis_type'] = analysis_type
+
 
 	str = helper_view.render_template_ext('patient_analysis_type_analysis.html', server = server)
 	return str

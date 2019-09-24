@@ -37,7 +37,7 @@
 
 		<br>
 
-		<input type="checkbox" id="isHideEmpty" name="isHideEmpty" v-model="isHideEmpty">
+		<input type="checkbox" id="isHideEmpty" name="isHideEmpty" v-model="settings.is_hide_empty">
 		<label for="isHideEmpty">Скрыть пустые результаты</label>
 
 		<div class="table-wrapper">
@@ -178,7 +178,7 @@
 		else
 			data.tests = null;
 
-		var dataParams = {
+		var paramsDef = {
 			date_receipt_example: '[---]',
 			request_number: '[---]',
 			customer: '[---]', // НМИЦ онкологии
@@ -191,10 +191,15 @@
 			conclusion_note: '', // Измерение Креатинина стандартизовано по методу IDMS
 		};
 
-		data.params = _.extend({}, dataParams, data.data.params);
+		data.params = _.extend({}, paramsDef, data.data.params);
+
+		var settingsDef = {
+			is_hide_empty: false
+		};
+
+		data.settings = _.extend({}, settingsDef, data.settings);
 
 		data.isMobile = breakpoints.active('min-to-small');
-		data.isHideEmpty = false;
 
 		var app = new Vue({
 			el: '#analisis',
@@ -204,7 +209,7 @@
 			},
 			computed: {
 				tests2: function () {
-					if (!this.isHideEmpty)
+					if (!this.settings.is_hide_empty)
 						return this.tests;
 
 					var tests2 = [];

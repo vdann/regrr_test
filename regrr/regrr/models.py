@@ -36,6 +36,11 @@ def utc_to_local(utc):
 	offset = datetime.fromtimestamp (epoch) - datetime.utcfromtimestamp (epoch)
 	return utc + offset
 
+def utc_from_local(local):
+	epoch = time.mktime(local.timetuple())
+	offset = datetime.fromtimestamp (epoch) - datetime.utcfromtimestamp (epoch)
+	return local - offset
+
 def datetime_to_str(utc):
 	return utc_to_local(utc).strftime("%d.%m.%Y %H:%M:%S")
 
@@ -54,18 +59,21 @@ def datetime_from_str(s):
 
 	try:
 		dt = datetime.strptime(s, '%d.%m.%Y %H:%M:%S')
+		dt = utc_from_local(dt)
 		return dt
 	except Exception:
 		pass
 
 	try:
 		dt = datetime.strptime(s, '%d.%m.%Y %H:%M')
+		dt = utc_from_local(dt)
 		return dt
 	except Exception:
 		pass
 
 	try:
 		dt = datetime.strptime(s, '%d.%m.%Y')
+		dt = utc_from_local(dt)
 		return dt
 	except Exception:
 		pass
@@ -357,7 +365,7 @@ class Analysis(Base):
 	def toJson(self):
 		date_completion_str = '[---]';
 		if self.date_completion:
-			date_completion_str = datetime_to_str(self.date_completion)
+			date_completion_str = datetime_to_str_date_hm(self.date_completion)
 
 		j = {}
 		j['id'] = self.id
