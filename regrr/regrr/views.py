@@ -1246,6 +1246,7 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 	if not analysis_type_str:
 		abort(400)
 
+	kwargs = {}
 
 	if (
 		analysis_type_int == db.AnalysisType.Биохимические_исследования
@@ -1256,6 +1257,10 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 		):
 		result = ''
 		data = request.json
+		
+		params = data.get('params', {})
+		kwargs['date_completion'] = params.pop('date_completion', None)
+
 	else:
 		result = request.json.get('result')
 		
@@ -1275,11 +1280,11 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 	user_id = user_info.get('id')
 
 	#analysis_id = None
-	analysis = db.Analysis(user_id, patient_id, analysis_type, result, data)
+	analysis = db.Analysis(user_id, patient_id, analysis_type, result, data, **kwargs)
 	with db.session_scope() as db_session:
 		db_session.add(analysis)
 		db_session.commit()
-		analysis_id = analysis.id		
+		analysis_id = analysis.id
 
 	#result = query.first() == None
 	result = True

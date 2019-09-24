@@ -48,6 +48,30 @@ def datetime_to_str_date_hm(utc):
 def datetime_to_str_date(utc):
 	return utc_to_local(utc).strftime("%d.%m.%Y")
 
+def datetime_from_str(s):
+	if s == None:
+		return None
+
+	try:
+		dt = datetime.strptime(s, '%d.%m.%Y %H:%M:%S')
+		return dt
+	except Exception:
+		pass
+
+	try:
+		dt = datetime.strptime(s, '%d.%m.%Y %H:%M')
+		return dt
+	except Exception:
+		pass
+
+	try:
+		dt = datetime.strptime(s, '%d.%m.%Y')
+		return dt
+	except Exception:
+		pass
+
+	return None
+
 ########################################################################
 def make_lastname_and_initials(lastname, firstname, middlename):
 	str = "{} {}.{}.".format(lastname, firstname[0], middlename[0])
@@ -301,7 +325,8 @@ class Analysis(Base):
 	patient_id = sa.Column(sa.Integer) # для какого пациента
 
 	type = sa.Column(sa.Integer) # тип анализа
-	date_of_creation = sa.Column(sa.DateTime(), default=datetime.utcnow) # когда зарегистрирован
+	date_of_creation = sa.Column(sa.DateTime, default=datetime.utcnow) # когда зарегистрирован
+	date_completion = sa.Column(sa.DateTime)
 
 	result = sa.Column(sa.String) # результат
 	data = sa.Column(sa.String) # данные
@@ -312,25 +337,35 @@ class Analysis(Base):
 		patient_id,
 		type,
 		result,
-		data):
+		data,
+		**kwargs):
 		""""""
+		date_completion = datetime_from_str(kwargs.get('date_completion', None))
+
 		self.user_id = user_id
 		self.patient_id = patient_id
 		self.type = type
 		self.result = result
 		self.data = data
+		self.date_completion = date_completion
+		pass
 
 	def __repr__(self):
 		return "<Аnalysis (id: %s, user: %s, patient: %s, type: %s, result: %s)>" \
 			% (self.id, self.user_id, self.patient_id, self.type, self.result)
 
 	def toJson(self):
+		date_completion_str = '[---]';
+		if self.date_completion:
+			date_completion_str = datetime_to_str(self.date_completion)
+
 		j = {}
 		j['id'] = self.id
 		j['user_id'] = self.user_id
 		j['patient_id'] = self.patient_id
 		j['type'] = self.type
 		j['date_of_creation'] = datetime_to_str(self.date_of_creation)
+		j['date_completion'] = date_completion_str
 		j['result'] = self.result
 		j['data'] = self.data
 		return j
