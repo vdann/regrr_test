@@ -16,6 +16,10 @@
 		font-size: 1.2em;
 	}
 
+	.mobile-header-clr {
+		color:#7f888f;
+	}
+
 	.header-label {
 		display: flex;
 		flex-direction: row;
@@ -101,8 +105,8 @@
 						<td v-html="analyzes_offset + i + 1"></td>
 						<td v-html="makeLinkAnalysis(analysis, analysis.id)"></td>
 						<td style="width:25%" class="va-m" v-html="nbsp(analysis.user)"></td>
-						<td style="width:18%" class="va-m" v-html="nbsp(analysis.date_of_creation)"></td>
-						<td style="width:18%" class="va-m" v-html="nbsp(analysis.date_completion)"></td>
+						<td style="width:15%" class="va-m" v-html="nbsp(analysis.date_of_creation)"></td>
+						<td style="width:15%" class="va-m" v-html="nbsp(analysis.date_completion)"></td>
 						<td class="va-m ta-c" v-if="tests" v-html="analysis.data.items[model_test]"></td>
 						<td class="va-m ta-c" v-else v-html="makeLinkAnalysis(analysis, analysis.result)"></td>
 					</tr>
@@ -114,8 +118,9 @@
 						<th class="va-m">№</th>
 						<th class="va-m">
 							<div><b>ID</b></div>
-							<div class="fs-small" style="color:#7f888f;" v-html="nbsp('Исследование выполнил')"></div>
-							<div class="fs-small" style="color:#7f888f;" v-html="makeHeaderLabel('Дата фиксации')"></div>
+							<div class="fs-small mobile-header-clr" v-html="nbsp('Исследование выполнил')"></div>
+							<div class="fs-small mobile-header-clr" v-html="makeHeaderLabel('Дата фиксации')"></div>
+							<div class="fs-small mobile-header-clr" v-html="makeHeaderLabel('Дата выполнения')"></div>
 						</th>
 						<th class="va-m" v-if="tests">
 							<select v-model="model_test">
@@ -136,6 +141,7 @@
 							<div v-html="makeLinkAnalysis(analysis, analysis.id)"></div>
 							<div class="fs-small" v-html="nbsp(analysis.user)"></div>
 							<div class="fs-small" v-html="nbsp(analysis.date_of_creation)"></div>
+							<div class="fs-small" v-html="nbsp(analysis.date_completion)"></div>
 						</td>
 						<td class="va-m ta-c" v-if="tests" v-html="analyzes[i].data.items[model_test]"></td>
 						<td class="va-m ta-c" v-else v-html="makeLinkAnalysis(analysis, analysis.result)"></td>
