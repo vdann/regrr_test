@@ -108,6 +108,63 @@ var Utils = (function () {
 		makeUrlFromRoute: makeUrlFromRoute
 	};
 
+	/* 
+	console.assert(updateUrlQueryStringParameter('', 'key1', 'value2') == '?key1=value2');
+	console.assert(updateUrlQueryStringParameter('/page?key1=value1', 'key1', 'value2') == '/page?key1=value2');
+	console.assert(updateUrlQueryStringParameter('/page?key1=value1', 'key1', 'value2') == '/page?key1=value2');
+	console.assert(updateUrlQueryStringParameter('/page?key1=value1', 'key1') == '/page');
+	console.assert(updateUrlQueryStringParameter('/page', 'k1', 'v1') == '/page?k1=v1');
+	console.assert(updateUrlQueryStringParameter('/page?', 'k1', 'v1') == '/page?k1=v1');
+	console.assert(updateUrlQueryStringParameter('/page?k1=v1', 'k2', 'v2') == '/page?k1=v1&k2=v2');
+	console.assert(updateUrlQueryStringParameter('/page?k1=v1&k2=v2', 'k1') == '/page?k2=v2');
+	console.assert(updateUrlQueryStringParameter('/page?k1=v1&k2=v2', 'k2') == '/page?k1=v1');
+	console.assert(updateUrlQueryStringParameter('/page?k1=v1&k2=v2&k3=v3', 'k1') == '/page?k2=v2&k3=v3'); // FAIL
+	console.assert(updateUrlQueryStringParameter('/page?k1=v1&k2=v2&k3=v3', 'k2') == '/page?k1=v1&k3=v3'); // FAIL
+	console.assert(updateUrlQueryStringParameter('/page?k1=v1&k2=v2&k3=v3', 'k3') == '/page?k1=v1&k2=v2'); // FAIL
+	/** /
+	function updateUrlQueryStringParameter(uri, key, value) {
+		var re = new RegExp("([?&])" + key + "=.*?(&|#|$)", "i");
+		if (value === undefined) {
+			if (!uri.match(re))
+				return uri;
+
+			var uri_ = uri.replace(new RegExp("&" + key + "=.*?&", "i"), '');
+			if (uri_ == uri) {
+				uri_ = uri.replace(new RegExp(key + "=.*?&", "i"), '');
+				if (uri_ == uri)
+					uri_ = uri.replace(new RegExp(key + "=.*", "i"), '');
+			}
+			uri = uri_;
+
+			if (uri[uri.length - 1] == '?')
+				uri = uri.substr(0, uri.length - 1);
+			return uri;
+		}
+
+		if (uri.match(re)) {
+			uri = uri.replace(re, '$1' + key + "=" + value + '$2');
+			return uri;
+		}
+
+		var hash =  '';
+		if( uri.indexOf('#') !== -1 ) {
+			hash = uri.replace(/.*#/, '#');
+			uri = uri.replace(/#.* /, '');
+		}
+
+		var separator = '';
+		if (uri[uri.length - 1] != '?') {
+			separator = uri.indexOf('?') !== -1 ? "&" : "?";
+		}
+			
+		uri = uri + separator + key + "=" + value + hash;
+		return uri;
+	}
+
+	export_.routes = {
+		updateUrlQueryStringParameter: updateUrlQueryStringParameter
+	};
+	*/
 	//------------------------------------
 	// rules
 

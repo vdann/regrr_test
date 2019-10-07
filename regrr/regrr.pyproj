@@ -72,6 +72,7 @@
     <Folder Include="regrr\static\_design\editorial\images\" />
     <Folder Include="regrr\static\_design\extern\" />
     <Folder Include="regrr\static\_design\extern\axios.js-v0.18.0\" />
+    <Folder Include="regrr\static\_design\extern\domurl-2.2.0\" />
     <Folder Include="regrr\static\_design\extern\es6-promise.js-v4.2.6\" />
     <Folder Include="regrr\static\_design\extern\lodash.js-v4.17.11\" />
     <Folder Include="regrr\static\_design\extern\vue.js-v2.5.22\" />
@@ -195,6 +196,8 @@
     <Content Include="regrr\static\_design\editorial\README.txt" />
     <Content Include="regrr\static\_design\extern\axios.js-v0.18.0\axios.js" />
     <Content Include="regrr\static\_design\extern\axios.js-v0.18.0\axios.min.js" />
+    <Content Include="regrr\static\_design\extern\domurl-2.2.0\url.js" />
+    <Content Include="regrr\static\_design\extern\domurl-2.2.0\url.min.js" />
     <Content Include="regrr\static\_design\extern\es6-promise.js-v4.2.6\es6-promise.auto.js" />
     <Content Include="regrr\static\_design\extern\es6-promise.js-v4.2.6\es6-promise.auto.min.js" />
     <Content Include="regrr\static\_design\extern\es6-promise.js-v4.2.6\es6-promise.min.js" />

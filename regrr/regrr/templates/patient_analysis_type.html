@@ -15,6 +15,25 @@
 	.fs-large {
 		font-size: 1.2em;
 	}
+
+	.header-label {
+		display: flex;
+		flex-direction: row;
+	}
+
+	.header-label--icon {
+		flex-grow: 0;
+		align-self: center;
+		padding-right: 0.8em;
+		color:rgba(210, 215, 217, 0.75);
+	}
+
+	.header-label--text {
+		flex-grow: 1;
+		align-self: center;
+	}
+
+
 </style>
 (% endblock %)
 
@@ -57,14 +76,14 @@
 					<tr>
 						<th class="va-m">№</th>
 						<th class="va-m">
-							<span class="fa-stack fa-lg">
-								<i class="fa fa-sort fa-stack-1x"></i>
+<!--							<span class="fa-stack fa-lg">
+								<i class="fa fa-sort-asc fa-stack-1x"></i>
 								<i class="fa fa-sort-desc fa-stack-1x"></i>
-							</span>&nbsp;ID
+							</span>&nbsp;-->ID
 						</th>
 						<th class="va-m">Исследование выполнил</th>
-						<th class="va-m">Дата фиксации</th>
-						<th class="va-m">Дата выполнения</th>
+						<th class="va-m" v-html="makeHeaderLabel('Дата фиксации')"></th>
+						<th class="va-m" v-html="makeHeaderLabel('Дата выполнения')"></th>
 						<th class="va-m" v-if="tests">
 							<select v-model="model_test">
 								<option v-for="(test, i) in tests" v-bind:value="i">
@@ -82,8 +101,8 @@
 						<td v-html="analyzes_offset + i + 1"></td>
 						<td v-html="makeLinkAnalysis(analysis, analysis.id)"></td>
 						<td style="width:25%" class="va-m" v-html="nbsp(analysis.user)"></td>
-						<td style="width:15%" class="va-m" v-html="nbsp(analysis.date_of_creation)"></td>
-						<td style="width:15%" class="va-m" v-html="nbsp(analysis.date_completion)"></td>
+						<td style="width:18%" class="va-m" v-html="nbsp(analysis.date_of_creation)"></td>
+						<td style="width:18%" class="va-m" v-html="nbsp(analysis.date_completion)"></td>
 						<td class="va-m ta-c" v-if="tests" v-html="analysis.data.items[model_test]"></td>
 						<td class="va-m ta-c" v-else v-html="makeLinkAnalysis(analysis, analysis.result)"></td>
 					</tr>
@@ -96,7 +115,7 @@
 						<th class="va-m">
 							<div><b>ID</b></div>
 							<div class="fs-small" style="color:#7f888f;" v-html="nbsp('Исследование выполнил')"></div>
-							<div class="fs-small" style="color:#7f888f;" v-html="nbsp('Дата фиксации')"></div>
+							<div class="fs-small" style="color:#7f888f;" v-html="makeHeaderLabel('Дата фиксации')"></div>
 						</th>
 						<th class="va-m" v-if="tests">
 							<select v-model="model_test">
@@ -156,18 +175,31 @@
 
 		data.sorts = [{
 			text: 'Дата фиксации (сначала последние)',
-			value: 'date_of_creation',
-		}, {
-			text: 'Дата фиксации (сначала первые)',
 			value: 'date_of_creation__desc',
 		}, {
+			text: 'Дата фиксации (сначала первые)',
+			value: 'date_of_creation',
+		}, {
 			text: 'Дата выполнения (сначала последние)',
-			value: 'date_completion',
+			value: 'date_completion__desc',
 		}, {
 			text: 'Дата выполнения (сначала первые)',
-			value: 'date_completion__desc',
+			value: 'date_completion',
 		}]
-		data.model_sort = data.sorts[0].value;
+		var sort_def = data.sorts[0].value;
+
+		var u = new Url();
+		data.model_sort = u.query.sort;
+
+		if (!_.find(data.sorts, function(item) {
+			return item.value == data.model_sort;
+		})) {
+			data.model_sort = sort_def;
+		}
+
+		data.model_sort_item = _.find(data.sorts, function(item) {
+			return item.value == data.model_sort;
+		})
 
 		document.addEventListener("DOMContentLoaded", function (event) {
 
@@ -177,11 +209,13 @@
 				el: '#analizes',
 				data: data,
 				watch: {
-					model_sort: function () {
-						var l = window.location;
-						//window.location.href = window.location.pathname + window.location.search + window.location.hash;
-						console.log(l.pathname + l.search + l.hash);
-						console.log(l);
+					model_sort: function (val) {
+						var u = new Url();
+						if (val == sort_def)
+							delete u.query.sort;
+						else
+							u.query.sort = val;
+						window.location.href = u.toString();
 					}
 				},
 				methods: {
@@ -195,7 +229,24 @@
 
 						var s = Utils.html.a(href, text);
 						return s;
+					},
+
+					makeHeaderLabel: function (label) {
+						if (!_.startsWith(data.model_sort_item.text, label))
+							return label;
+
+						var icon = _.endsWith(data.model_sort_item.value, '__desc') ? 
+							'fa-sort-amount-desc' : 'fa-sort-amount-asc';
+
+						var text = '';
+						text += '<div class="header-label">';
+						text += '  <i class="header-label--icon fa ' + icon + '"></i>';
+						text += '  <div class="header-label--text">' + label + '</div>';
+						text += '</div>';
+						return text;
 					}
+
+
 				}
 			});
 

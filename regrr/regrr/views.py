@@ -735,6 +735,13 @@ def patient_add_post():
 
 	return redirect(url_for('patient_view', patient_id=patient_id))
 
+sorts = {}
+sorts['date_of_creation'] = db.Analysis.date_of_creation
+sorts['date_of_creation__desc'] = db.Analysis.date_of_creation.desc()
+sorts['date_completion'] = db.Analysis.date_completion
+sorts['date_completion__desc'] = db.Analysis.date_completion.desc()
+sort_def = sorts['date_of_creation__desc']
+
 ################################################################
 @app.route('/patient/<patient_id>/analysis_type/<analysis_type>/analysis', methods=['GET'])
 def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
@@ -747,6 +754,9 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 
 	page_num = request.args.get('page', 1, type=int)
 	page_size = 10
+
+	sort = request.args.get('sort')
+	sort = sorts.get(sort, sort_def)
 
 	analysis_type_int = int_no_exc(analysis_type)
 	analysis_type_str = db.AnalysisTypeStr.get(analysis_type_int)
@@ -775,7 +785,8 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 					db.Analysis.type == analysis_type,
 					db.Analysis.patient_id == patient_id,
 					db.Analysis.user_id == db.User.id
-				).order_by(db.Analysis.date_completion)
+				).order_by(sort)
+				#date_of_creation
 
 				pagination = paginate(db_query, page_num, page_size)
 
