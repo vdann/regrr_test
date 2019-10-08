@@ -736,10 +736,22 @@ def patient_add_post():
 	return redirect(url_for('patient_view', patient_id=patient_id))
 
 sorts = {}
-sorts['date_of_creation'] = db.Analysis.date_of_creation
-sorts['date_of_creation__desc'] = db.Analysis.date_of_creation.desc()
-sorts['date_completion'] = db.Analysis.date_completion
-sorts['date_completion__desc'] = db.Analysis.date_completion.desc()
+def addSortField(dbColumn):
+	name = str(dbColumn)
+	sorts[name] = [dbColumn.asc(), db.Analysis.id.asc()]
+	sorts[name + '__desc'] = [dbColumn.desc(), db.Analysis.id.desc()]
+	
+sorts['date_of_creation'] = [db.Analysis.date_of_creation.asc(), db.Analysis.id.asc()]
+sorts['date_of_creation__desc'] = [db.Analysis.date_of_creation.desc(), db.Analysis.id.desc()]
+
+sorts['date_receipt_example'] = [db.Analysis.date_receipt_example.asc(), db.Analysis.id.asc()]
+sorts['date_receipt_example__desc'] = [db.Analysis.date_receipt_example.desc(), db.Analysis.id.desc()]
+
+sorts['date_delivery_biomaterial'] = [db.Analysis.date_delivery_biomaterial.asc(), db.Analysis.id.asc()]
+sorts['date_delivery_biomaterial__desc'] = [db.Analysis.date_delivery_biomaterial.desc(), db.Analysis.id.desc()]
+
+sorts['date_completion'] = [db.Analysis.date_completion.asc(), db.Analysis.id.asc()]
+sorts['date_completion__desc'] = [db.Analysis.date_completion.desc(), db.Analysis.id.desc()]
 sort_def = sorts['date_of_creation__desc']
 
 ################################################################
@@ -774,19 +786,11 @@ def patient_analysis_type_analyzes_viewer(patient_id, analysis_type):
 			patient_fullname = db_patient.getFullname()
 
 			if analysis_type_str:
-				'''
 				db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
 					db.Analysis.type == analysis_type,
 					db.Analysis.patient_id == patient_id,
 					db.Analysis.user_id == db.User.id
-				).order_by(db.Analysis.id.desc())
-				'''
-				db_query = db_session.query(db.Analysis, db.User.lastname, db.User.firstname, db.User.middlename).filter(
-					db.Analysis.type == analysis_type,
-					db.Analysis.patient_id == patient_id,
-					db.Analysis.user_id == db.User.id
-				).order_by(sort)
-				#date_of_creation
+				).order_by(*sort)
 
 				pagination = paginate(db_query, page_num, page_size)
 
@@ -1286,6 +1290,8 @@ def patient_analysis_type_analysis_add_post(patient_id, analysis_type):
 		data = request.json
 		
 		params = data.get('params', {})
+		kwargs['date_receipt_example'] = params.pop('date_receipt_example', None)
+		kwargs['date_delivery_biomaterial'] = params.pop('date_delivery_biomaterial', None)
 		kwargs['date_completion'] = params.pop('date_completion', None)
 
 	else:

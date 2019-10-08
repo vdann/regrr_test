@@ -32,6 +32,10 @@
 		color:rgba(210, 215, 217, 0.75);
 	}
 
+	.header-label--icon-active {
+		color:#7f888f;
+	}
+
 	.header-label--text {
 		flex-grow: 1;
 		align-self: center;
@@ -86,8 +90,10 @@
 							</span>&nbsp;-->ID
 						</th>
 						<th class="va-m">Исследование выполнил</th>
-						<th class="va-m" v-html="makeHeaderLabel('Дата фиксации')"></th>
-						<th class="va-m" v-html="makeHeaderLabel('Дата выполнения')"></th>
+						<th class="va-m fs-small" v-html="makeHeaderLabel('Дата фиксации')"></th>
+						<th class="va-m fs-small" v-html="makeHeaderLabel('Дата поступления образца')"></th>
+						<th class="va-m fs-small" v-html="makeHeaderLabel('Дата доставки биоматериала')"></th>
+						<th class="va-m fs-small" v-html="makeHeaderLabel('Дата выполнения')"></th>
 						<th class="va-m" v-if="tests">
 							<select v-model="model_test">
 								<option v-for="(test, i) in tests" v-bind:value="i">
@@ -104,9 +110,11 @@
 					<tr v-for="(analysis, i) in analyzes" v-bind:key="i">
 						<td v-html="analyzes_offset + i + 1"></td>
 						<td v-html="makeLinkAnalysis(analysis, analysis.id)"></td>
-						<td style="width:25%" class="va-m" v-html="nbsp(analysis.user)"></td>
-						<td style="width:15%" class="va-m" v-html="nbsp(analysis.date_of_creation)"></td>
-						<td style="width:15%" class="va-m" v-html="nbsp(analysis.date_completion)"></td>
+						<td style="width1:25%" class="va-m" v-html="nbsp(analysis.user)"></td>
+						<td style="width1:15%" class="va-m fs-small" v-html="nbsp(analysis.date_of_creation)"></td>
+						<td style="width1:15%" class="va-m fs-small" v-html="nbsp(analysis.date_receipt_example)"></td>
+						<td style="width1:15%" class="va-m fs-small" v-html="nbsp(analysis.date_delivery_biomaterial)"></td>
+						<td style="width1:15%" class="va-m fs-small" v-html="nbsp(analysis.date_completion)"></td>
 						<td class="va-m ta-c" v-if="tests" v-html="analysis.data.items[model_test]"></td>
 						<td class="va-m ta-c" v-else v-html="makeLinkAnalysis(analysis, analysis.result)"></td>
 					</tr>
@@ -120,6 +128,8 @@
 							<div><b>ID</b></div>
 							<div class="fs-small mobile-header-clr" v-html="nbsp('Исследование выполнил')"></div>
 							<div class="fs-small mobile-header-clr" v-html="makeHeaderLabel('Дата фиксации')"></div>
+							<div class="fs-small mobile-header-clr" v-html="makeHeaderLabel('Дата поступления образца')"></div>
+							<div class="fs-small mobile-header-clr" v-html="makeHeaderLabel('Дата доставки биоматериала')"></div>
 							<div class="fs-small mobile-header-clr" v-html="makeHeaderLabel('Дата выполнения')"></div>
 						</th>
 						<th class="va-m" v-if="tests">
@@ -141,6 +151,8 @@
 							<div v-html="makeLinkAnalysis(analysis, analysis.id)"></div>
 							<div class="fs-small" v-html="nbsp(analysis.user)"></div>
 							<div class="fs-small" v-html="nbsp(analysis.date_of_creation)"></div>
+							<div class="fs-small" v-html="nbsp(analysis.date_receipt_example)"></div>
+							<div class="fs-small" v-html="nbsp(analysis.date_delivery_biomaterial)"></div>
 							<div class="fs-small" v-html="nbsp(analysis.date_completion)"></div>
 						</td>
 						<td class="va-m ta-c" v-if="tests" v-html="analyzes[i].data.items[model_test]"></td>
@@ -179,19 +191,22 @@
 		data.route_patient_analysis_type_analysis = data.route_patient_analysis_type_analysis
 			|| '/patient/<patient_id>/analysis_type/<analysis_type>/analysis/<analysis_id>';
 
-		data.sorts = [{
-			text: 'Дата фиксации (сначала последние)',
-			value: 'date_of_creation__desc',
-		}, {
-			text: 'Дата фиксации (сначала первые)',
-			value: 'date_of_creation',
-		}, {
-			text: 'Дата выполнения (сначала последние)',
-			value: 'date_completion__desc',
-		}, {
-			text: 'Дата выполнения (сначала первые)',
-			value: 'date_completion',
-		}]
+		data.sorts = [];
+		data.addSort = function (text, value) {
+			data.sorts.push({
+				text: text +' (сначала последние)',
+				value: value + '__desc'
+			});
+			data.sorts.push({
+				text: text +' (сначала первые)',
+				value: value
+			});
+		};
+
+		data.addSort('Дата фиксации', 'date_of_creation');
+		data.addSort('Дата поступления образца', 'date_receipt_example');
+		data.addSort('Дата доставки биоматериала', 'date_delivery_biomaterial');
+		data.addSort('Дата выполнения', 'date_completion');
 		var sort_def = data.sorts[0].value;
 
 		var u = new Url();
@@ -238,15 +253,26 @@
 					},
 
 					makeHeaderLabel: function (label) {
-						if (!_.startsWith(data.model_sort_item.text, label))
-							return label;
-
-						var icon = _.endsWith(data.model_sort_item.value, '__desc') ? 
-							'fa-sort-amount-desc' : 'fa-sort-amount-asc';
-
+						//var icon = 'fa-sort-amount-asc f-transparent';
+						var icon_asc = '';
+						var icon_desc = '';
+						if (_.startsWith(data.model_sort_item.text, label)) {
+							if (_.endsWith(data.model_sort_item.value, '__desc')) 
+								icon_desc = 'header-label--icon-active';
+							else
+								icon_asc = 'header-label--icon-active';
+						}
 						var text = '';
-						text += '<div class="header-label">';
+/*						text += '<div class="header-label">';
 						text += '  <i class="header-label--icon fa ' + icon + '"></i>';
+						text += '  <div class="header-label--text">' + label + '</div>';
+						text += '</div>';
+*/
+						text += '<div class="header-label">';
+						text += '  <span class="header-label--icon fa-stack fa-lg">';
+						text += '    <i class="fa fa-sort-asc fa-stack-1x ' + icon_asc + '"></i>';
+						text += '    <i class="fa fa-sort-desc fa-stack-1x ' + icon_desc + '"></i>';
+						text += '  </span>';
 						text += '  <div class="header-label--text">' + label + '</div>';
 						text += '</div>';
 						return text;

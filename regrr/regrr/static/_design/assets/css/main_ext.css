@@ -90,6 +90,9 @@
 	font-weight: bold;
 }
 
+.f-transparent {
+	color: transparent !important;
+}
 
 /* поля ввода как текст */
 input[type="text"].input-static,

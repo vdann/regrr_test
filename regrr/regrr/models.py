@@ -329,12 +329,14 @@ class Analysis(Base):
 	__tablename__ = "analyzes"
 
 	id = sa.Column(sa.Integer, primary_key=True)
-	user_id = sa.Column(sa.Integer) # кто добавил
+	user_id = sa.Column(sa.Integer, doc='Исследование выполнил') # кто добавил
 	patient_id = sa.Column(sa.Integer) # для какого пациента
 
-	type = sa.Column(sa.Integer) # тип анализа
-	date_of_creation = sa.Column(sa.DateTime, default=datetime.utcnow) # когда зарегистрирован
-	date_completion = sa.Column(sa.DateTime)
+	type = sa.Column(sa.Integer, doc='Тип анализа')
+	date_of_creation = sa.Column(sa.DateTime, default=datetime.utcnow, doc='Дата фиксации')
+	date_receipt_example = sa.Column(sa.DateTime, doc='Дата поступления образца')
+	date_delivery_biomaterial = sa.Column(sa.DateTime, doc='Дата доставки биоматериала')
+	date_completion = sa.Column(sa.DateTime, doc='Дата выполнения')
 
 	result = sa.Column(sa.String) # результат
 	data = sa.Column(sa.String) # данные
@@ -348,6 +350,8 @@ class Analysis(Base):
 		data,
 		**kwargs):
 		""""""
+		date_receipt_example = datetime_from_str(kwargs.get('date_receipt_example', None))
+		date_delivery_biomaterial = datetime_from_str(kwargs.get('date_delivery_biomaterial', None))
 		date_completion = datetime_from_str(kwargs.get('date_completion', None))
 
 		self.user_id = user_id
@@ -355,6 +359,8 @@ class Analysis(Base):
 		self.type = type
 		self.result = result
 		self.data = data
+		self.date_receipt_example = date_receipt_example
+		self.date_delivery_biomaterial = date_delivery_biomaterial
 		self.date_completion = date_completion
 		pass
 
@@ -363,6 +369,15 @@ class Analysis(Base):
 			% (self.id, self.user_id, self.patient_id, self.type, self.result)
 
 	def toJson(self):
+
+		date_receipt_example_str = '[---]';
+		if self.date_receipt_example:
+			date_receipt_example_str = datetime_to_str_date(self.date_receipt_example)
+
+		date_delivery_biomaterial_str = '[---]';
+		if self.date_delivery_biomaterial:
+			date_delivery_biomaterial_str = datetime_to_str_date_hm(self.date_delivery_biomaterial)
+
 		date_completion_str = '[---]';
 		if self.date_completion:
 			date_completion_str = datetime_to_str_date_hm(self.date_completion)
@@ -373,6 +388,8 @@ class Analysis(Base):
 		j['patient_id'] = self.patient_id
 		j['type'] = self.type
 		j['date_of_creation'] = datetime_to_str(self.date_of_creation)
+		j['date_receipt_example'] = date_receipt_example_str
+		j['date_delivery_biomaterial'] = date_delivery_biomaterial_str
 		j['date_completion'] = date_completion_str
 		j['result'] = self.result
 		j['data'] = self.data
