@@ -40,15 +40,16 @@
 (% block content %)
 <div id="form_profile">
 
-	<div>
-		<a class="button" title="Изменить пароль" style="padding: 0em 1.1em 0em 1.1em;"
-		   @click="changePassword">
-			<i style="vertical-align: middle;"
-			   class="fa fa-2x fa-key"></i>
-		</a>
-	</div>
-
-	<br>
+	<template v-if="!isBrowserBed">
+		<div>
+			<a class="button" title="Изменить пароль" style="padding: 0em 1.1em 0em 1.1em;"
+			   @click="changePassword">
+				<i style="vertical-align: middle;"
+				   class="fa fa-2x fa-key"></i>
+			</a>
+		</div>
+		<br>
+	</template>
 
 	<form v-cloak method="post" action="#">
 		<div class="row gtr-uniform">
@@ -175,7 +176,7 @@
 		</div>
 	</form>
 
-	<div class="dialog" id="dialog_change_password">
+	<div class="dialog" id="dialog_change_password" style="opacity:0;">
 		<div class="dialog-overlay" tabindex="-1" data-a11y-dialog-hide></div>
 		<dialog class="dialog-content" aria-labelledby="dialog_change_password_title" aria-describedby="dialog_change_password_description">
 
@@ -226,7 +227,7 @@
 		</dialog>
 	</div>
 
-	<div class="dialog" id="dialog_alert">
+	<div class="dialog" id="dialog_alert" style="opacity:0;">
 		<div class="dialog-overlay" tabindex="-1" data-a11y-dialog-hide></div>
 		<dialog class="dialog-content" aria-labelledby="dialog_alert_title" aria-describedby="dialog_alert_description">
 
@@ -301,6 +302,10 @@
 	}
 
 	document.addEventListener('DOMContentLoaded', function () {
+
+		data.isBrowserBed = false;
+		if (browser.name == "ie" || browser.name == "safari")
+			data.isBrowserBed = true;
 
 		data.password_old = '';
 		data.password_new = '';

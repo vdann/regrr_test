@@ -273,35 +273,44 @@
 	<script src="/static/_design/extern/a11y-dialog/a11y-dialog.js"></script>
 
 	<script>
+		console.log('browser info', browser);
+		var isBrowserBed = false;
+		if (browser.name == "ie" || browser.name == "safari")
+			isBrowserBed = true;
+
 		document.addEventListener("DOMContentLoaded", function (event) {
+
 			console.log('document.addEventListener("DOMContentLoaded") layout');
+
 			$('#nav_context').css('opacity', 1);
 
-			var mainEl = document.querySelector('body');
-			var dialogEl = document.getElementById('dialog_logout');
-			var dialog = new window.A11yDialog(dialogEl, mainEl);
-			dialog.on('show', function (dialogEl, triggerEl) {
-				console.log(dialogEl);
-				console.log(triggerEl);
-			});
+			if (!isBrowserBed) {
+				var mainEl = document.querySelector('body');
+				var dialogEl = document.getElementById('dialog_logout');
+				var dialog = new window.A11yDialog(dialogEl, mainEl);
+				dialog.on('show', function (dialogEl, triggerEl) {
+					console.log(dialogEl);
+					console.log(triggerEl);
+				});
 
-			var btnLogout = document.getElementById('btn_logout');
-			btnLogout.onclick = function (e) {
-				dialog.show();
-				e.stopPropagation();
-				return false;
-			};
+				var btnLogout = document.getElementById('btn_logout');
+				btnLogout.onclick = function (e) {
+					dialog.show();
+					e.stopPropagation();
+					return false;
+				};
 
-			var btnDialogLogout = document.getElementById('dialog_logout_btn');
-			btnDialogLogout.onclick = function (e) {
-				window.location.href = '/logout';
-			};
+				var btnDialogLogout = document.getElementById('dialog_logout_btn');
+				btnDialogLogout.onclick = function (e) {
+					window.location.href = '/logout';
+				};
+			}
 
 			
 		});
 	</script>
 	
-	<div class="dialog" id="dialog_logout">
+	<div class="dialog" id="dialog_logout" style="opacity:0;">
 		<div class="dialog-overlay" tabindex="-1" data-a11y-dialog-hide></div>
 		<dialog class="dialog-content" aria-labelledby="dialog_logout_title" aria-describedby="dialog_logout_description">
 
